@@ -14,7 +14,7 @@ Scenario: Ingreso de un paciente de bajo nivel de emergencia y luego otro de alt
     | 23-4567899-2 | Estrella | Patricio | Fondo de Bikini SA  |
   When Ingresan a urgencias los siguientes pacientes:
     | CUIL         | Informe         | Nivel de Emergencia | Temperatura | Frecuencia Cardiaca | Frecuencia Respiratoria | Tension Arterial |
-    | 23-4567899-2 | Le duele el ojo | SIN_URGENCIA         | 37          | 70                  | 15                      | 120/80           |
+    | 23-4567899-2 | Le duele el ojo | SIN_URGENCIA        | 37          | 70                  | 15                      | 120/80           |
     | 23-1234567-9 | Le agarro dengue| EMERGENCIA          | 38          | 70                  | 15                      | 120/80           |
   Then La lista de espera esta ordenada por cuil de la siguiente manera:
     | CUIL         |
@@ -26,6 +26,6 @@ Scenario: Registrar ingreso con valores negativos en Frecuencia Cardiaca
     | CUIL          | Apellido   | Nombre | Obra Social   |
     | 23-12345678-7 | Gomez Rivera | Pablo  | Swiss Medical |
   When Ingresan a urgencias los siguientes pacientes:
-    | CUIL          | Informe           | Nivel de Emergencia | Temperatura | Frecuencia Cardiaca | Frecuencia Respiratoria | Tension Arterial |
-    | 23-12345678-7 | Le duele la pestana | SinUrgencia         | 37          | -70                 | 15                      | 120/80           |
-  Then el sistema muestra el siguiente error: "La frecuencia cardíaca no puede ser negativa"
+    | CUIL          | Informe             | Nivel de Emergencia | Temperatura | Frecuencia Cardiaca | Frecuencia Respiratoria | Tension Arterial |
+    | 23-12345678-7 | Le duele la pestana | SIN_URGENCIA         | 37          | -70                 | 15                      | 120/80           |
+  Then el sistema muestra el siguiente error: "La frecuencia cardiaca no puede ser negativa"

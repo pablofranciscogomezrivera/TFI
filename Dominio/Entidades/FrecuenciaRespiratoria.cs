@@ -14,7 +14,7 @@ public class FrecuenciaRespiratoria : Frecuencia
 
     protected override Exception NotificarError()
     {
-        return new ArgumentException("La frecuencia respiratorioa no puede ser negativa");
+        return new ArgumentException("La frecuencia respiratoria no puede ser negativa");
     }
 }
 

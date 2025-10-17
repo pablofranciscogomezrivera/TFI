@@ -45,9 +45,14 @@ namespace Tests.StepDefinitions
 
             foreach (var fila in dataTable.Rows)
             {
-                var cuil = fila["CUIL"];
-                var informe = fila["Informe"];
-                var nivelEmergencia = Enum.Parse<NivelEmergencia>(fila["Nivel de Emergencia"]);
+                var cuil = fila["CUIL"].Trim();
+                var informe = fila["Informe"].Trim();
+
+                if (!Enum.TryParse<NivelEmergencia>(fila["Nivel de Emergencia"].Trim(), true, out var nivelEmergencia))
+                {
+                    throw new ArgumentException($"El nivel de Emergencia '{fila["Nivel de Emergencia"]}' no es válido.");
+                }
+
                 var temperatura = double.Parse(fila["Temperatura"]);
                 var frecCardiaca = double.Parse(fila["Frecuencia Cardiaca"]);
                 var frecRespiratoria = double.Parse(fila["Frecuencia Respiratoria"]);

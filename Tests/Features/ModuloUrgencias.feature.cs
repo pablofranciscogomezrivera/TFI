@@ -235,7 +235,7 @@ await this.FeatureBackgroundAsync();
                 table6.AddRow(new string[] {
                             "23-12345678-7",
                             "Le duele la pestana",
-                            "SinUrgencia",
+                            "SIN_URGENCIA",
                             "37",
                             "-70",
                             "15",
@@ -244,7 +244,7 @@ await this.FeatureBackgroundAsync();
   await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table6, "When ");
 #line hidden
 #line 31
-  await testRunner.ThenAsync("el sistema muestra el siguiente error: \"La frecuencia cardíaca no puede ser negat" +
+  await testRunner.ThenAsync("el sistema muestra el siguiente error: \"La frecuencia cardiaca no puede ser negat" +
                         "iva\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
