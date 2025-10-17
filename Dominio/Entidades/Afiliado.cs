@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dominio.Entidades;
 
-public enum NivelEmergencia
+public class Afiliado
 {
-    URGENCIA,
-    SIN_URGENCIA,
-    EMERGENCIA,
-    URGENCIA_MENOR
+    public required ObraSocial ObraSocial { get; set; }
+    public required string NumeroAfiliado { get; set; }
 }
 

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="8.7.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="Reqnroll.xUnit" Version="2.2.1" />
     <PackageReference Include="xunit" Version="2.8.1" />
@@ -21,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Aplicacion\Aplicacion.csproj" />
     <ProjectReference Include="..\Dominio\Dominio.csproj" />
+    <ProjectReference Include="..\Infraestructura\Infraestructura.csproj" />
   </ItemGroup>
 
 </Project>

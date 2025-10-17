@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dominio.Entidades;
 
-public enum NivelEmergencia
+public class FrecuenciaCardiaca : Frecuencia
 {
-    URGENCIA,
-    SIN_URGENCIA,
-    EMERGENCIA,
-    URGENCIA_MENOR
 }
 

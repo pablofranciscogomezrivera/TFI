@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Dominio.Entidades;
 
-public class Direccion
+public enum EstadoIngreso
 {
-
+    
+    PENDIENTE,
+    EN_PROCESO,
+    FINALIZADO
 }
 

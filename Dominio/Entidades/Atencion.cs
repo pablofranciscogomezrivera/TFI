@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dominio.Entidades;
 
-public enum NivelEmergencia
+public class Atencion
 {
-    URGENCIA,
-    SIN_URGENCIA,
-    EMERGENCIA,
-    URGENCIA_MENOR
+    public required Doctor Doctor { get; set; }
+    public required string Informe { get; set; }
 }
 

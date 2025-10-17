@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Dominio.Entidades;
 
-public enum NivelEmergencia
+public class ColaAtencion
 {
-    URGENCIA,
-    SIN_URGENCIA,
-    EMERGENCIA,
-    URGENCIA_MENOR
+    public List<Ingreso> Ingresos = new List<Ingreso>();
 }
 

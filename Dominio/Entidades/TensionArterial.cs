@@ -8,8 +8,8 @@ namespace Dominio.Entidades;
 
 public class TensionArterial
 {
-    public double FrecuenciaSistolica {  get; set; }
-    public double FrecuenciaDiastolica { get; set; }
+    public required Frecuencia FrecuenciaSistolica {  get; set; }
+    public required Frecuencia FrecuenciaDiastolica { get; set; }
 
     public override string ToString()
     {

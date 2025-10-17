@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
     <Folder Include="Excepciones\" />
     <Folder Include="ReglasDeNegocio\" />
   </ItemGroup>

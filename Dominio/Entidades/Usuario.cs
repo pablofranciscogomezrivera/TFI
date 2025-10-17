@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dominio.Entidades;
 
-public enum Estado
+public class Usuario
 {
-    PENDIENTE,
-    EN_PROCESO,
-    FINALIZADO
+    public required string User {  get; set; }
+    public required string Password { get; set; }
 }
 
