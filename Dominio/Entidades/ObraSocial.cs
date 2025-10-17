@@ -8,6 +8,6 @@ namespace Dominio.Entidades;
 
 public class ObraSocial
 {
-    public required string Nombre { get; set; }
+    public string Nombre { get; set; }
 }
 

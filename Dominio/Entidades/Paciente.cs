@@ -8,7 +8,7 @@ namespace Dominio.Entidades;
 
 public class Paciente : Persona
 {
-    public required Afiliado Afiliado { get; set; }
-    public required Domicilio Domicilio { get; set; }
+    public Afiliado Afiliado { get; set; }
+    public Domicilio Domicilio { get; set; }
 }
 

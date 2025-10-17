@@ -1,11 +1,12 @@
-using System;
-using Aplicacion;
+using Reqnroll;
 using Dominio.Entidades;
 using Dominio.Interfaces;
 using Infraestructura;
-using Reqnroll;
-using Reqnroll.Assist;
+using Aplicacion;
 using FluentAssertions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Tests.StepDefinitions
 {
@@ -14,8 +15,8 @@ namespace Tests.StepDefinitions
     {
         private Enfermera _enfermera;
         private readonly IRepositorioPacientes _dbMockeada = new DBPruebaMemoria();
-        private IServicioUrgencias _servicioUrgencias;
-        private Exception _excepcionEncontrada;
+        private readonly IServicioUrgencias _servicioUrgencias;
+        private Exception _excepcionEsperada;
 
         public ModuloDeUrgenciasStepDefinitions()
         {
@@ -23,82 +24,107 @@ namespace Tests.StepDefinitions
         }
 
         [Given("que la siguiente enfermera esta registrada:")]
-        public void GivenQueLaSiguienteEnfermeraEstaRegistrada(DataTable dataTable)
+        public void GivenQueLaSiguienteEnfermeraEstaRegistrada(Table table)
         {
-            _enfermera = dataTable.CreateInstance<Enfermera>();
+            var row = table.Rows[0];
+            _enfermera = new Enfermera
+            {
+                Nombre = row["Nombre"],
+                Apellido = row["Apellido"],
+                Matricula = "0000",
+                Usuario = new Usuario { User = "test", Password = "123" }
+            };
         }
 
         [Given("que estan registrados los siguientes pacientes:")]
-        public void GivenQueEstanRegistradosLosSiguientesPacientes(DataTable dataTable)
+        public void GivenQueEstanRegistradosLosSiguientesPacientes(Table table)
         {
-            var pacientes = dataTable.CreateSet<Paciente>();
-            foreach (var paciente in pacientes)
+            foreach (var row in table.Rows)
             {
-                _dbMockeada.GuardarPaciente(paciente);
+                try
+                {
+                    var paciente = new Paciente
+                    {
+                        CUIL = row["CUIL"].Trim(),
+                        Nombre = row["Nombre"].Trim(),
+                        Apellido = row["Apellido"].Trim(),
+                        DNI = 0,
+                        FechaNacimiento = DateTime.Now,
+                        Email = "test@test.com",
+                        Telefono = 12345,
+                        Afiliado = new Afiliado
+                        {
+                            NumeroAfiliado = "N/A",
+                            ObraSocial = new ObraSocial { Nombre = row["Obra Social"].Trim() }
+                        },
+                        Domicilio = new Domicilio
+                        {
+                            Calle = "N/A",
+                            Numero = 0,
+                            Ciudad = "N/A",
+                            Provincia = "N/A",
+                            Localidad = "N/A"
+                        }
+                    };
+                    _dbMockeada.GuardarPaciente(paciente);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidOperationException($"Falló la creación del paciente en el step 'Given': {e.Message}", e);
+                }
             }
         }
 
         [When("Ingresan a urgencias los siguientes pacientes:")]
-        public void WhenIngresanAUrgenciasLosSiguientesPacientes(DataTable dataTable)
+        public void WhenIngresanAUrgenciasLosSiguientesPacientes(Table table)
         {
-            _excepcionEncontrada = null;
-
-            foreach (var fila in dataTable.Rows)
+            _excepcionEsperada = null;
+            foreach (var fila in table.Rows)
             {
-                var cuil = fila["CUIL"].Trim();
-                var informe = fila["Informe"].Trim();
-
-                if (!Enum.TryParse<NivelEmergencia>(fila["Nivel de Emergencia"].Trim(), true, out var nivelEmergencia))
-                {
-                    throw new ArgumentException($"El nivel de Emergencia '{fila["Nivel de Emergencia"]}' no es válido.");
-                }
-
-                var temperatura = double.Parse(fila["Temperatura"]);
-                var frecCardiaca = double.Parse(fila["Frecuencia Cardiaca"]);
-                var frecRespiratoria = double.Parse(fila["Frecuencia Respiratoria"]);
-                var tension = fila["Tension Arterial"].Split('/');
-                var sistolica = double.Parse(tension[0]);
-                var diastolica = double.Parse(tension[1]);
-
                 try
                 {
-                    _servicioUrgencias.RegistrarUrgencia(
-                        cuil,
-                        _enfermera,
-                        informe,
-                        temperatura,
-                        nivelEmergencia,
-                        frecCardiaca,
-                        frecRespiratoria,
-                        sistolica,
-                        diastolica);
+                    var cuil = fila["CUIL"].Trim();
+                    var informe = fila["Informe"].Trim();
+
+                    if (!Enum.TryParse<NivelEmergencia>(fila["Nivel de Emergencia"].Trim(), true, out var nivelEmergencia))
+                    {
+                        throw new ArgumentException($"El nivel de emergencia '{fila["Nivel de Emergencia"]}' no es válido.");
+                    }
+
+                    var temperatura = double.Parse(fila["Temperatura"]);
+                    var frecuenciaCardiaca = double.Parse(fila["Frecuencia Cardiaca"]);
+                    var frecuenciaRespiratoria = double.Parse(fila["Frecuencia Respiratoria"]);
+                    var tension = fila["Tension Arterial"].Split('/');
+                    var sistolica = double.Parse(tension[0]);
+                    var diastolica = double.Parse(tension[1]);
+
+                    _servicioUrgencias.RegistrarUrgencia(cuil, _enfermera, informe, temperatura, nivelEmergencia, frecuenciaCardiaca, frecuenciaRespiratoria, sistolica, diastolica);
                 }
                 catch (Exception e)
                 {
-                    _excepcionEncontrada = e;
+                    _excepcionEsperada = e.GetBaseException();
                     break;
                 }
             }
         }
 
         [Then("La lista de espera esta ordenada por cuil de la siguiente manera:")]
-        public void ThenLaListaDeEsperaEstaOrdenadaPorCuilDeLaSiguienteManera(DataTable dataTable)
+        public void ThenLaListaDeEsperaEstaOrdenadaPorCuilDeLaSiguienteManera(Table table)
         {
-            var cuilsEsperados = dataTable.Rows.Select(fila => fila["CUIL"]).ToList();
+            var cuilsEsperados = table.Rows.Select(row => row["CUIL"].Trim()).ToList();
 
             var cuilsReales = _servicioUrgencias.ObtenerIngresosPendientes()
                 .Select(ingreso => ingreso.Paciente.CUIL)
                 .ToList();
 
             cuilsReales.Should().Equal(cuilsEsperados);
-
         }
 
-        [Then("el sistema muestra el siguiente error: {string}")]
+        [Then("el sistema muestra el siguiente error: \"(.*)\"")]
         public void ThenElSistemaMuestraElSiguienteError(string mensajeError)
         {
-            _excepcionEncontrada.Should().NotBeNull();
-            _excepcionEncontrada.Message.Should().Be(mensajeError);
+            _excepcionEsperada.Should().NotBeNull();
+            _excepcionEsperada.Message.Should().Be(mensajeError);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dominio.Entidades.ValueObject;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dominio.Entidades;
 
-public class Ingreso
+public class Ingreso : IComparable<Ingreso>
 {
     public Atencion Atencion { get; set; }
     public Paciente Paciente { get; set; }

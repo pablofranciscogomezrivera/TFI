@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dominio.Entidades;
+namespace Dominio.Entidades.ValueObject;
 
 public class FrecuenciaRespiratoria : Frecuencia
 {
