@@ -14,13 +14,16 @@ namespace Tests.StepDefinitions
     public class ModuloDeUrgenciasStepDefinitions
     {
         private Enfermera _enfermera;
-        private readonly IRepositorioPacientes _dbMockeada = new DBPruebaMemoria();
-        private readonly IServicioUrgencias _servicioUrgencias;
+        private IRepositorioPacientes _dbMockeada = new DBPruebaMemoria();
+        private IServicioUrgencias _servicioUrgencias;
         private Exception _excepcionEsperada;
 
-        public ModuloDeUrgenciasStepDefinitions()
+        [BeforeScenario]
+        public void Setup()
         {
+            _dbMockeada = new DBPruebaMemoria();
             _servicioUrgencias = new ServicioUrgencias(_dbMockeada);
+            _excepcionEsperada = null;
         }
 
         [Given("que la siguiente enfermera esta registrada:")]
@@ -41,37 +44,30 @@ namespace Tests.StepDefinitions
         {
             foreach (var row in table.Rows)
             {
-                try
+                var paciente = new Paciente
                 {
-                    var paciente = new Paciente
+                    CUIL = row["CUIL"].Trim(),
+                    Nombre = row["Nombre"].Trim(),
+                    Apellido = row["Apellido"].Trim(),
+                    DNI = 0,
+                    FechaNacimiento = DateTime.Now,
+                    Email = "test@gmail.com",
+                    Telefono = 12345,
+                    Afiliado = new Afiliado
                     {
-                        CUIL = row["CUIL"].Trim(),
-                        Nombre = row["Nombre"].Trim(),
-                        Apellido = row["Apellido"].Trim(),
-                        DNI = 0,
-                        FechaNacimiento = DateTime.Now,
-                        Email = "test@test.com",
-                        Telefono = 12345,
-                        Afiliado = new Afiliado
-                        {
-                            NumeroAfiliado = "N/A",
-                            ObraSocial = new ObraSocial { Nombre = row["Obra Social"].Trim() }
-                        },
-                        Domicilio = new Domicilio
-                        {
-                            Calle = "N/A",
-                            Numero = 0,
-                            Ciudad = "N/A",
-                            Provincia = "N/A",
-                            Localidad = "N/A"
-                        }
-                    };
-                    _dbMockeada.GuardarPaciente(paciente);
-                }
-                catch (Exception e)
-                {
-                    throw new InvalidOperationException($"Falló la creación del paciente en el step 'Given': {e.Message}", e);
-                }
+                        NumeroAfiliado = "N/A",
+                        ObraSocial = new ObraSocial { Nombre = row["Obra Social"].Trim() }
+                    },
+                    Domicilio = new Domicilio
+                    {
+                        Calle = "N/A",
+                        Numero = 0,
+                        Ciudad = "N/A",
+                        Provincia = "N/A",
+                        Localidad = "N/A"
+                    }
+                };
+                _dbMockeada.GuardarPaciente(paciente);
             }
         }
 
@@ -86,11 +82,9 @@ namespace Tests.StepDefinitions
                     var cuil = fila["CUIL"].Trim();
                     var informe = fila["Informe"].Trim();
 
-                    if (!Enum.TryParse<NivelEmergencia>(fila["Nivel de Emergencia"].Trim(), true, out var nivelEmergencia))
-                    {
-                        throw new ArgumentException($"El nivel de emergencia '{fila["Nivel de Emergencia"]}' no es válido.");
-                    }
-
+                    if (string.IsNullOrEmpty(informe)) throw new ArgumentException("El informe es un dato mandatorio");
+                    if (!Enum.TryParse<NivelEmergencia>(fila["Nivel de Emergencia"].Trim(), true, out var nivelEmergencia)) throw new ArgumentException($"El nivel de emergencia '{fila["Nivel de Emergencia"]}' no es válido.");
+                    
                     var temperatura = double.Parse(fila["Temperatura"]);
                     var frecuenciaCardiaca = double.Parse(fila["Frecuencia Cardiaca"]);
                     var frecuenciaRespiratoria = double.Parse(fila["Frecuencia Respiratoria"]);
@@ -106,6 +100,14 @@ namespace Tests.StepDefinitions
                     break;
                 }
             }
+        }
+
+        [Then("el paciente con CUIL \"(.*)\" se crea en el sistema")]
+        public void ThenElPacienteConCUILSeCreaEnElSistema(string cuil)
+        {
+            var paciente = _dbMockeada.BuscarPacientePorCuil(cuil);
+            paciente.Should().NotBeNull();
+            paciente.CUIL.Should().Be(cuil);
         }
 
         [Then("La lista de espera esta ordenada por cuil de la siguiente manera:")]

@@ -128,29 +128,29 @@ namespace Tests.Features
 #line 11
     await testRunner.GivenAsync("que el paciente con DNI \"12345678\" existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-                global::Reqnroll.Table table7 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table13 = new global::Reqnroll.Table(new string[] {
                             "informe",
                             "\"Paciente presenta dolor toracico agudo\""});
-                table7.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "nivelEmergencia",
                             "\"Critica\""});
-                table7.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "temperatura",
                             "38.5"});
-                table7.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "frecuenciaCardiaca",
                             "95"});
-                table7.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "frecuenciaRespiratoria",
                             "20"});
-                table7.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "tensionSistolica",
                             "120"});
-                table7.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "tensionDiastolica",
                             "80"});
 #line 12
-    await testRunner.WhenAsync("registro un ingreso con los siguientes datos:", ((string)(null)), table7, "When ");
+    await testRunner.WhenAsync("registro un ingreso con los siguientes datos:", ((string)(null)), table13, "When ");
 #line hidden
 #line 20
     await testRunner.ThenAsync("el ingreso se registra exitosamente con estado \"PENDIENTE\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
@@ -191,29 +191,29 @@ namespace Tests.Features
 #line 26
     await testRunner.GivenAsync("que el paciente con DNI \"87654321\" no existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-                global::Reqnroll.Table table8 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table14 = new global::Reqnroll.Table(new string[] {
                             "informe",
                             "\"Paciente con fractura expuesta\""});
-                table8.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "nivelEmergencia",
                             "\"Emergencia\""});
-                table8.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "temperatura",
                             "37.0"});
-                table8.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "frecuenciaCardiaca",
                             "88"});
-                table8.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "frecuenciaRespiratoria",
                             "22"});
-                table8.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "tensionSistolica",
                             "130"});
-                table8.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "tensionDiastolica",
                             "85"});
 #line 27
-    await testRunner.WhenAsync("intento registrar su ingreso con los siguientes datos:", ((string)(null)), table8, "When ");
+    await testRunner.WhenAsync("intento registrar su ingreso con los siguientes datos:", ((string)(null)), table14, "When ");
 #line hidden
 #line 35
     await testRunner.ThenAsync("el sistema crea al paciente", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");

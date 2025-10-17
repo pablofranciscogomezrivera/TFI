@@ -15,4 +15,5 @@ public interface IServicioUrgencias
                                   double frecDiastolica);
 
     public List<Ingreso> ObtenerIngresosPendientes();
+
 }

@@ -96,6 +96,34 @@ namespace Tests.Features
 #line 6
   await testRunner.GivenAsync("que la siguiente enfermera esta registrada:", ((string)(null)), table1, "Given ");
 #line hidden
+            global::Reqnroll.Table table2 = new global::Reqnroll.Table(new string[] {
+                        "CUIL",
+                        "Apellido",
+                        "Nombre",
+                        "Obra Social"});
+            table2.AddRow(new string[] {
+                        "23-1234567-9",
+                        "Nunez",
+                        "Marcelo",
+                        "Subsidio de Salud"});
+            table2.AddRow(new string[] {
+                        "23-4567899-2",
+                        "Estrella",
+                        "Patricio",
+                        "Fondo de Bikini SA"});
+            table2.AddRow(new string[] {
+                        "27-4567890-3",
+                        "Dufour",
+                        "Ale",
+                        "Swiss Medical"});
+            table2.AddRow(new string[] {
+                        "23-12345678-7",
+                        "Gomez Rivera",
+                        "Pablo",
+                        "Swiss Medical"});
+#line 9
+  await testRunner.AndAsync("que estan registrados los siguientes pacientes:", ((string)(null)), table2, "And ");
+#line hidden
         }
         
         async System.Threading.Tasks.Task Xunit.IAsyncLifetime.InitializeAsync()
@@ -119,7 +147,7 @@ namespace Tests.Features
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de un paciente de bajo nivel de emergencia y luego otro de alto nivel de " +
                     "emergencia", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 10
+#line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -132,24 +160,6 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
 await this.FeatureBackgroundAsync();
 #line hidden
-                global::Reqnroll.Table table2 = new global::Reqnroll.Table(new string[] {
-                            "CUIL",
-                            "Apellido",
-                            "Nombre",
-                            "Obra Social"});
-                table2.AddRow(new string[] {
-                            "23-1234567-9",
-                            "Nunez",
-                            "Marcelo",
-                            "Subsidio de Salud"});
-                table2.AddRow(new string[] {
-                            "23-4567899-2",
-                            "Estrella",
-                            "Patricio",
-                            "Fondo de Bikini SA"});
-#line 11
-  await testRunner.GivenAsync("que estan registrados los siguientes pacientes:", ((string)(null)), table2, "Given ");
-#line hidden
                 global::Reqnroll.Table table3 = new global::Reqnroll.Table(new string[] {
                             "CUIL",
                             "Informe",
@@ -161,7 +171,7 @@ await this.FeatureBackgroundAsync();
                 table3.AddRow(new string[] {
                             "23-4567899-2",
                             "Le duele el ojo",
-                            "SIN_URGENCIA",
+                            "SinUrgencia",
                             "37",
                             "70",
                             "15",
@@ -169,12 +179,12 @@ await this.FeatureBackgroundAsync();
                 table3.AddRow(new string[] {
                             "23-1234567-9",
                             "Le agarro dengue",
-                            "EMERGENCIA",
+                            "Emergencia",
                             "38",
                             "70",
                             "15",
                             "120/80"});
-#line 15
+#line 17
   await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table3, "When ");
 #line hidden
                 global::Reqnroll.Table table4 = new global::Reqnroll.Table(new string[] {
@@ -183,22 +193,22 @@ await this.FeatureBackgroundAsync();
                             "23-1234567-9"});
                 table4.AddRow(new string[] {
                             "23-4567899-2"});
-#line 19
+#line 21
   await testRunner.ThenAsync("La lista de espera esta ordenada por cuil de la siguiente manera:", ((string)(null)), table4, "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Registrar ingreso con valores negativos en Frecuencia Cardiaca")]
+        [Xunit.SkippableFactAttribute(DisplayName="Ingreso de un paciente con menor prioridad que uno ya en espera")]
         [Xunit.TraitAttribute("FeatureTitle", "Modulo de Urgencias")]
-        [Xunit.TraitAttribute("Description", "Registrar ingreso con valores negativos en Frecuencia Cardiaca")]
-        public async System.Threading.Tasks.Task RegistrarIngresoConValoresNegativosEnFrecuenciaCardiaca()
+        [Xunit.TraitAttribute("Description", "Ingreso de un paciente con menor prioridad que uno ya en espera")]
+        public async System.Threading.Tasks.Task IngresoDeUnPacienteConMenorPrioridadQueUnoYaEnEspera()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Registrar ingreso con valores negativos en Frecuencia Cardiaca", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 24
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de un paciente con menor prioridad que uno ya en espera", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 26
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -213,18 +223,66 @@ await this.FeatureBackgroundAsync();
 #line hidden
                 global::Reqnroll.Table table5 = new global::Reqnroll.Table(new string[] {
                             "CUIL",
-                            "Apellido",
-                            "Nombre",
-                            "Obra Social"});
+                            "Informe",
+                            "Nivel de Emergencia",
+                            "Temperatura",
+                            "Frecuencia Cardiaca",
+                            "Frecuencia Respiratoria",
+                            "Tension Arterial"});
                 table5.AddRow(new string[] {
-                            "23-12345678-7",
-                            "Gomez Rivera",
-                            "Pablo",
-                            "Swiss Medical"});
-#line 25
-  await testRunner.GivenAsync("que estan registrados los siguientes pacientes:", ((string)(null)), table5, "Given ");
+                            "23-1234567-9",
+                            "Le agarro dengue",
+                            "Emergencia",
+                            "38",
+                            "70",
+                            "15",
+                            "120/80"});
+                table5.AddRow(new string[] {
+                            "27-4567890-3",
+                            "Le duele el ojo",
+                            "SinUrgencia",
+                            "37",
+                            "70",
+                            "15",
+                            "120/80"});
+#line 27
+  await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table5, "When ");
 #line hidden
                 global::Reqnroll.Table table6 = new global::Reqnroll.Table(new string[] {
+                            "CUIL"});
+                table6.AddRow(new string[] {
+                            "23-1234567-9"});
+                table6.AddRow(new string[] {
+                            "27-4567890-3"});
+#line 31
+  await testRunner.ThenAsync("La lista de espera esta ordenada por cuil de la siguiente manera:", ((string)(null)), table6, "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Ingreso de dos pacientes con igual nivel de emergencia (se ordena por llegada)")]
+        [Xunit.TraitAttribute("FeatureTitle", "Modulo de Urgencias")]
+        [Xunit.TraitAttribute("Description", "Ingreso de dos pacientes con igual nivel de emergencia (se ordena por llegada)")]
+        public async System.Threading.Tasks.Task IngresoDeDosPacientesConIgualNivelDeEmergenciaSeOrdenaPorLlegada()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de dos pacientes con igual nivel de emergencia (se ordena por llegada)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 36
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 5
+await this.FeatureBackgroundAsync();
+#line hidden
+                global::Reqnroll.Table table7 = new global::Reqnroll.Table(new string[] {
                             "CUIL",
                             "Informe",
                             "Nivel de Emergencia",
@@ -232,20 +290,182 @@ await this.FeatureBackgroundAsync();
                             "Frecuencia Cardiaca",
                             "Frecuencia Respiratoria",
                             "Tension Arterial"});
-                table6.AddRow(new string[] {
+                table7.AddRow(new string[] {
+                            "23-1234567-9",
+                            "Le agarro dengue",
+                            "Emergencia",
+                            "38",
+                            "70",
+                            "15",
+                            "120/80"});
+                table7.AddRow(new string[] {
+                            "23-4567899-2",
+                            "Neumonia",
+                            "Emergencia",
+                            "39",
+                            "85",
+                            "22",
+                            "130/85"});
+#line 37
+  await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table7, "When ");
+#line hidden
+                global::Reqnroll.Table table8 = new global::Reqnroll.Table(new string[] {
+                            "CUIL"});
+                table8.AddRow(new string[] {
+                            "23-1234567-9"});
+                table8.AddRow(new string[] {
+                            "23-4567899-2"});
+#line 41
+  await testRunner.ThenAsync("La lista de espera esta ordenada por cuil de la siguiente manera:", ((string)(null)), table8, "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Ingreso de un paciente que no existe en el sistema")]
+        [Xunit.TraitAttribute("FeatureTitle", "Modulo de Urgencias")]
+        [Xunit.TraitAttribute("Description", "Ingreso de un paciente que no existe en el sistema")]
+        public async System.Threading.Tasks.Task IngresoDeUnPacienteQueNoExisteEnElSistema()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de un paciente que no existe en el sistema", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 46
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 5
+await this.FeatureBackgroundAsync();
+#line hidden
+                global::Reqnroll.Table table9 = new global::Reqnroll.Table(new string[] {
+                            "CUIL",
+                            "Informe",
+                            "Nivel de Emergencia",
+                            "Temperatura",
+                            "Frecuencia Cardiaca",
+                            "Frecuencia Respiratoria",
+                            "Tension Arterial"});
+                table9.AddRow(new string[] {
+                            "20-30111222-1",
+                            "Paciente nuevo",
+                            "Urgencia",
+                            "37.5",
+                            "80",
+                            "18",
+                            "110/70"});
+#line 47
+  await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table9, "When ");
+#line hidden
+#line 50
+  await testRunner.ThenAsync("el paciente con CUIL \"20-30111222-1\" se crea en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+                global::Reqnroll.Table table10 = new global::Reqnroll.Table(new string[] {
+                            "CUIL"});
+                table10.AddRow(new string[] {
+                            "20-30111222-1"});
+#line 51
+  await testRunner.AndAsync("La lista de espera esta ordenada por cuil de la siguiente manera:", ((string)(null)), table10, "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Registrar ingreso con valores negativos en Frecuencia Cardiaca")]
+        [Xunit.TraitAttribute("FeatureTitle", "Modulo de Urgencias")]
+        [Xunit.TraitAttribute("Description", "Registrar ingreso con valores negativos en Frecuencia Cardiaca")]
+        public async System.Threading.Tasks.Task RegistrarIngresoConValoresNegativosEnFrecuenciaCardiaca()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Registrar ingreso con valores negativos en Frecuencia Cardiaca", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 55
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 5
+await this.FeatureBackgroundAsync();
+#line hidden
+                global::Reqnroll.Table table11 = new global::Reqnroll.Table(new string[] {
+                            "CUIL",
+                            "Informe",
+                            "Nivel de Emergencia",
+                            "Temperatura",
+                            "Frecuencia Cardiaca",
+                            "Frecuencia Respiratoria",
+                            "Tension Arterial"});
+                table11.AddRow(new string[] {
                             "23-12345678-7",
                             "Le duele la pestana",
-                            "SIN_URGENCIA",
+                            "SinUrgencia",
                             "37",
                             "-70",
                             "15",
                             "120/80"});
-#line 28
-  await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table6, "When ");
+#line 56
+  await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table11, "When ");
 #line hidden
-#line 31
+#line 59
   await testRunner.ThenAsync("el sistema muestra el siguiente error: \"La frecuencia cardiaca no puede ser negat" +
                         "iva\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Registrar ingreso sin un dato mandatorio (informe)")]
+        [Xunit.TraitAttribute("FeatureTitle", "Modulo de Urgencias")]
+        [Xunit.TraitAttribute("Description", "Registrar ingreso sin un dato mandatorio (informe)")]
+        public async System.Threading.Tasks.Task RegistrarIngresoSinUnDatoMandatorioInforme()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Registrar ingreso sin un dato mandatorio (informe)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 61
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 5
+await this.FeatureBackgroundAsync();
+#line hidden
+                global::Reqnroll.Table table12 = new global::Reqnroll.Table(new string[] {
+                            "CUIL",
+                            "Informe",
+                            "Nivel de Emergencia",
+                            "Temperatura",
+                            "Frecuencia Cardiaca",
+                            "Frecuencia Respiratoria",
+                            "Tension Arterial"});
+                table12.AddRow(new string[] {
+                            "23-12345678-7",
+                            "",
+                            "SinUrgencia",
+                            "37",
+                            "70",
+                            "15",
+                            "120/80"});
+#line 62
+  await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table12, "When ");
+#line hidden
+#line 65
+  await testRunner.ThenAsync("el sistema muestra el siguiente error: \"El informe es un dato mandatorio\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

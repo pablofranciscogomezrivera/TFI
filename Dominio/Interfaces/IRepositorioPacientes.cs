@@ -12,5 +12,7 @@ public interface IRepositorioPacientes
     public void GuardarPaciente(Paciente Paciente);
 
     public Paciente? BuscarPacientePorCuil(string cuil);
+
+    public void RegistrarNuevoPaciente(string cuil);
 }
 
