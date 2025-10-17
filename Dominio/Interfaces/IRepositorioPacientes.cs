@@ -13,6 +13,6 @@ public interface IRepositorioPacientes
 
     public Paciente? BuscarPacientePorCuil(string cuil);
 
-    public void RegistrarNuevoPaciente(string cuil);
+    public Paciente RegistrarPaciente(Paciente paciente);
 }
 

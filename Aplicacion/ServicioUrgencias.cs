@@ -26,8 +26,16 @@ public class ServicioUrgencias : IServicioUrgencias
 
     public void RegistrarUrgencia(string CUILPaciente, Enfermera Enfermera, string informe, double Temperatura, NivelEmergencia NivelEmergencia, double FrecCardiaca, double FrecRespiratoria, double FrecSistolica, double FrecDiastolica)
     {
-        var paciente = _repositorio.BuscarPacientePorCuil(CUILPaciente)
-            ?? throw new Exception("Paciente no encontrado");
+        var paciente = _repositorio.BuscarPacientePorCuil(CUILPaciente);
+
+        if(paciente is null)
+        {
+            var nuevoPaciente = new Paciente
+            {
+                CUIL = CUILPaciente
+            };
+            paciente = _repositorio.RegistrarPaciente(nuevoPaciente);
+        }
 
         var ingreso = new Ingreso(
             paciente,

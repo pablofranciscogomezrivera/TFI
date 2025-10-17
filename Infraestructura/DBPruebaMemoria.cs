@@ -21,5 +21,11 @@ public class DBPruebaMemoria : IRepositorioPacientes
         _pacientes.TryGetValue(cuil, out var paciente);
         return paciente;
     }
+
+    public Paciente RegistrarPaciente(Paciente paciente)
+    {
+        GuardarPaciente(paciente);
+        return paciente;
+    }
 }
 
