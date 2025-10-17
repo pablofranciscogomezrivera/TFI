@@ -128,29 +128,29 @@ namespace Tests.Features
 #line 11
     await testRunner.GivenAsync("que el paciente con DNI \"12345678\" existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-                global::Reqnroll.Table table1 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table7 = new global::Reqnroll.Table(new string[] {
                             "informe",
                             "\"Paciente presenta dolor toracico agudo\""});
-                table1.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "nivelEmergencia",
                             "\"Critica\""});
-                table1.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "temperatura",
                             "38.5"});
-                table1.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "frecuenciaCardiaca",
                             "95"});
-                table1.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "frecuenciaRespiratoria",
                             "20"});
-                table1.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "tensionSistolica",
                             "120"});
-                table1.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "tensionDiastolica",
                             "80"});
 #line 12
-    await testRunner.WhenAsync("registro un ingreso con los siguientes datos:", ((string)(null)), table1, "When ");
+    await testRunner.WhenAsync("registro un ingreso con los siguientes datos:", ((string)(null)), table7, "When ");
 #line hidden
 #line 20
     await testRunner.ThenAsync("el ingreso se registra exitosamente con estado \"PENDIENTE\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
@@ -191,29 +191,29 @@ namespace Tests.Features
 #line 26
     await testRunner.GivenAsync("que el paciente con DNI \"87654321\" no existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-                global::Reqnroll.Table table2 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table8 = new global::Reqnroll.Table(new string[] {
                             "informe",
                             "\"Paciente con fractura expuesta\""});
-                table2.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "nivelEmergencia",
                             "\"Emergencia\""});
-                table2.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "temperatura",
                             "37.0"});
-                table2.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "frecuenciaCardiaca",
                             "88"});
-                table2.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "frecuenciaRespiratoria",
                             "22"});
-                table2.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "tensionSistolica",
                             "130"});
-                table2.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "tensionDiastolica",
                             "85"});
 #line 27
-    await testRunner.WhenAsync("intento registrar su ingreso con los siguientes datos:", ((string)(null)), table2, "When ");
+    await testRunner.WhenAsync("intento registrar su ingreso con los siguientes datos:", ((string)(null)), table8, "When ");
 #line hidden
 #line 35
     await testRunner.ThenAsync("el sistema crea al paciente", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
@@ -299,16 +299,16 @@ namespace Tests.Features
             await this.ScenarioCleanupAsync();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Ingreso de paciente con mayor prioridad que los ya en espera")]
+        [Xunit.SkippableFactAttribute(DisplayName="Registrar ingreso sin el informe del paciente")]
         [Xunit.TraitAttribute("FeatureTitle", "Registro de admisión de pacientes en urgencias")]
-        [Xunit.TraitAttribute("Description", "Ingreso de paciente con mayor prioridad que los ya en espera")]
-        [Xunit.TraitAttribute("Category", "Prioridad")]
-        public async System.Threading.Tasks.Task IngresoDePacienteConMayorPrioridadQueLosYaEnEspera()
+        [Xunit.TraitAttribute("Description", "Registrar ingreso sin el informe del paciente")]
+        [Xunit.TraitAttribute("Category", "Validaciones")]
+        public async System.Threading.Tasks.Task RegistrarIngresoSinElInformeDelPaciente()
         {
             string[] tagsOfScenario = new string[] {
-                    "Prioridad"};
+                    "Validaciones"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de paciente con mayor prioridad que los ya en espera", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Registrar ingreso sin el informe del paciente", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 51
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -323,15 +323,51 @@ namespace Tests.Features
   await this.FeatureBackgroundAsync();
 #line hidden
 #line 52
-    await testRunner.GivenAsync("que hay un paciente \"B\" en espera con nivel de emergencia \"Urgencia\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+     await testRunner.GivenAsync("que el paciente con DNI \"12345678\" existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
 #line 53
-    await testRunner.AndAsync("que el paciente \"A\" con DNI \"11111111\" existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+     await testRunner.WhenAsync("intento registrar el ingreso sin informar el \"informe\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
 #line 54
+     await testRunner.ThenAsync("el sistema muestra un error indicando que \"informe\" es mandatorio", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Ingreso de paciente con mayor prioridad que los ya en espera")]
+        [Xunit.TraitAttribute("FeatureTitle", "Registro de admisión de pacientes en urgencias")]
+        [Xunit.TraitAttribute("Description", "Ingreso de paciente con mayor prioridad que los ya en espera")]
+        [Xunit.TraitAttribute("Category", "Prioridad")]
+        public async System.Threading.Tasks.Task IngresoDePacienteConMayorPrioridadQueLosYaEnEspera()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "Prioridad"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de paciente con mayor prioridad que los ya en espera", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 57
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 6
+  await this.FeatureBackgroundAsync();
+#line hidden
+#line 58
+    await testRunner.GivenAsync("que hay un paciente \"B\" en espera con nivel de emergencia \"Urgencia\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 59
+    await testRunner.AndAsync("que el paciente \"A\" con DNI \"11111111\" existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 60
     await testRunner.WhenAsync("registro un ingreso para el paciente \"A\" con nivel de emergencia \"Crítica\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 55
+#line 61
     await testRunner.ThenAsync("el paciente \"A\" debe ser atendido antes que el paciente \"B\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -348,7 +384,7 @@ namespace Tests.Features
                     "Prioridad"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de paciente con igual nivel de emergencia que otro", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 58
+#line 64
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -361,19 +397,58 @@ namespace Tests.Features
 #line 6
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 59
+#line 65
     await testRunner.GivenAsync("que hay un paciente \"B\" en espera con nivel de emergencia \"Emergencia\" ingresado " +
                         "a las 14:00", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 60
+#line 66
     await testRunner.AndAsync("que el paciente \"A\" con DNI \"22222222\" existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 61
+#line 67
     await testRunner.WhenAsync("registro un ingreso para el paciente \"A\" con nivel de emergencia \"Emergencia\" a l" +
                         "as 14:05", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 62
+#line 68
     await testRunner.ThenAsync("el paciente \"B\" debe ser atendido antes que el paciente \"A\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Ingreso de paciente con menor prioridad que los ya en espera")]
+        [Xunit.TraitAttribute("FeatureTitle", "Registro de admisión de pacientes en urgencias")]
+        [Xunit.TraitAttribute("Description", "Ingreso de paciente con menor prioridad que los ya en espera")]
+        [Xunit.TraitAttribute("Category", "Prioridad")]
+        public async System.Threading.Tasks.Task IngresoDePacienteConMenorPrioridadQueLosYaEnEspera()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "Prioridad"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de paciente con menor prioridad que los ya en espera", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 71
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+#line 6
+  await this.FeatureBackgroundAsync();
+#line hidden
+#line 72
+    await testRunner.GivenAsync("que hay un paciente \"B\" en espera con nivel de emergencia \"Emergencia\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+#line hidden
+#line 73
+    await testRunner.AndAsync("que el paciente \"C\" con DNI \"33333333\" existe en el sistema", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+#line 74
+    await testRunner.WhenAsync("registro un ingreso para el paciente \"C\" con nivel de emergencia \"Urgencia\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 75
+    await testRunner.ThenAsync("el paciente \"B\" debe ser atendido antes que el paciente \"C\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

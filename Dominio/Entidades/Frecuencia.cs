@@ -8,6 +8,17 @@ namespace Dominio.Entidades;
 
 public abstract class Frecuencia
 {
-    public required double Valor {  get; set; }
+    public  double Valor {  get; set; }
+
+    protected Frecuencia(double valor)
+    {
+        if (valor < 0)
+        {
+            throw NotificarError();
+        }
+        Valor = valor;
+    }
+
+    protected abstract Exception NotificarError();
 }
 

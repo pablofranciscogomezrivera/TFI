@@ -10,5 +10,7 @@ namespace Dominio.Interfaces;
 public interface IRepositorioPacientes
 {
     public void GuardarPaciente(Paciente Paciente);
+
+    public Paciente? BuscarPacientePorCuil(string cuil);
 }
 

@@ -8,7 +8,7 @@ namespace Dominio.Entidades;
 
 public class Atencion
 {
-    public required Doctor Doctor { get; set; }
-    public required string Informe { get; set; }
+    public Doctor Doctor { get; set; }
+    public string Informe { get; set; }
 }
 

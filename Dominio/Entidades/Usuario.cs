@@ -8,7 +8,7 @@ namespace Dominio.Entidades;
 
 public class Usuario
 {
-    public required string User {  get; set; }
-    public required string Password { get; set; }
+    public string User {  get; set; }
+    public string Password { get; set; }
 }
 

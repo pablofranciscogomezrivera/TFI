@@ -10,10 +10,16 @@ namespace Infraestructura;
 
 public class DBPruebaMemoria : IRepositorioPacientes
 {
-    public Dictionary<string, Paciente> Pacientes = new Dictionary<string, Paciente>();
+    private readonly Dictionary<string, Paciente> _pacientes = new Dictionary<string, Paciente>();
     public void GuardarPaciente(Paciente Paciente)
     {
-        Pacientes.Add(Paciente.CUIL, Paciente);
+        _pacientes[Paciente.CUIL] = Paciente;
+    }
+
+    public Paciente? BuscarPacientePorCuil(string cuil)
+    {
+        _pacientes.TryGetValue(cuil, out var paciente);
+        return paciente;
     }
 }
 

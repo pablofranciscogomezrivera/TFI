@@ -47,6 +47,12 @@
     When intento registrar el ingreso con frecuenciaCardiaca -70 y frecuenciaRespiratoria -15
     Then el sistema muestra un error indicando que las frecuencias no pueden ser negativas
 
+  @Validaciones
+  Scenario: Registrar ingreso sin el informe del paciente
+     Given que el paciente con DNI "12345678" existe en el sistema
+     When intento registrar el ingreso sin informar el "informe"
+     Then el sistema muestra un error indicando que "informe" es mandatorio
+
   @Prioridad
   Scenario: Ingreso de paciente con mayor prioridad que los ya en espera
     Given que hay un paciente "B" en espera con nivel de emergencia "Urgencia"
@@ -60,3 +66,10 @@
     And que el paciente "A" con DNI "22222222" existe en el sistema
     When registro un ingreso para el paciente "A" con nivel de emergencia "Emergencia" a las 14:05
     Then el paciente "B" debe ser atendido antes que el paciente "A"
+
+  @Prioridad
+  Scenario: Ingreso de paciente con menor prioridad que los ya en espera
+    Given que hay un paciente "B" en espera con nivel de emergencia "Emergencia"
+    And que el paciente "C" con DNI "33333333" existe en el sistema
+    When registro un ingreso para el paciente "C" con nivel de emergencia "Urgencia"
+    Then el paciente "B" debe ser atendido antes que el paciente "C"

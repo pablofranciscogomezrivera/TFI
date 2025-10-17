@@ -2,6 +2,6 @@
 
 public class Enfermera : Persona
 {
-    public required string Matricula {  get; set; }
-    public required Usuario Usuario { get; set; }
+    public string Matricula {  get; set; }
+    public Usuario Usuario { get; set; }
 }

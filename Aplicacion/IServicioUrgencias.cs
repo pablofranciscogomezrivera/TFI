@@ -5,12 +5,14 @@ namespace Aplicacion;
 public interface IServicioUrgencias
 {
     public void RegistrarUrgencia(string CUILPaciente,
-                                  Enfermera Enfermera,
-                                  string Informe,
-                                  double Temperatura,
-                                  NivelEmergencia NivelEmergencia,
-                                  FrecuenciaCardiaca FrecCardiaca,
-                                  FrecuenciaRespiratoria FrecRespiratoria,
-                                  double FrecSistolica,
-                                  double FrecDiastolica);
+                                  Enfermera enfermera,
+                                  string informe,
+                                  double temperatura,
+                                  NivelEmergencia nivelEmergencia,
+                                  double frecCardiaca,
+                                  double frecRespiratoria,
+                                  double frecSistolica,
+                                  double frecDiastolica);
+
+    public List<Ingreso> ObtenerIngresosPendientes();
 }

@@ -8,6 +8,6 @@ namespace Dominio.Entidades;
 
 public class Temperatura
 {
-    public required double Valor {  get; set; }
+    public double Valor {  get; set; }
 }
 

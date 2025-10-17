@@ -8,10 +8,10 @@ namespace Dominio.Entidades;
 
 public class Domicilio
 {
-    public required string Calle {  get; set; }
-    public required int Numero { get; set; }
-    public required string Ciudad { get; set; }
-    public required string Provincia { get; set; }
-    public required string Localidad { get; set; }
+    public string Calle {  get; set; }
+    public int Numero { get; set; }
+    public string Ciudad { get; set; }
+    public string Provincia { get; set; }
+    public string Localidad { get; set; }
 }
 

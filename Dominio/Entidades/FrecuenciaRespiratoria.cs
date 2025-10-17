@@ -8,6 +8,13 @@ namespace Dominio.Entidades;
 
 public class FrecuenciaRespiratoria : Frecuencia
 {
+    public FrecuenciaRespiratoria(double valor) : base(valor)
+    {
+    }
 
+    protected override Exception NotificarError()
+    {
+        return new ArgumentException("La frecuencia respiratorioa no puede ser negativa");
+    }
 }
 

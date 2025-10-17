@@ -8,7 +8,7 @@ namespace Dominio.Entidades;
 
 public class Afiliado
 {
-    public required ObraSocial ObraSocial { get; set; }
-    public required string NumeroAfiliado { get; set; }
+    public ObraSocial ObraSocial { get; set; }
+    public string NumeroAfiliado { get; set; }
 }
 

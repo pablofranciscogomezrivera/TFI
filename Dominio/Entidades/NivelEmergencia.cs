@@ -8,9 +8,10 @@ namespace Dominio.Entidades;
 
 public enum NivelEmergencia
 {
-    URGENCIA,
-    SIN_URGENCIA,
+    CRITICA = 0,
     EMERGENCIA,
-    URGENCIA_MENOR
+    URGENCIA,
+    URGENCIA_MENOR,
+    SIN_URGENCIA
 }
 

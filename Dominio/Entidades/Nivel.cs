@@ -8,8 +8,8 @@ namespace Dominio.Entidades;
 
 public class Nivel
 {
-    public required int Nivell { get; set; }
-    public required TimeOnly DuracionMaxEspera { get; set; }
-    public required NivelEmergencia NivelEmergencia { get; set; }
+    public int Nivell { get; set; }
+    public TimeOnly DuracionMaxEspera { get; set; }
+    public NivelEmergencia NivelEmergencia { get; set; }
 }
 

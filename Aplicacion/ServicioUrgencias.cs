@@ -3,6 +3,7 @@ using Dominio.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,17 +11,37 @@ namespace Aplicacion;
 
 public class ServicioUrgencias : IServicioUrgencias
 {
-    public IRepositorioPacientes _repositorio;
+    private readonly IRepositorioPacientes _repositorio;
+    private readonly List<Ingreso> _listaEspera = new List<Ingreso>();
 
     public ServicioUrgencias(IRepositorioPacientes repositorio)
     {
         _repositorio = repositorio;
-    }   
+    }
 
-
-    public void RegistrarUrgencia(string CUILPaciente, Enfermera Enfermera, string Informe, double Temperatura, NivelEmergencia NivelEmergencia, FrecuenciaCardiaca FrecCardiaca, FrecuenciaRespiratoria FrecRespiratoria, double FrecSistolica, double FrecDiastolica)
+    public List<Ingreso> ObtenerIngresosPendientes()
     {
-        throw new NotImplementedException();
+        return _listaEspera;
+    }
+
+    public void RegistrarUrgencia(string CUILPaciente, Enfermera Enfermera, string informe, double Temperatura, NivelEmergencia NivelEmergencia, double FrecCardiaca, double FrecRespiratoria, double FrecSistolica, double FrecDiastolica)
+    {
+        var paciente = _repositorio.BuscarPacientePorCuil(CUILPaciente)
+            ?? throw new Exception("Paciente no encontrado");
+
+        var ingreso = new Ingreso(
+            paciente,
+            Enfermera,
+            informe,
+            NivelEmergencia,
+            Temperatura,
+            FrecCardiaca,
+            FrecRespiratoria,
+            FrecSistolica,
+            FrecDiastolica);
+
+        _listaEspera.Add(ingreso);
+        _listaEspera.Sort();
     }
 }
 
