@@ -1,35 +1,65 @@
-## Estructura de la Solucion
+# 🎓 Sistema de Gestión de Urgencias Clínicas
+### Trabajo Final Integrador (TFI)
 
-El sistema sigue una arquitectura por capas para separar las responsabilidades, lo que facilita su mantenimiento y escalabilidad:
+Proyecto desarrollado para la materia **Ingeniería de Software** del curso 4K2 en la **Universidad Tecnológica Nacional - Facultad Regional Tucumán**. 
 
-* **`Dominio`**: Contiene las entidades del negocio (`Paciente`, `Ingreso`, `Enfermera`), los objetos de valor (`TensionArterial`, `Frecuencia`) y las reglas de negocio principales. Es el corazón de la aplicación.
-* **`Aplicacion`**: Orquesta la lógica del dominio a través de servicios (`ServicioUrgencias`). Actúa como intermediario entre la interfaz de usuario y el dominio.
-* **`Infraestructura`**: Implementa las interfaces definidas en el dominio, como los repositorios. Actualmente contiene una implementación en memoria (`DBPruebaMemoria`) para las pruebas.
-* **`Webb`**: Proyecto (No decidido todavia) destinado a ser la capa de presentación (frontend) de la aplicación.
-* **`Tests`**: Contiene todas las pruebas BDD. Aquí se encuentran los archivos `.feature` con las especificaciones en Gherkin y los *Step Definitions* que los conectan con el código C#.
+#### Integrantes del Grupo
 
-## Cómo Ejecutar las Pruebas
+| Legajo | Apellido y Nombre      |
+| :--- |:---------------------|
+| 47731  | Marcial, Gabriel       |
+| 46646  | Ponce, Facundo         |
+| 46380  | Cancino, Micaela       |
+| 48235  | Bellor, Maria          |
+| 48308  | Herrera, Macarena      |
+| 52467  | Gómez, Pablo           |
+
+---
+
+## 📜 Descripción del Proyecto
+
+El sistema está diseñado para gestionar el flujo de admisiones en la sala de urgencias de una clínica. Permite al personal de enfermería registrar el ingreso de pacientes, capturar sus signos vitales y priorizarlos automáticamente en una cola de atención.
+
+La lógica de negocio se basa en el enfoque de **Desarrollo Guiado por el Comportamiento (BDD)**, a partir de las siguientes historias de usuario:
+* **IS2025-001**: Modelado del módulo de urgencias, incluyendo el registro de ingresos y el ordenamiento de la cola de atención por prioridad.
+
+## 🛠️ Tecnologías Utilizadas
+
+El backend está construido sobre la plataforma .NET, mientras que la tecnología para el frontend está en proceso de definición.
+
+| Componente | Tecnología |
+| :--- | :--- |
+| **Framework** | `.NET 8` |
+| **Lenguaje** | `C#` |
+| **Pruebas BDD** | `Reqnroll (Gherkin)` |
+| **Framework de Pruebas** | `xUnit` |
+| **Aserciones** | `Fluent Assertions` |
+| **Interfaz de Usuario**| `Blazor` o `React` (A definir) |
+
+## 📁 Estructura del Proyecto
+
+El sistema sigue una arquitectura por capas para garantizar la separación de responsabilidades y la mantenibilidad.
+
+* **`Dominio`**: 🧠 Contiene las entidades, objetos de valor y reglas de negocio. Es el corazón de la aplicación.
+* **`Aplicacion`**: ⚙️ Orquesta la lógica del dominio a través de servicios, actuando como intermediario entre la UI y el núcleo.
+* **`Infraestructura`**: 🧱 Implementa las interfaces del dominio (ej. repositorios). Actualmente usa una base de datos en memoria para las pruebas.
+* **`Webb`**: 🖥️ Proyecto destinado a la capa de presentación (frontend) de la aplicación.
+* **`Tests`**: 🧪 Contiene todas las pruebas BDD, con los archivos `.feature` y sus implementaciones.
+
+## 🚀 Cómo Ejecutar las Pruebas
 
 Para verificar el comportamiento implementado, puedes ejecutar las pruebas de aceptación automatizadas desde tu editor de preferencia.
 
 ### En Visual Studio
 
-1.  **Abrir el Proyecto**: Abre el archivo de solución `TFI.sln` con Visual Studio.
-2.  **Restaurar Dependencias**: Visual Studio debería restaurar los paquetes NuGet automáticamente. Si no, haz clic derecho en la solución en el "Explorador de Soluciones" y selecciona "Restaurar paquetes NuGet".
-3.  **Compilar la Solución**: Compila el proyecto para asegurarte de que todo esté en orden (puedes usar el atajo `Ctrl+Shift+B`).
-4.  **Abrir el Explorador de Pruebas**: Ve al menú `Test > Explorador de pruebas`.
-5.  **Ejecutar las Pruebas**: En la ventana del Explorador de Pruebas, verás los escenarios definidos en tus archivos `.feature`. Puedes ejecutarlos todos haciendo clic en el botón "Run All Tests".
+1.  **Abrir la Solución**: Abre el archivo `TFI.sln`.
+2.  **Restaurar Dependencias**: Haz clic derecho en la solución y selecciona "Restaurar paquetes NuGet".
+3.  **Compilar**: Usa el atajo `Ctrl+Shift+B`.
+4.  **Ejecutar Pruebas**: Abre el **Explorador de Pruebas** (`Test > Explorador de pruebas`) y haz clic en "Run All Tests".
 
 ### En Visual Studio Code
 
-1.  **Instalar Extensiones**: Asegúrate de tener instaladas las siguientes extensiones desde el Marketplace de VS Code:
-    * **C# Dev Kit** (de Microsoft).
-    * **Test Explorer UI** (opcional, para una mejor interfaz gráfica).
-
-2.  **Abrir la Carpeta del Proyecto**: Abre la carpeta raíz del repositorio en VS Code.
-
-3.  **Cargar la Solución**: El C# Dev Kit detectará automáticamente el archivo `TFI.sln`. Espera a que cargue la solución en el panel del "Explorador de Soluciones".
-
-4.  **Abrir la Vista de Pruebas**: Haz clic en el ícono de matraz (Testing) en la barra de actividades del lado izquierdo.
-
-5.  **Ejecutar las Pruebas**: En el panel de "Testing", verás el árbol de pruebas con tus escenarios. Haz clic en el botón de "play" en la parte superior para ejecutar todas las pruebas, o ejecuta escenarios individuales haciendo clic en el "play" que aparece junto a cada uno.
+1.  **Instalar Extensiones**: Asegúrate de tener instalada la extensión **C# Dev Kit** de Microsoft.
+2.  **Abrir la Carpeta**: Abre la carpeta raíz del repositorio en VS Code.
+3.  **Cargar Solución**: Espera a que el C# Dev Kit cargue el archivo `TFI.sln`.
+4.  **Ejecutar Pruebas**: Ve al ícono de matraz (Testing) en la barra de actividades del lado izquierdo y ejecuta las pruebas desde allí.
