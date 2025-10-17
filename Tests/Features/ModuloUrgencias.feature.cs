@@ -171,7 +171,7 @@ await this.FeatureBackgroundAsync();
                 table3.AddRow(new string[] {
                             "23-4567899-2",
                             "Le duele el ojo",
-                            "SinUrgencia",
+                            "SIN_URGENCIA",
                             "37",
                             "70",
                             "15",
@@ -179,7 +179,7 @@ await this.FeatureBackgroundAsync();
                 table3.AddRow(new string[] {
                             "23-1234567-9",
                             "Le agarro dengue",
-                            "Emergencia",
+                            "EMERGENCIA",
                             "38",
                             "70",
                             "15",
@@ -232,7 +232,7 @@ await this.FeatureBackgroundAsync();
                 table5.AddRow(new string[] {
                             "23-1234567-9",
                             "Le agarro dengue",
-                            "Emergencia",
+                            "EMERGENCIA",
                             "38",
                             "70",
                             "15",
@@ -240,7 +240,7 @@ await this.FeatureBackgroundAsync();
                 table5.AddRow(new string[] {
                             "27-4567890-3",
                             "Le duele el ojo",
-                            "SinUrgencia",
+                            "SIN_URGENCIA",
                             "37",
                             "70",
                             "15",
@@ -293,7 +293,7 @@ await this.FeatureBackgroundAsync();
                 table7.AddRow(new string[] {
                             "23-1234567-9",
                             "Le agarro dengue",
-                            "Emergencia",
+                            "EMERGENCIA",
                             "38",
                             "70",
                             "15",
@@ -301,7 +301,7 @@ await this.FeatureBackgroundAsync();
                 table7.AddRow(new string[] {
                             "23-4567899-2",
                             "Neumonia",
-                            "Emergencia",
+                            "EMERGENCIA",
                             "39",
                             "85",
                             "22",
@@ -354,7 +354,7 @@ await this.FeatureBackgroundAsync();
                 table9.AddRow(new string[] {
                             "20-30111222-1",
                             "Paciente nuevo",
-                            "Urgencia",
+                            "URGENCIA",
                             "37.5",
                             "80",
                             "18",
@@ -408,7 +408,7 @@ await this.FeatureBackgroundAsync();
                 table11.AddRow(new string[] {
                             "23-12345678-7",
                             "Le duele la pestana",
-                            "SinUrgencia",
+                            "SIN_URGENCIA",
                             "37",
                             "-70",
                             "15",
@@ -456,7 +456,7 @@ await this.FeatureBackgroundAsync();
                 table12.AddRow(new string[] {
                             "23-12345678-7",
                             "",
-                            "SinUrgencia",
+                            "SIN_URGENCIA",
                             "37",
                             "70",
                             "15",

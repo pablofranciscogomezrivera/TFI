@@ -1,6 +1,6 @@
 ﻿using Dominio.Entidades;
 
-namespace Aplicacion;
+namespace Aplicacion.Intefaces;
 
 public interface IServicioUrgencias
 {

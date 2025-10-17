@@ -1,4 +1,5 @@
-﻿using Dominio.Entidades;
+﻿using Aplicacion.Intefaces;
+using Dominio.Entidades;
 using Dominio.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,10 @@ public class ServicioUrgencias : IServicioUrgencias
 
     public void RegistrarUrgencia(string CUILPaciente, Enfermera Enfermera, string informe, double Temperatura, NivelEmergencia NivelEmergencia, double FrecCardiaca, double FrecRespiratoria, double FrecSistolica, double FrecDiastolica)
     {
+        if (string.IsNullOrWhiteSpace(informe))
+        {
+            throw new ArgumentException("El informe es un dato mandatorio");
+        }
         var paciente = _repositorio.BuscarPacientePorCuil(CUILPaciente);
 
         if(paciente is null)

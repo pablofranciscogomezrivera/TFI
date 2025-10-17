@@ -7,6 +7,7 @@ using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Aplicacion.Intefaces;
 
 namespace Tests.StepDefinitions
 {
@@ -14,15 +15,25 @@ namespace Tests.StepDefinitions
     public class ModuloDeUrgenciasStepDefinitions
     {
         private Enfermera _enfermera;
-        private IRepositorioPacientes _dbMockeada = new DBPruebaMemoria();
+        private IRepositorioPacientes _dbMockeada;
         private IServicioUrgencias _servicioUrgencias;
         private Exception _excepcionEsperada;
+
+        // El constructor ahora recibe las dependencias
+        public ModuloDeUrgenciasStepDefinitions()
+        {
+            // Se crea una sola vez la base de datos en memoria
+            _dbMockeada = new DBPruebaMemoria();
+            // Se inyecta la MISMA instancia de la base de datos al servicio
+            _servicioUrgencias = new ServicioUrgencias(_dbMockeada);
+        }
 
         [BeforeScenario]
         public void Setup()
         {
-            _dbMockeada = new DBPruebaMemoria();
-            _servicioUrgencias = new ServicioUrgencias(_dbMockeada);
+            // En lugar de crear nuevas instancias, este método podría usarse
+            // para limpiar el estado si fuera necesario, pero con la
+            // creación en el constructor, cada ejecución de test tendrá su propio estado.
             _excepcionEsperada = null;
         }
 
