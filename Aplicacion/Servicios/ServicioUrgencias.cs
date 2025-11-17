@@ -56,5 +56,32 @@ public class ServicioUrgencias : IServicioUrgencias
         _listaEspera.Add(ingreso);
         _listaEspera.Sort();
     }
+
+    public Ingreso ReclamarPaciente(Doctor doctor)
+    {
+        if (doctor == null)
+        {
+            throw new ArgumentNullException(nameof(doctor), "El doctor es requerido");
+        }
+
+        if (_listaEspera.Count == 0)
+        {
+            throw new InvalidOperationException("No hay pacientes en la lista de espera");
+        }
+
+        // Obtener el primer paciente (el de mayor prioridad)
+        var ingreso = _listaEspera[0];
+
+        // Cambiar el estado a EN_PROCESO
+        ingreso.Estado = EstadoIngreso.EN_PROCESO;
+
+        // Asignar el doctor a la atención
+        ingreso.Atencion.Doctor = doctor;
+
+        // Remover de la lista de espera
+        _listaEspera.RemoveAt(0);
+
+        return ingreso;
+    }
 }
 
