@@ -2,25 +2,23 @@ using Aplicacion;
 using Aplicacion.Intefaces;
 using Dominio.Interfaces;
 using Infraestructura;
-using Scalar.AspNetCore;
+using Microsoft.OpenApi;
+using Scalar.AspNetCore; // Importante para Scalar
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
-// Configure API Controllers
+// 1. Configurar API Controllers
 builder.Services.AddControllers();
 
-// Configure Swagger/OpenAPI
+// 2. Configurar Swagger/OpenAPI (necesario para ambos)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "Hospital Urgencias API", Version = "v1" });
+    // Esto define el documento "v1" que Scalar no encontraba
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TFI - API de Urgencias", Version = "v1" });
 });
 
-// Configure CORS
+// 3. Configurar CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -31,13 +29,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register Repositories as Singleton (to maintain state in memory)
+// 4. Registrar Repositorios (Singleton para estado en memoria)
 builder.Services.AddSingleton<IRepositorioUrgencias, RepositorioUrgenciasMemoria>();
 builder.Services.AddSingleton<IRepositorioPacientes, DBPruebaMemoria>();
 builder.Services.AddSingleton<IRepositorioObraSocial, RepositorioObraSocialMemoria>();
 builder.Services.AddSingleton<IRepositorioUsuario, RepositorioUsuarioMemoria>();
 
-// Register Services as Scoped
+// 5. Registrar Servicios (Scoped)
 builder.Services.AddScoped<IServicioUrgencias, ServicioUrgencias>();
 builder.Services.AddScoped<IServicioPacientes, ServicioPacientes>();
 builder.Services.AddScoped<IServicioAutenticacion, ServicioAutenticacion>();
@@ -45,31 +43,28 @@ builder.Services.AddScoped<IServicioAtencion, ServicioAtencion>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 6. Configurar el Pipeline de HTTP
 if (app.Environment.IsDevelopment())
 {
-    // Swagger UI tradicional
+    // A. Genera el archivo swagger.json. DEBE IR PRIMERO.
     app.UseSwagger();
+
+    // B. Sirve la UI de Swagger en /swagger
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hospital Urgencias API v1"));
 
-    // Scalar - Documentación moderna
+    // C. Sirve la UI de Scalar en /scalar
     app.MapScalarApiReference();
 }
-
-if (!app.Environment.IsDevelopment())
+else
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // En producción, no expones Swagger/Scalar
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-app.UseAntiforgery();
-
-app.UseCors("AllowAll");
-
-// Map API Controllers
-app.MapControllers();
+app.UseCors("AllowAll"); // Habilita CORS
+app.UseAuthorization();
+app.MapControllers(); // Mapea tus Controllers
 
 app.Run();
