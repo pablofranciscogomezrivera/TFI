@@ -4,11 +4,7 @@ using Dominio.Interfaces;
 using Infraestructura;
 using Aplicacion;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Aplicacion.Intefaces;
-using Aplicacion.Servicios;
 
 namespace Tests.StepDefinitions
 {
@@ -25,8 +21,9 @@ namespace Tests.StepDefinitions
         {
             // Se crea una sola vez la base de datos en memoria
             _dbMockeada = new DBPruebaMemoria();
-            // Se inyecta la MISMA instancia de la base de datos al servicio
-            _servicioUrgencias = new ServicioUrgencias(_dbMockeada);
+            var repositorioUrgencias = new RepositorioUrgenciasMemoria();
+            // Se inyecta la MISMA instancia de los repositorios al servicio
+            _servicioUrgencias = new ServicioUrgencias(_dbMockeada, repositorioUrgencias);
         }
 
         [BeforeScenario]

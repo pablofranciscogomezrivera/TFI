@@ -1,8 +1,7 @@
 ﻿using Aplicacion;
-using Aplicacion.Servicios;
 using Dominio.Entidades;
-using FluentAssertions;
 using Infraestructura;
+using FluentAssertions;
 using Xunit;
 
 namespace Tests.UnitTests;
@@ -16,8 +15,9 @@ public class ServicioAtencionTests
 
     public ServicioAtencionTests()
     {
-        var repositorio = new DBPruebaMemoria();
-        _servicioUrgencias = new ServicioUrgencias(repositorio);
+        var repositorioPacientes = new DBPruebaMemoria();
+        var repositorioUrgencias = new RepositorioUrgenciasMemoria();
+        _servicioUrgencias = new ServicioUrgencias(repositorioPacientes, repositorioUrgencias);
         _servicioAtencion = new ServicioAtencion();
 
         _doctor = new Doctor

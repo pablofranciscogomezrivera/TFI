@@ -8,21 +8,54 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Aplicacion.Servicios;
+namespace Aplicacion;
 
 public class ServicioUrgencias : IServicioUrgencias
 {
-    private readonly IRepositorioPacientes _repositorio;
-    private readonly List<Ingreso> _listaEspera = new List<Ingreso>();
+    private readonly IRepositorioPacientes _repositorioPacientes;
+    private readonly IRepositorioUrgencias _repositorioUrgencias;
 
-    public ServicioUrgencias(IRepositorioPacientes repositorio)
+    public ServicioUrgencias(IRepositorioPacientes repositorioPacientes, IRepositorioUrgencias repositorioUrgencias)
     {
-        _repositorio = repositorio;
+        _repositorioPacientes = repositorioPacientes;
+        _repositorioUrgencias = repositorioUrgencias;
     }
 
     public List<Ingreso> ObtenerIngresosPendientes()
     {
-        return _listaEspera;
+        return _repositorioUrgencias.ObtenerIngresosPendientes();
+    }
+
+    public Ingreso ReclamarPaciente(Doctor doctor)
+    {
+        if (doctor == null)
+        {
+            throw new ArgumentNullException(nameof(doctor), "El doctor es requerido");
+        }
+
+        var listaEspera = _repositorioUrgencias.ObtenerIngresosPendientes();
+
+        if (listaEspera.Count == 0)
+        {
+            throw new InvalidOperationException("No hay pacientes en la lista de espera");
+        }
+
+        // Obtener el primer paciente (el de mayor prioridad)
+        var ingreso = listaEspera[0];
+
+        // Cambiar el estado a EN_PROCESO
+        ingreso.Estado = EstadoIngreso.EN_PROCESO;
+
+        // Asignar el doctor a la atención
+        ingreso.Atencion.Doctor = doctor;
+
+        // Remover de la lista de espera
+        _repositorioUrgencias.RemoverIngreso(ingreso);
+
+        // Actualizar el ingreso
+        _repositorioUrgencias.ActualizarIngreso(ingreso);
+
+        return ingreso;
     }
 
     public void RegistrarUrgencia(string CUILPaciente, Enfermera Enfermera, string informe, double Temperatura, NivelEmergencia NivelEmergencia, double FrecCardiaca, double FrecRespiratoria, double FrecSistolica, double FrecDiastolica)
@@ -31,15 +64,15 @@ public class ServicioUrgencias : IServicioUrgencias
         {
             throw new ArgumentException("El informe es un dato mandatorio");
         }
-        var paciente = _repositorio.BuscarPacientePorCuil(CUILPaciente);
+        var paciente = _repositorioPacientes.BuscarPacientePorCuil(CUILPaciente);
 
-        if(paciente is null)
+        if (paciente is null)
         {
             var nuevoPaciente = new Paciente
             {
                 CUIL = CUILPaciente
             };
-            paciente = _repositorio.RegistrarPaciente(nuevoPaciente);
+            paciente = _repositorioPacientes.RegistrarPaciente(nuevoPaciente);
         }
 
         var ingreso = new Ingreso(
@@ -53,35 +86,6 @@ public class ServicioUrgencias : IServicioUrgencias
             FrecSistolica,
             FrecDiastolica);
 
-        _listaEspera.Add(ingreso);
-        _listaEspera.Sort();
-    }
-
-    public Ingreso ReclamarPaciente(Doctor doctor)
-    {
-        if (doctor == null)
-        {
-            throw new ArgumentNullException(nameof(doctor), "El doctor es requerido");
-        }
-
-        if (_listaEspera.Count == 0)
-        {
-            throw new InvalidOperationException("No hay pacientes en la lista de espera");
-        }
-
-        // Obtener el primer paciente (el de mayor prioridad)
-        var ingreso = _listaEspera[0];
-
-        // Cambiar el estado a EN_PROCESO
-        ingreso.Estado = EstadoIngreso.EN_PROCESO;
-
-        // Asignar el doctor a la atención
-        ingreso.Atencion.Doctor = doctor;
-
-        // Remover de la lista de espera
-        _listaEspera.RemoveAt(0);
-
-        return ingreso;
+        _repositorioUrgencias.AgregarIngreso(ingreso);
     }
 }
-
