@@ -13,25 +13,28 @@ https://localhost:5001/api
 
 ## Documentación Interactiva
 
-Una vez que la aplicación esté corriendo, puedes acceder a la documentación interactiva en:
+Una vez que la aplicación esté corriendo, puedes acceder a la documentación interactiva con **Scalar**:
 
-### Scalar (Recomendado - Moderna y Rápida)
 ```
-http://localhost:5000/scalar/v1
-https://localhost:5001/scalar/v1
-```
-
-### Swagger UI (Clásica)
-```
-http://localhost:5000/swagger
-https://localhost:5001/swagger
+http://localhost:5000/scalar
+https://localhost:5001/scalar
 ```
 
-**Recomendamos usar Scalar** por su interfaz moderna, mejor rendimiento y características adicionales como:
-- Dark mode automático
-- Búsqueda mejorada
-- Mejor visualización de ejemplos
-- Exportación de código en múltiples lenguajes
+### ¿Por qué Scalar?
+
+Scalar es una herramienta moderna de documentación de APIs que ofrece:
+
+✨ **Interfaz Moderna**: Diseño limpio y profesional con dark mode automático
+
+🚀 **Alto Rendimiento**: Carga rápida y navegación fluida
+
+🔍 **Búsqueda Avanzada**: Encuentra endpoints y modelos fácilmente
+
+💻 **Ejemplos de Código**: Genera código en múltiples lenguajes (C#, JavaScript, Python, cURL, etc.)
+
+🎨 **Personalizable**: Temas y estilos adaptables
+
+📱 **Responsive**: Funciona perfectamente en desktop y mobile
 
 ---
 
@@ -415,4 +418,4 @@ dotnet run
 La API estará disponible en:
 - HTTP: http://localhost:5000
 - HTTPS: https://localhost:5001
-- Swagger: http://localhost:5000/swagger
+- Documentación: http://localhost:5000/scalar

@@ -19,8 +19,7 @@ dotnet run
 La API estará disponible en:
 - **HTTP**: http://localhost:5000
 - **HTTPS**: https://localhost:5001
-- **Scalar (Recomendado)**: http://localhost:5000/scalar/v1
-- **Swagger UI**: http://localhost:5000/swagger
+- **Documentación (Scalar)**: http://localhost:5000/scalar
 
 ## 📚 Documentación
 
@@ -73,9 +72,15 @@ Los servicios están configurados en `Program.cs`:
 
 CORS está habilitado para permitir requests desde cualquier origen en desarrollo. **Ajustar en producción**.
 
-### Swagger
+### Documentación con Scalar
 
-Swagger/OpenAPI está habilitado automáticamente en desarrollo para facilitar testing y documentación.
+La API utiliza **Scalar** para proporcionar documentación interactiva moderna. Scalar genera automáticamente documentación a partir de la especificación OpenAPI y ofrece:
+
+- Interfaz moderna y responsive
+- Ejemplos de código en múltiples lenguajes
+- Testing interactivo de endpoints
+- Búsqueda avanzada
+- Dark mode automático
 
 ## 🧪 Testing
 
