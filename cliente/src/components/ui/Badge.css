@@ -1,0 +1,38 @@
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.badge-default {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.badge-critica {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-emergencia {
+    background: #fed7aa;
+    color: #9a3412;
+}
+
+.badge-urgencia {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-menor {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-sin-urgencia {
+    background: #dbeafe;
+    color: #1e40af;
+}

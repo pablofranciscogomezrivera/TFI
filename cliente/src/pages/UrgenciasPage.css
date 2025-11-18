@@ -1,0 +1,144 @@
+.urgencias-page {
+    min-height: 100vh;
+    background: #f9fafb;
+}
+
+.urgencias-header {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 24px 0;
+    margin-bottom: 32px;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+}
+
+.page-subtitle {
+    font-size: 16px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.urgencias-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+}
+
+.tabs-navigation {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    background: white;
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .tab-button:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+
+.tab-button-active {
+    background: #1f2937;
+    color: white;
+}
+
+.tab-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 32px;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #1f2937;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 32px;
+    text-align: center;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.formulario-section {
+    /* El formulario tiene su propio overlay */
+}
+
+@media (max-width: 768px) {
+    .urgencias-header {
+        padding: 16px 0;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .page-subtitle {
+        font-size: 14px;
+    }
+
+    .tabs-navigation {
+        flex-direction: column;
+    }
+
+    .tab-button {
+        width: 100%;
+    }
+}

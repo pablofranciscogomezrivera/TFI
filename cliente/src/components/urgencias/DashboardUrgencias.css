@@ -1,0 +1,44 @@
+.dashboard-container {
+    margin-bottom: 32px;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    border-left: 4px solid #e5e7eb;
+}
+
+.stat-card-critical {
+    border-left-color: #ef4444;
+}
+
+    .stat-card-critical .card-icon {
+        color: #ef4444;
+    }
+
+.stat-card-emergency {
+    border-left-color: #f97316;
+}
+
+    .stat-card-emergency .card-icon {
+        color: #f97316;
+    }
+
+.card-value-critical {
+    color: #ef4444;
+}
+
+.card-value-emergency {
+    color: #f97316;
+}
+
+@media (max-width: 768px) {
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+}

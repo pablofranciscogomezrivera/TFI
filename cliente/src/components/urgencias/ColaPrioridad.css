@@ -1,0 +1,197 @@
+.cola-prioridad {
+    margin-bottom: 32px;
+}
+
+.cola-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.cola-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+}
+
+.cola-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.btn-actualizar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+    transition: all 0.2s ease;
+}
+
+    .btn-actualizar:hover {
+        background: #f9fafb;
+        border-color: #1f2937;
+    }
+
+.actualizar-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.cola-info {
+    margin-bottom: 16px;
+}
+
+.cola-count {
+    font-size: 16px;
+    color: #6b7280;
+    font-weight: 500;
+    margin: 0;
+    text-align: right;
+}
+
+.cola-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.paciente-card {
+    transition: all 0.2s ease;
+}
+
+    .paciente-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+.paciente-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.paciente-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.paciente-posicion {
+    font-size: 32px;
+    font-weight: 700;
+    color: #9ca3af;
+    line-height: 1;
+}
+
+.paciente-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.paciente-nombre {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.paciente-dni {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.paciente-tiempo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.tiempo-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.paciente-vitales {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.vital-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vital-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.vital-value {
+    font-size: 16px;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.cola-vacia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 32px;
+    text-align: center;
+}
+
+.cola-vacia-icon {
+    width: 64px;
+    height: 64px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+}
+
+.cola-vacia-text {
+    font-size: 18px;
+    color: #9ca3af;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .cola-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .btn-actualizar {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .paciente-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .paciente-vitales {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

@@ -38,6 +38,28 @@ builder.Services.AddScoped<IServicioAtencion, ServicioAtencion>();
 
 var app = builder.Build();
 
+
+// Poblar datos de prueba al iniciar
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var repositorioPacientes = services.GetRequiredService<IRepositorioPacientes>();
+        var repositorioObraSocial = services.GetRequiredService<IRepositorioObraSocial>();
+
+        Web.DataSeeder.SeedData(repositorioPacientes, repositorioObraSocial);
+
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Datos de prueba inicializados correctamente");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Error al inicializar datos de prueba");
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
