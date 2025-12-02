@@ -1,4 +1,4 @@
-name: Backend Tests
+name: Backend Tests (Simple)
 
 on:
   # Se ejecuta ante un PR a la rama principal
@@ -30,27 +30,27 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout Repository
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET 8.0
+      - name: 🔧 Setup .NET 8.0
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore Dependencies
-        run: dotnet restore TFI.sln
+      - name: 📦 Restore Dependencies
+        run: dotnet restore Tests/Tests.csproj
 
-      - name: Build Solution
-        run: dotnet build TFI.sln --configuration Release --no-restore
+      - name: 🔨 Build Solution
+        run: dotnet build Tests/Tests.csproj --configuration Release --no-restore
 
-      - name: Run Unit Tests
+      - name: 🧪 Run Unit Tests
         run: dotnet test Tests/Tests.csproj --configuration Release --no-build --verbosity normal
 
-      - name: Tests Completed
+      - name: ✅ Tests Completed
         if: success()
         run: echo "✅ All tests passed successfully!"
 
-      - name: Tests Failed
+      - name: ❌ Tests Failed
         if: failure()
         run: echo "❌ Some tests failed. Please check the logs above."
