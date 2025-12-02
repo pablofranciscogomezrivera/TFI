@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<shim enabled="true">
+
+  <caching enabled="true">
+    <cacheControl enabled="true">
+      <add value="NoCache"></add>
+      <add value="NoStore"></add>
+      <add value="MustRevalidate"></add>
+    </cacheControl>
+    <expires enabled="true" value="-1"></expires>
+    <pragma enabled="true">
+      <add value="NoCache"></add>
+    </pragma>
+    <exclude>
+      <location path="page.aspx"></location>
+      <location path="path/page.aspx"></location>
+      <location path="path"></location>
+    </exclude>
+  </caching>
+
+  <contentSecurityPolicy enabled="true" reportOnly="false">
+    <defaultSource enabled="true">
+      <add value="self"></add>
+    </defaultSource>
+    <exclude>
+      <location path="page.aspx"></location>
+      <location path="path/page.aspx"></location>
+      <location path="path"></location>
+    </exclude>
+  </contentSecurityPolicy>
+
+  <strictTransportSecurity enabled="true" maxAge="31536000" includeSubDomains="true"></strictTransportSecurity>
+
+  <xContentTypeOptions enabled="true" value="NoSniff">
+    <exclude>
+      <location path="page.aspx"></location>
+      <location path="path/page.aspx"></location>
+      <location path="path"></location>
+    </exclude>
+  </xContentTypeOptions>
+
+  <xFrameOptions enabled="true" value="Deny" allowFromUri="">
+    <exclude>
+      <location path="page.aspx"></location>
+      <location path="path/page.aspx"></location>
+      <location path="path"></location>
+    </exclude>
+  </xFrameOptions>
+
+  <xXssProtection enabled="true" value="1" block="true">
+    <exclude>
+      <location path="page.aspx"></location>
+      <location path="path/page.aspx"></location>
+      <location path="path"></location>
+    </exclude>
+  </xXssProtection>
+
+</shim>

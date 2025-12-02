@@ -1,4 +1,5 @@
 ﻿using Aplicacion.Intefaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.DTOs.Common;
 using Web.DTOs.Pacientes;
@@ -6,6 +7,7 @@ using Webb.DTOs.Pacientes;
 
 namespace Webb.Controllers;
 
+[Authorize(Roles = "Enfermera")]
 [ApiController]
 [Route("api/[controller]")]
 public class PacientesController : ControllerBase

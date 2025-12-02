@@ -1,20 +1,71 @@
+Ôªøusing Aplicacion.Intefaces;
 using Dominio.Entidades;
 using Dominio.Interfaces;
+using Microsoft.Data.SqlClient;
 
 namespace Web;
 
 /// <summary>
-/// Clase para poblar la base de datos con datos de prueba al iniciar la aplicaciÛn
+/// Clase para poblar la base de datos con datos de prueba al iniciar la aplicaci√≥n
 /// </summary>
 public static class DataSeeder
 {
-    public static void SeedData(IRepositorioPacientes repositorioPacientes, IRepositorioObraSocial repositorioObraSocial)
+    // Actualizamos la firma para recibir todo lo necesario
+    public static void SeedData(
+        IRepositorioPacientes repositorioPacientes,
+        IRepositorioObraSocial repositorioObraSocial,
+        IServicioAutenticacion servicioAutenticacion,
+        IConfiguration configuration)
     {
         // Sembrar Obras Sociales
         SeedObrasSociales(repositorioObraSocial);
 
         // Sembrar Pacientes de prueba
         SeedPacientes(repositorioPacientes, repositorioObraSocial);
+
+        // Sembrar Usuarios y Profesionales (Nuevo)
+        SeedUsuariosYProfesionales(servicioAutenticacion, configuration);
+    }
+
+    private static void SeedUsuariosYProfesionales(IServicioAutenticacion authService, IConfiguration configuration)
+    {
+        try
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            // 1. Crear Usuario Enfermera
+            // El servicio maneja el hash de la contrase√±a y la validaci√≥n de duplicados
+            var usuarioEnfermera = authService.RegistrarUsuario("enfermera@hospital.com", "Password123!", Dominio.Enums.TipoAutoridad.Enfermera);
+
+            // 2. Insertar Datos Personales de la Enfermera
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand(
+                    "IF NOT EXISTS (SELECT 1 FROM Enfermeros WHERE IdUsuario = @Id) " +
+                    "INSERT INTO Enfermeros (IdUsuario, Nombre, Apellido, DNI, Matricula) VALUES (@Id, 'Florence', 'Nightingale', 11111111, 'ENF-SEED-01')", conn);
+                cmd.Parameters.AddWithValue("@Id", usuarioEnfermera.Id);
+                cmd.ExecuteNonQuery();
+            }
+
+            // 3. Crear Usuario M√©dico
+            var usuarioMedico = authService.RegistrarUsuario("medico@hospital.com", "Password123!", Dominio.Enums.TipoAutoridad.Medico);
+
+            // 4. Insertar Datos Personales del M√©dico
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand(
+                    "IF NOT EXISTS (SELECT 1 FROM Doctores WHERE IdUsuario = @Id) " +
+                    "INSERT INTO Doctores (IdUsuario, Nombre, Apellido, DNI, Matricula) VALUES (@Id, 'Gregory', 'House', 22222222, 'MED-SEED-01')", conn);
+                cmd.Parameters.AddWithValue("@Id", usuarioMedico.Id);
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch (Exception)
+        {
+            // Ignorar excepciones (probablemente usuarios ya existentes)
+        }
     }
 
     private static void SeedObrasSociales(IRepositorioObraSocial repositorio)
@@ -33,6 +84,10 @@ public static class DataSeeder
             try
             {
                 repositorio.AgregarObraSocial(obraSocial);
+                if (repositorio is Infraestructura.Memory.RepositorioObraSocialMemoria repoMemoria)
+                {
+                    repoMemoria.AgregarAfiliado(1, "PG999");
+                }
             }
             catch
             {
@@ -55,17 +110,17 @@ public static class DataSeeder
                 CUIL = "20-12345678-9",
                 DNI = 12345678,
                 Nombre = "Juan",
-                Apellido = "PÈrez",
+                Apellido = "P√©rez",
                 FechaNacimiento = new DateTime(1985, 5, 15),
                 Email = "juan.perez@email.com",
                 Telefono = 3814567890,
                 Domicilio = new Domicilio
                 {
-                    Calle = "San MartÌn",
+                    Calle = "San Mart√≠n",
                     Numero = 123,
-                    Localidad = "San Miguel de Tucum·n",
-                    Ciudad = "San Miguel de Tucum·n",
-                    Provincia = "Tucum·n"
+                    Localidad = "San Miguel de Tucum√°n",
+                    Ciudad = "San Miguel de Tucum√°n",
+                    Provincia = "Tucum√°n"
                 },
                 Afiliado = new Afiliado
                 {
@@ -77,8 +132,8 @@ public static class DataSeeder
             {
                 CUIL = "27-23456789-0",
                 DNI = 23456789,
-                Nombre = "MarÌa",
-                Apellido = "GarcÌa",
+                Nombre = "Mar√≠a",
+                Apellido = "Garc√≠a",
                 FechaNacimiento = new DateTime(1990, 8, 22),
                 Email = "maria.garcia@email.com",
                 Telefono = 3814567891,
@@ -88,7 +143,7 @@ public static class DataSeeder
                     Numero = 456,
                     Localidad = "Yerba Buena",
                     Ciudad = "Yerba Buena",
-                    Provincia = "Tucum·n"
+                    Provincia = "Tucum√°n"
                 },
                 Afiliado = new Afiliado
                 {
@@ -101,7 +156,7 @@ public static class DataSeeder
                 CUIL = "23-34567890-1",
                 DNI = 34567890,
                 Nombre = "Carlos",
-                Apellido = "LÛpez",
+                Apellido = "L√≥pez",
                 FechaNacimiento = new DateTime(1975, 3, 10),
                 Email = "carlos.lopez@email.com",
                 Telefono = 3814567892,
@@ -109,9 +164,9 @@ public static class DataSeeder
                 {
                     Calle = "Avenida Alem",
                     Numero = 789,
-                    Localidad = "TafÌ Viejo",
-                    Ciudad = "TafÌ Viejo",
-                    Provincia = "Tucum·n"
+                    Localidad = "Taf√≠ Viejo",
+                    Ciudad = "Taf√≠ Viejo",
+                    Provincia = "Tucum√°n"
                 },
                 Afiliado = new Afiliado
                 {
@@ -124,7 +179,7 @@ public static class DataSeeder
                 CUIL = "20-45678901-2",
                 DNI = 45678901,
                 Nombre = "Ana",
-                Apellido = "MartÌnez",
+                Apellido = "Mart√≠nez",
                 FechaNacimiento = new DateTime(1988, 11, 5),
                 Email = "ana.martinez@email.com",
                 Telefono = 3814567893,
@@ -132,9 +187,9 @@ public static class DataSeeder
                 {
                     Calle = "Mate de Luna",
                     Numero = 321,
-                    Localidad = "San Miguel de Tucum·n",
-                    Ciudad = "San Miguel de Tucum·n",
-                    Provincia = "Tucum·n"
+                    Localidad = "San Miguel de Tucum√°n",
+                    Ciudad = "San Miguel de Tucum√°n",
+                    Provincia = "Tucum√°n"
                 },
                 Afiliado = new Afiliado
                 {
@@ -155,9 +210,9 @@ public static class DataSeeder
                 {
                     Calle = "Las Piedras",
                     Numero = 555,
-                    Localidad = "San Miguel de Tucum·n",
-                    Ciudad = "San Miguel de Tucum·n",
-                    Provincia = "Tucum·n"
+                    Localidad = "San Miguel de Tucum√°n",
+                    Ciudad = "San Miguel de Tucum√°n",
+                    Provincia = "Tucum√°n"
                 },
                 Afiliado = new Afiliado
                 {
@@ -178,9 +233,9 @@ public static class DataSeeder
                 {
                     Calle = "Fondo de Bikini",
                     Numero = 1,
-                    Localidad = "San Miguel de Tucum·n",
-                    Ciudad = "San Miguel de Tucum·n",
-                    Provincia = "Tucum·n"
+                    Localidad = "San Miguel de Tucum√°n",
+                    Ciudad = "San Miguel de Tucum√°n",
+                    Provincia = "Tucum√°n"
                 },
                 Afiliado = new Afiliado
                 {

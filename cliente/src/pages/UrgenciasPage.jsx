@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+锘縤mport { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Para logout si quieres
 import DashboardUrgencias from '../components/urgencias/DashboardUrgencias';
 import ColaPrioridad from '../components/urgencias/ColaPrioridad';
 import FormularioIngreso from '../components/urgencias/FormularioIngreso';
@@ -12,10 +13,20 @@ export const UrgenciasPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
-    const [vistaActual, setVistaActual] = useState('cola'); // 'cola' o 'formulario'
+    const [vistaActual, setVistaActual] = useState('cola');
+    const dniEnfermera = localStorage.getItem('profesionalDNI') || '';
+    
+    // 0: Medico, 1: Enfermera 
+    const userRole = parseInt(localStorage.getItem('userRole'));
+    const esMedico = userRole === 0;
+    const esEnfermera = userRole === 1;
+    // --------------------------------------
 
-    // Matr韈ula de enfermera (esto deber韆 venir de un contexto de autenticaci髇)
+    const navigate = useNavigate();
+
+    // Matr铆culas hardcodeadas por ahora (esto lo toma el interceptor api.js tambi茅n)
     const matriculaEnfermera = '87654321';
+    const matriculaDoctor = 'MP12345';
 
     const cargarPacientes = async () => {
         try {
@@ -25,6 +36,7 @@ export const UrgenciasPage = () => {
             setPacientes(data);
         } catch (err) {
             console.error('Error al cargar pacientes:', err);
+            if (err.response?.status === 401) navigate('/login');
             setError('No se pudo cargar la lista de pacientes');
         } finally {
             setLoading(false);
@@ -33,47 +45,60 @@ export const UrgenciasPage = () => {
 
     useEffect(() => {
         cargarPacientes();
-
-        // Actualizar cada 30 segundos
         const interval = setInterval(cargarPacientes, 30000);
-
         return () => clearInterval(interval);
     }, []);
 
     const handleRegistrarIngreso = async (data) => {
         try {
             await urgenciasService.registrarUrgencia(data, matriculaEnfermera);
-
-            // Mostrar mensaje de 閤ito
             alert('Paciente registrado exitosamente');
-
-            // Recargar lista de pacientes
             await cargarPacientes();
-
-            // Cerrar formulario y volver a la cola
             setMostrarFormulario(false);
             setVistaActual('cola');
         } catch (err) {
             console.error('Error al registrar ingreso:', err);
-            const errorMsg = err.response?.data?.error || 'Error al registrar el paciente';
-            alert(errorMsg);
-            throw err; // Re-lanzar para que el formulario maneje el estado de carga
+            alert('Error al registrar el paciente');
         }
+    };
+
+    const handleReclamarPaciente = async () => {
+        try {
+            const paciente = await urgenciasService.reclamarPaciente(matriculaDoctor);
+
+            // Mostrar modal o alerta con el paciente asignado
+            alert(`PACIENTE ASIGNADO:\n\n${paciente.nombrePaciente} ${paciente.apellidoPaciente}\n\nInforme: ${paciente.informeInicial}`);
+
+            // Recargar la lista (el paciente deber铆a desaparecer de la cola)
+            await cargarPacientes();
+        } catch (err) {
+            console.error(err);
+            alert(err.response?.data?.message || 'No hay pacientes en espera o error al reclamar.');
+        }
+    };
+    // -----------------------------------------------------
+
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userRole');
+        navigate('/login');
     };
 
     return (
         <div className="urgencias-page">
             <header className="urgencias-header">
-                <div className="header-content">
+                <div className="header-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                        <h1 className="page-title">Modulo de Urgencias</h1>
-                        <p className="page-subtitle">Sistema de gestion de admisiones de emergencia</p>
+                        <h1 className="page-title">M贸dulo de Urgencias</h1>
+                        <p className="page-subtitle">
+                            Conectado como: {esMedico ? 'M茅dico' : 'Enfermera'}
+                        </p>
                     </div>
+                    <Button variant="outline" onClick={handleLogout}>Cerrar Sesi贸n</Button>
                 </div>
             </header>
 
             <div className="urgencias-content">
-                {/* Navegaci髇 de pesta馻s */}
                 <div className="tabs-navigation">
                     <button
                         className={`tab-button ${vistaActual === 'cola' ? 'tab-button-active' : ''}`}
@@ -82,40 +107,43 @@ export const UrgenciasPage = () => {
                             setMostrarFormulario(false);
                         }}
                     >
-                        <svg className="tab-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
                         Cola de Prioridad
                     </button>
-                    <button
-                        className={`tab-button ${vistaActual === 'formulario' ? 'tab-button-active' : ''}`}
-                        onClick={() => {
-                            setVistaActual('formulario');
-                            setMostrarFormulario(true);
-                        }}
-                    >
-                        <svg className="tab-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                        </svg>
-                        Nuevo Ingreso
-                    </button>
+
+                    {/* Solo Enfermera ve el bot贸n de Nuevo Ingreso */}
+                    {esEnfermera && (
+                        <button
+                            className={`tab-button ${vistaActual === 'formulario' ? 'tab-button-active' : ''}`}
+                            onClick={() => {
+                                setVistaActual('formulario');
+                                setMostrarFormulario(true);
+                            }}
+                        >
+                            Nuevo Ingreso
+                        </button>
+                    )}
                 </div>
 
-                {/* Contenido principal */}
                 {vistaActual === 'cola' && (
                     <>
                         <DashboardUrgencias pacientes={pacientes} />
 
+                        {/* --- NUEVO: Bot贸n de Acci贸n para M茅dico --- */}
+                        {esMedico && (
+                            <div style={{ marginBottom: '20px', padding: '20px', background: '#e0f2fe', borderRadius: '8px', border: '1px solid #bae6fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <h3 style={{ margin: 0, color: '#0369a1' }}>Panel M茅dico</h3>
+                                    <p style={{ margin: 0, color: '#0c4a6e' }}>Hay {pacientes.length} pacientes esperando atenci贸n.</p>
+                                </div>
+                                <Button onClick={handleReclamarPaciente} size="large">
+                                    Llamar Siguiente Paciente
+                                </Button>
+                            </div>
+                        )}
+                        {/* ----------------------------------------- */}
+
                         {loading && !pacientes.length ? (
-                            <div className="loading-container">
-                                <div className="loading-spinner"></div>
-                                <p>Cargando pacientes...</p>
-                            </div>
-                        ) : error ? (
-                            <div className="error-container">
-                                <p className="error-message">{error}</p>
-                                <Button onClick={cargarPacientes}>Reintentar</Button>
-                            </div>
+                            <div className="loading-container"><p>Cargando...</p></div>
                         ) : (
                             <ColaPrioridad
                                 pacientes={pacientes}
@@ -133,7 +161,7 @@ export const UrgenciasPage = () => {
                                 setMostrarFormulario(false);
                                 setVistaActual('cola');
                             }}
-                            matriculaEnfermera={matriculaEnfermera}
+                            matriculaEnfermera={dniEnfermera}
                         />
                     </div>
                 )}

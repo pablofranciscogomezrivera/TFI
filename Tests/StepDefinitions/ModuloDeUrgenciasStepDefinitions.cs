@@ -5,6 +5,7 @@ using Infraestructura;
 using Aplicacion;
 using FluentAssertions;
 using Aplicacion.Intefaces;
+using Infraestructura.Memory;
 
 namespace Tests.StepDefinitions
 {

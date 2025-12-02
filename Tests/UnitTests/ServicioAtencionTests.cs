@@ -3,6 +3,7 @@ using Dominio.Entidades;
 using Infraestructura;
 using FluentAssertions;
 using Xunit;
+using Infraestructura.Memory;
 
 namespace Tests.UnitTests;
 

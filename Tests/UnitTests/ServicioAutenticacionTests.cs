@@ -4,6 +4,7 @@ using Dominio.Enums;
 using Dominio.Interfaces;
 using FluentAssertions;
 using Infraestructura;
+using Infraestructura.Memory;
 using Xunit;
 
 namespace Tests.UnitTests;

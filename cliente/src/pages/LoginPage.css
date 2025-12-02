@@ -1,0 +1,85 @@
+/* cliente/src/pages/LoginPage.css */
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9fafb; /* Mismo fondo que el resto de la app */
+    padding: 24px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    /* Los estilos base de la tarjeta (sombra, borde, blanco) vienen del componente Card */
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.login-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+}
+
+.login-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espacio entre inputs */
+}
+
+.login-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #fecaca;
+    animation: shake 0.5s ease-in-out;
+}
+
+.login-actions {
+    margin-top: 8px;
+}
+
+/* Animación opcional para cuando hay error */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-4px);
+    }
+
+    20%, 40%, 60%, 80% {
+        transform: translateX(4px);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: 64px;
+    }
+
+    .login-card {
+        box-shadow: none;
+        background: transparent;
+        padding: 0;
+    }
+}

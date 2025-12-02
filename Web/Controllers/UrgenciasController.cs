@@ -1,6 +1,7 @@
 ﻿using Aplicacion.Intefaces;
 using Dominio.Entidades;
 using Dominio.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.DTOs.Common;
 using Web.DTOs.Urgencias;
@@ -31,6 +32,7 @@ public class UrgenciasController : ControllerBase
     /// <param name="request">Datos de la urgencia</param>
     /// <param name="matriculaEnfermera">Matrícula de la enfermera que registra</param>
     /// <returns>Confirmación del registro</returns>
+    [Authorize(Roles = "Enfermera")]
     [HttpPost]
     [ProducesResponseType(typeof(object), 201)]
     [ProducesResponseType(typeof(ErrorResponse), 400)]
@@ -87,6 +89,7 @@ public class UrgenciasController : ControllerBase
     /// Obtiene la lista de espera de pacientes pendientes
     /// </summary>
     /// <returns>Lista de ingresos pendientes ordenados por prioridad</returns>
+    [Authorize]
     [HttpGet("lista-espera")]
     [ProducesResponseType(typeof(List<IngresoResponse>), 200)]
     public IActionResult ObtenerListaEspera()
@@ -134,6 +137,7 @@ public class UrgenciasController : ControllerBase
     /// </summary>
     /// <param name="matriculaDoctor">Matrícula del doctor que reclama</param>
     /// <returns>Datos del ingreso reclamado</returns>
+    [Authorize(Roles = "Medico")]
     [HttpPost("reclamar")]
     [ProducesResponseType(typeof(IngresoResponse), 200)]
     [ProducesResponseType(typeof(ErrorResponse), 400)]
