@@ -19,7 +19,7 @@ public class ServicioAtencionTests
         var repositorioPacientes = new RepositorioPacientesMemoria();
         var repositorioUrgencias = new RepositorioUrgenciasMemoria();
         _servicioUrgencias = new ServicioUrgencias(repositorioPacientes, repositorioUrgencias);
-        _servicioAtencion = new ServicioAtencion();
+        _servicioAtencion = new ServicioAtencion(repositorioUrgencias);
 
         _doctor = new Doctor
         {
@@ -112,7 +112,8 @@ public class ServicioAtencionTests
         );
 
         var ingreso = _servicioUrgencias.ReclamarPaciente(_doctor);
-        ingreso.Atencion.Doctor.Should().Be(_doctor);
+        ingreso.Estado.Should().Be(EstadoIngreso.EN_PROCESO);
+        ingreso.Atencion.Should().BeNull(); // La atención no existe hasta que el médico la registra
 
         // Act
         var atencion = _servicioAtencion.RegistrarAtencion(
@@ -122,12 +123,14 @@ public class ServicioAtencionTests
         );
 
         // Assert
+        atencion.Should().NotBeNull();
         atencion.Doctor.Should().Be(_doctor);
+        ingreso.Atencion.Should().NotBeNull();
         ingreso.Atencion.Doctor.Should().Be(_doctor);
     }
 
     [Fact]
-    public void RegistrarAtencion_ConservaInformeEnfermera()
+    public void RegistrarAtencion_MantieneInformesIndependientes()
     {
         // Arrange
         string informeEnfermera = "Paciente con dolor abdominal intenso";
@@ -149,9 +152,10 @@ public class ServicioAtencionTests
         // Act
         var atencion = _servicioAtencion.RegistrarAtencion(ingreso, informeMedico, _doctor);
 
-        // Assert
-        atencion.Informe.Should().Contain(informeEnfermera);
-        atencion.Informe.Should().Contain(informeMedico);
+        // Assert - Los informes están separados
+        ingreso.InformeIngreso.Should().Be(informeEnfermera); // Informe de enfermera
+        atencion.Informe.Should().Be(informeMedico); // Informe del médico
+        atencion.Informe.Should().NotContain(informeEnfermera); // NO deben estar concatenados
     }
 
     [Fact]
@@ -422,8 +426,11 @@ public class ServicioAtencionTests
         // Assert - Verificar estado final
         ingreso.Estado.Should().Be(EstadoIngreso.FINALIZADO);
         atencion.Doctor.Should().Be(_doctor);
-        atencion.Informe.Should().Contain("dolor de pecho"); // Informe enfermera
+
+        // Los informes están separados
+        ingreso.InformeIngreso.Should().Contain("dolor de pecho"); // Informe enfermera
         atencion.Informe.Should().Contain("Síndrome coronario agudo"); // Informe médico
+        atencion.Informe.Should().NotContain("dolor de pecho"); // NO deben estar concatenados
     }
 
     [Fact]

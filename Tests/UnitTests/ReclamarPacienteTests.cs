@@ -117,14 +117,15 @@ public class ReclamarPacienteTests
         );
 
         var ingresoAntes = _servicioUrgencias.ObtenerIngresosPendientes()[0];
-        ingresoAntes.Atencion.Doctor.Should().BeNull();
+        ingresoAntes.Atencion.Should().BeNull(); // La atención se crea al registrarla, no al reclamar
 
         // Act
         var ingresoReclamado = _servicioUrgencias.ReclamarPaciente(_doctor);
 
-        // Assert
-        ingresoReclamado.Atencion.Doctor.Should().Be(_doctor);
-        ingresoReclamado.Atencion.Doctor.Matricula.Should().Be("MP12345");
+        // Assert - El estado cambia a EN_PROCESO
+        ingresoReclamado.Estado.Should().Be(EstadoIngreso.EN_PROCESO);
+        // La atención aún no existe (se creará cuando el médico la registre)
+        ingresoReclamado.Atencion.Should().BeNull();
     }
 
     [Fact]
@@ -254,7 +255,7 @@ public class ReclamarPacienteTests
 
         // Assert - Debe ser el paciente CRITICO
         primerPaciente.NivelEmergencia.Should().Be(NivelEmergencia.CRITICA);
-        primerPaciente.Atencion.Informe.Should().Be("Infarto");
+        primerPaciente.InformeIngreso.Should().Be("Infarto");
     }
 
     [Fact]
@@ -292,7 +293,7 @@ public class ReclamarPacienteTests
         var primerReclamado = _servicioUrgencias.ReclamarPaciente(_doctor);
 
         // Assert - Debe ser el primer paciente que llegó
-        primerReclamado.Atencion.Informe.Should().Be("Primer paciente con urgencia");
+        primerReclamado.InformeIngreso.Should().Be("Primer paciente con urgencia");
     }
 
     [Fact]

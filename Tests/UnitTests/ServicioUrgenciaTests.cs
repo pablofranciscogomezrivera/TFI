@@ -70,47 +70,6 @@ public class ServicioUrgenciasTests
         ingresos[0].Estado.Should().Be(EstadoIngreso.PENDIENTE);
     }
 
-    //[Fact]
-    //public void RegistrarUrgencia_ConPacienteNuevoConDatos_CreaPacienteYRegistraUrgencia()
-    //{
-    //    // Arrange - Paciente NO existe en el sistema
-    //    string cuil = "20-30123456-3";
-
-    //    // Act - Registrar urgencia con datos del paciente
-    //    _servicioUrgencias.RegistrarUrgencia(
-    //        cuil,
-    //        _enfermera,
-    //        "Fiebre alta",
-    //        39.0,
-    //        NivelEmergencia.URGENCIA,
-    //        85,
-    //        20,
-    //        130,
-    //        85,
-    //        // Datos del paciente nuevo
-    //        "María",
-    //        "García",
-    //        "Belgrano",
-    //        456,
-    //        "Yerba Buena",
-    //        new DateTime(1985, 5, 15)
-    //    );
-
-    //    // Assert - Verificar que el paciente fue creado
-    //    var paciente = _repositorioPacientes.BuscarPacientePorCuil(cuil);
-    //    paciente.Should().NotBeNull();
-    //    paciente!.Nombre.Should().Be("María");
-    //    paciente.Apellido.Should().Be("García");
-    //    paciente.Domicilio.Calle.Should().Be("Belgrano");
-    //    paciente.Domicilio.Numero.Should().Be(456);
-    //    paciente.Domicilio.Localidad.Should().Be("Yerba Buena");
-
-    //    // Verificar que la urgencia fue registrada
-    //    var ingresos = _servicioUrgencias.ObtenerIngresosPendientes();
-    //    ingresos.Should().HaveCount(1);
-    //    ingresos[0].Paciente.Should().Be(paciente);
-    //    ingresos[0].NivelEmergencia.Should().Be(NivelEmergencia.URGENCIA);
-    //}
 
     [Fact]
     public void RegistrarUrgencia_ConPacienteNuevoSinDatos_CreaPacienteConDatosGenericos()
