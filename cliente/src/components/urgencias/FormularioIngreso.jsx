@@ -1,29 +1,24 @@
-import { useState } from 'react';
+锘縤mport { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Input, { TextArea } from '../ui/Input';
-import { NivelEmergencia, getNivelEmergenciaInfo } from '../../constants/enums';
+import { NivelEmergencia, NivelesEmergencia } from '../../constants/enums';
 import './FormularioIngreso.css';
 import React from 'react';
 
-const NIVELES_EMERGENCIA = [
-    { value: NivelEmergencia.CRITICA, ...getNivelEmergenciaInfo(NivelEmergencia.CRITICA) },
-    { value: NivelEmergencia.EMERGENCIA, ...getNivelEmergenciaInfo(NivelEmergencia.EMERGENCIA) },
-    { value: NivelEmergencia.URGENCIA, ...getNivelEmergenciaInfo(NivelEmergencia.URGENCIA) },
-    { value: NivelEmergencia.URGENCIA_MENOR, ...getNivelEmergenciaInfo(NivelEmergencia.URGENCIA_MENOR) },
-    { value: NivelEmergencia.SIN_URGENCIA, ...getNivelEmergenciaInfo(NivelEmergencia.SIN_URGENCIA) },
-];
 
 export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => {
     const [formData, setFormData] = useState({
         cuilPaciente: '',
-        informe: '',
+        nombre: '', 
+        apellido: '', 
+        nivelEmergencia: null, 
         temperatura: '',
-        nivelEmergencia: NivelEmergencia.URGENCIA, // Urgencia por defecto
         frecuenciaCardiaca: '',
         frecuenciaRespiratoria: '',
         frecuenciaSistolica: '',
         frecuenciaDiastolica: '',
+        informe: ''
     });
 
     const [errors, setErrors] = useState({});
@@ -44,11 +39,15 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         }
     };
 
+    const handleNivelSelect = (nivelId) => {
+        setFormData(prev => ({ ...prev, nivelEmergencia: nivelId }));
+    };
+
     const validateForm = () => {
         const newErrors = {};
 
         // Validar CUIL
-        if (!formData.cuilPaciente.trim()) {
+        if (!formData.cuilPaciente || !formData.cuilPaciente.trim()) {
             newErrors.cuilPaciente = 'El CUIL del paciente es obligatorio';
         }
 
@@ -57,7 +56,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             newErrors.informe = 'El informe medico es obligatorio';
         }
 
-        // Validar frecuencia card韆ca
+        // Validar frecuencia card铆aca
         if (!formData.frecuenciaCardiaca) {
             newErrors.frecuenciaCardiaca = 'La frecuencia cardiaca es obligatoria';
         } else if (parseFloat(formData.frecuenciaCardiaca) < 0) {
@@ -71,18 +70,22 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             newErrors.frecuenciaRespiratoria = 'La frecuencia respiratoria no puede ser negativa';
         }
 
-        // Validar frecuencia sist髄ica
+        // Validar frecuencia sist贸lica
         if (!formData.frecuenciaSistolica) {
             newErrors.frecuenciaSistolica = 'La frecuencia sistolica es obligatoria';
         } else if (parseFloat(formData.frecuenciaSistolica) < 0) {
             newErrors.frecuenciaSistolica = 'La frecuencia sistolica no puede ser negativa';
         }
 
-        // Validar frecuencia diast髄ica
+        // Validar frecuencia diast贸lica
         if (!formData.frecuenciaDiastolica) {
             newErrors.frecuenciaDiastolica = 'La frecuencia diastolica es obligatoria';
         } else if (parseFloat(formData.frecuenciaDiastolica) < 0) {
             newErrors.frecuenciaDiastolica = 'La frecuencia diastolica no puede ser negativa';
+        }
+
+        if (formData.nivelEmergencia === null) {
+            newErrors.nivelEmergencia = 'Por favor seleccione un nivel de emergencia';
         }
 
         setErrors(newErrors);
@@ -112,7 +115,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
             await onSubmit(dataToSubmit);
 
-            // Limpiar formulario despu閟 del 閤ito
+            // Limpiar formulario despu茅s del 茅xito
             setFormData({
                 cuilPaciente: '',
                 informe: '',
@@ -129,6 +132,8 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             setLoading(false);
         }
     };
+
+    const nivelesArray = Object.values(NivelesEmergencia);
 
     return (
         <div className="formulario-overlay">
@@ -150,74 +155,45 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                         )}
                     </div>
 
-                    <form onSubmit={handleSubmit} className="formulario-form">
+                    <form onSubmit={handleSubmit}>
+                        {/* Secci贸n: Datos del Paciente */}
                         <div className="form-section">
-                            <h3 className="section-title">
-                                <svg className="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                Nuevo Ingreso de Paciente
-                            </h3>
-
+                            <h3>Datos del Paciente</h3>
                             <div className="form-row">
                                 <Input
-                                    label="DNI del Paciente"
+                                    label="CUIL Paciente"
                                     name="cuilPaciente"
                                     value={formData.cuilPaciente}
                                     onChange={handleChange}
-                                    placeholder="12345678"
+                                    placeholder="Ej: 20-30123456-3"
                                     required
                                     error={errors.cuilPaciente}
                                 />
+                                {/* Campo DNI Enfermera: Ahora es din谩mico y de solo lectura */}
                                 <Input
-                                    label="DNI de Enfermera"
-                                    name="matriculaEnfermera"
-                                    value={matriculaEnfermera}
-                                    disabled
-                                    placeholder="87654321"
+                                    
+                                    label="DNI Enfermera"
+                                    value={matriculaEnfermera || ''}
+                                    readOnly
+                                    style={{ backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
                                 />
                             </div>
-
-                            <TextArea
-                                label="Informe Medico"
-                                name="informe"
-                                value={formData.informe}
-                                onChange={handleChange}
-                                placeholder="Describa los sintomas y motivo de consulta..."
-                                required
-                                error={errors.informe}
-                                rows={4}
-                            />
                         </div>
 
+                        {/* Secci贸n: Nivel de Emergencia (Selecci贸n Visual) */}
                         <div className="form-section">
-                            <h3 className="section-title">Nivel de Emergencia</h3>
-                            <div className="niveles-emergencia">
-                                {NIVELES_EMERGENCIA.map((nivel) => (
-                                    <label
-                                        key={nivel.value}
-                                        className={`nivel-option ${formData.nivelEmergencia === nivel.value ? 'nivel-option-active' : ''}`}
-                                        style={{
-                                            borderColor: formData.nivelEmergencia === nivel.value ? nivel.color : '#e5e7eb'
-                                        }}
+                            <h3>Nivel de Emergencia</h3>
+                            <div className="niveles-grid">
+                                {nivelesArray.map((nivel) => (
+                                    <div
+                                        key={nivel.id}
+                                        // Ahora 'nivel' es un objeto {id, nombre, color...} y esto funcionar谩:
+                                        className={`nivel-item ${nivel.color.toLowerCase()} ${formData.nivelEmergencia === nivel.id ? 'selected' : ''}`}
+                                        onClick={() => handleNivelSelect(nivel.id)}
                                     >
-                                        <input
-                                            type="radio"
-                                            name="nivelEmergencia"
-                                            value={nivel.value}
-                                            checked={formData.nivelEmergencia === nivel.value}
-                                            onChange={handleChange}
-                                            className="nivel-input"
-                                        />
-                                        <div
-                                            className="nivel-color"
-                                            style={{ backgroundColor: nivel.color }}
-                                        />
-                                        <div className="nivel-info">
-                                            <div className="nivel-label">{nivel.label}</div>
-                                            <div className="nivel-tiempo">{nivel.tiempo}</div>
-                                        </div>
-                                    </label>
+                                        <span className="nivel-nombre">{nivel.nombre}</span>
+                                        <span className="nivel-tiempo">{nivel.tiempoEspera}</span>
+                                    </div>
                                 ))}
                             </div>
                         </div>
@@ -284,6 +260,19 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                     error={errors.frecuenciaDiastolica}
                                 />
                             </div>
+                        </div>
+
+                        <div className="form-section">
+                            <h3>Informe de Ingreso</h3>
+                            <textarea
+                                className="form-textarea"
+                                name="informe"
+                                value={formData.informe}
+                                onChange={handleChange}
+                                placeholder="Describa el motivo del ingreso y observaciones iniciales..."
+                                required
+                                rows="3"
+                            ></textarea>
                         </div>
 
                         <div className="form-actions">

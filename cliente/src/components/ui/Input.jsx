@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import './Input.css';
 
 export const Input = ({
@@ -10,7 +10,9 @@ export const Input = ({
     required = false,
     error = '',
     disabled = false,
-    name = ''
+    readOnly = false,
+    name = '',
+    style = {}
 }) => {
     return (
         <div className="input-group">
@@ -27,8 +29,10 @@ export const Input = ({
                 onChange={onChange}
                 placeholder={placeholder}
                 disabled={disabled}
+                readOnly={readOnly}
                 name={name}
                 required={required}
+                style={style}
             />
             {error && <span className="input-error-message">{error}</span>}
         </div>

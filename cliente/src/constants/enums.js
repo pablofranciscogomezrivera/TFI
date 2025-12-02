@@ -1,84 +1,83 @@
-/**
+ï»¿/**
  * Enumeraciones del backend - Sincronizadas con Dominio/Entidades
  */
 
-/**
- * Niveles de emergencia según el sistema de triage
- * Sincronizado con: Dominio/Entidades/NivelEmergencia.cs
- */
 export const NivelEmergencia = {
-    CRITICA: 0,        // Rojo - Inmediato (5 minutos)
-    EMERGENCIA: 1,     // Naranja - 10-30 minutos
-    URGENCIA: 2,       // Amarillo - 60 minutos
-    URGENCIA_MENOR: 3, // Verde - 2 horas
-    SIN_URGENCIA: 4    // Azul - 4 horas
+    CRITICA: 0,
+    EMERGENCIA: 1,
+    URGENCIA: 2,
+    URGENCIA_MENOR: 3,
+    SIN_URGENCIA: 4
 };
 
-/**
- * Estados de un ingreso en el sistema
- * Sincronizado con: Dominio/Entidades/EstadoIngreso.cs
- */
 export const EstadoIngreso = {
-    PENDIENTE: 0,   // En lista de espera
-    EN_PROCESO: 1,  // Siendo atendido por un médico
-    FINALIZADO: 2   // Atención completada
+    PENDIENTE: 0,
+    EN_PROCESO: 1,
+    FINALIZADO: 2
 };
 
-/**
- * Obtiene información detallada del nivel de emergencia
- */
+export const NivelesEmergencia = {
+    [NivelEmergencia.CRITICA]: {
+        id: NivelEmergencia.CRITICA,
+        nombre: 'CrÃ­tica',
+        tiempoEspera: 'Inmediato',
+        color: 'Rojo',      
+        hex: '#ef4444'       
+    },
+    [NivelEmergencia.EMERGENCIA]: {
+        id: NivelEmergencia.EMERGENCIA,
+        nombre: 'Emergencia',
+        tiempoEspera: '10-30 min',
+        color: 'Naranja',
+        hex: '#f97316'
+    },
+    [NivelEmergencia.URGENCIA]: {
+        id: NivelEmergencia.URGENCIA,
+        nombre: 'Urgencia',
+        tiempoEspera: '60 min',
+        color: 'Amarillo',
+        hex: '#f59e0b'
+    },
+    [NivelEmergencia.URGENCIA_MENOR]: {
+        id: NivelEmergencia.URGENCIA_MENOR,
+        nombre: 'Urgencia Menor',
+        tiempoEspera: '2 horas',
+        color: 'Verde',
+        hex: '#10b981'
+    },
+    [NivelEmergencia.SIN_URGENCIA]: {
+        id: NivelEmergencia.SIN_URGENCIA,
+        nombre: 'Sin Urgencia',
+        tiempoEspera: '4 horas',
+        color: 'Azul',
+        hex: '#3b82f6'
+    }
+};
+
 export const getNivelEmergenciaInfo = (nivel) => {
-    const info = {
-        [NivelEmergencia.CRITICA]: {
-            label: 'Critica',
-            color: '#ef4444',
-            tiempo: 'Inmediato (5 min)',
-            descripcion: 'Requiere atencion inmediata'
-        },
-        [NivelEmergencia.EMERGENCIA]: {
-            label: 'Emergencia',
-            color: '#f97316',
-            tiempo: '10-30 minutos',
-            descripcion: 'Requiere atencion urgente'
-        },
-        [NivelEmergencia.URGENCIA]: {
-            label: 'Urgencia',
-            color: '#f59e0b',
-            tiempo: '60 minutos',
-            descripcion: 'Requiere atencion pronta'
-        },
-        [NivelEmergencia.URGENCIA_MENOR]: {
-            label: 'Urgencia Menor',
-            color: '#10b981',
-            tiempo: '2 horas',
-            descripcion: 'Puede esperar hasta 2 horas'
-        },
-        [NivelEmergencia.SIN_URGENCIA]: {
-            label: 'Sin Urgencia',
-            color: '#3b82f6',
-            tiempo: '4 horas',
-            descripcion: 'Puede esperar hasta 4 horas'
-        }
-    };
+    const n = NivelesEmergencia[nivel];
+    if (!n) return NivelesEmergencia[NivelEmergencia.URGENCIA];
 
-    return info[nivel] || info[NivelEmergencia.URGENCIA];
+    return {
+        label: n.nombre,
+        color: n.hex,
+        tiempo: n.tiempoEspera,
+        descripcion: `Prioridad: ${n.nombre}`
+    };
 };
 
-/**
- * Obtiene el label del estado de ingreso
- */
 export const getEstadoIngresoLabel = (estado) => {
     const labels = {
         [EstadoIngreso.PENDIENTE]: 'Pendiente',
         [EstadoIngreso.EN_PROCESO]: 'En Proceso',
         [EstadoIngreso.FINALIZADO]: 'Finalizado'
     };
-
     return labels[estado] || 'Desconocido';
 };
 
 export default {
     NivelEmergencia,
+    NivelesEmergencia, 
     EstadoIngreso,
     getNivelEmergenciaInfo,
     getEstadoIngresoLabel

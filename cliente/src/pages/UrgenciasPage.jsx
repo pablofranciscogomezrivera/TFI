@@ -14,7 +14,7 @@ export const UrgenciasPage = () => {
     const [error, setError] = useState(null);
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
     const [vistaActual, setVistaActual] = useState('cola');
-    const dniEnfermera = localStorage.getItem('profesionalDNI') || '';
+    const dniEnfermera = localStorage.getItem('profesionalDNI') || 'Sin Identificar';
     
     // 0: Medico, 1: Enfermera 
     const userRole = parseInt(localStorage.getItem('userRole'));
@@ -132,8 +132,8 @@ export const UrgenciasPage = () => {
                         {esMedico && (
                             <div style={{ marginBottom: '20px', padding: '20px', background: '#e0f2fe', borderRadius: '8px', border: '1px solid #bae6fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
-                                    <h3 style={{ margin: 0, color: '#0369a1' }}>Panel Médico</h3>
-                                    <p style={{ margin: 0, color: '#0c4a6e' }}>Hay {pacientes.length} pacientes esperando atención.</p>
+                                    <h3 style={{ margin: 0, color: '#0369a1' }}>Panel Medico</h3>
+                                    <p style={{ margin: 0, color: '#0c4a6e' }}>Hay {pacientes.length} pacientes esperando atencion.</p>
                                 </div>
                                 <Button onClick={handleReclamarPaciente} size="large">
                                     Llamar Siguiente Paciente
