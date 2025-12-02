@@ -16,6 +16,7 @@ public interface IServicioPacientes
         string calle,
         int numero,
         string localidad,
+        DateTime fechaNacimiento,
         int? obraSocialId = null,
         string? numeroAfiliado = null);
 }

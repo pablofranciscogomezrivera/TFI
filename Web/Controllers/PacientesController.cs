@@ -38,6 +38,7 @@ public class PacientesController : ControllerBase
                 request.Calle,
                 request.Numero,
                 request.Localidad,
+                request.FechaNacimiento,
                 request.ObraSocialId,
                 request.NumeroAfiliado
             );

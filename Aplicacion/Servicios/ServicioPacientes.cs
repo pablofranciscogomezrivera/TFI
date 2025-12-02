@@ -30,6 +30,7 @@ public class ServicioPacientes : IServicioPacientes
         string calle,
         int numero,
         string localidad,
+        DateTime fechaNacimiento,
         int? obraSocialId = null,
         string? numeroAfiliado = null)
     {
@@ -61,8 +62,10 @@ public class ServicioPacientes : IServicioPacientes
         var paciente = new Paciente
         {
             CUIL = cuil,
+            DNI = int.Parse(cuil.Substring(3, 8)), 
             Nombre = nombre,
             Apellido = apellido,
+            FechaNacimiento = fechaNacimiento,
             Domicilio = domicilio,
             Afiliado = afiliado
         };

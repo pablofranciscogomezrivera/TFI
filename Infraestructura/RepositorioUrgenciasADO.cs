@@ -1,0 +1,210 @@
+﻿using Dominio.Entidades;
+using Dominio.Entidades.ValueObject;
+using Dominio.Interfaces;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using System.Data;
+
+namespace Infraestructura
+{
+    public class RepositorioUrgenciasADO : IRepositorioUrgencias
+    {
+        private readonly string _connectionString;
+
+        public RepositorioUrgenciasADO(IConfiguration configuration)
+        {
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
+        }
+
+        public void AgregarIngreso(Ingreso ingreso)
+        {
+            using (var conexion = new SqlConnection(_connectionString))
+            {
+                conexion.Open();
+
+                // 1. Necesitamos el ID del paciente en la BD
+                var idPaciente = ObtenerIdPacientePorCuil(ingreso.Paciente.CUIL, conexion);
+
+                var query = @"
+                    INSERT INTO Ingresos (
+                        IdPaciente, MatriculaEnfermera, FechaIngreso, Informe, 
+                        NivelEmergencia, Estado, Temperatura, 
+                        FrecuenciaCardiaca, FrecuenciaRespiratoria, 
+                        TensionSistolica, TensionDiastolica
+                    ) VALUES (
+                        @IdPaciente, @MatriculaEnfermera, @FechaIngreso, @Informe, 
+                        @NivelEmergencia, @Estado, @Temperatura, 
+                        @FrecuenciaCardiaca, @FrecuenciaRespiratoria, 
+                        @TensionSistolica, @TensionDiastolica
+                    )";
+
+                using (var cmd = new SqlCommand(query, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@IdPaciente", idPaciente);
+                    cmd.Parameters.AddWithValue("@MatriculaEnfermera", ingreso.Enfermera.Matricula);
+                    cmd.Parameters.Add("@FechaIngreso", SqlDbType.DateTime2).Value = ingreso.FechaIngreso;
+                    cmd.Parameters.AddWithValue("@Informe", ingreso.Atencion.Informe);
+                    cmd.Parameters.AddWithValue("@NivelEmergencia", (int)ingreso.NivelEmergencia);
+                    cmd.Parameters.AddWithValue("@Estado", (int)ingreso.Estado);
+
+                    // Extraemos los valores primitivos de tus Value Objects
+                    cmd.Parameters.AddWithValue("@Temperatura", ingreso.Temperatura.Valor);
+                    cmd.Parameters.AddWithValue("@FrecuenciaCardiaca", ingreso.FrecuenciaCardiaca.Valor);
+                    cmd.Parameters.AddWithValue("@FrecuenciaRespiratoria", ingreso.FrecuenciaRespiratoria.Valor);
+                    cmd.Parameters.AddWithValue("@TensionSistolica", ingreso.TensionArterial.FrecuenciaSistolica.Valor);
+                    cmd.Parameters.AddWithValue("@TensionDiastolica", ingreso.TensionArterial.FrecuenciaDiastolica.Valor);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public List<Ingreso> ObtenerIngresosPendientes()
+        {
+            var ingresos = new List<Ingreso>();
+
+            using (var conexion = new SqlConnection(_connectionString))
+            {
+                conexion.Open();
+                // AQUÍ LA BASE DE DATOS HACE EL TRABAJO DE LA COLA DE PRIORIDAD
+                // Ordenamos por Nivel (0 es Crítico) y luego por Fecha (FIFO)
+                var query = @"
+                    SELECT i.*, p.CUIL, p.Nombre, p.Apellido, p.DNI
+                    FROM Ingresos i
+                    INNER JOIN Pacientes p ON i.IdPaciente = p.Id
+                    WHERE i.Estado = 0 -- 0 = PENDIENTE
+                    ORDER BY i.NivelEmergencia ASC, i.FechaIngreso ASC";
+
+                using (var cmd = new SqlCommand(query, conexion))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ingresos.Add(MapearIngreso(reader));
+                        }
+                    }
+                }
+            }
+            return ingresos;
+        }
+
+        public void ActualizarIngreso(Ingreso ingreso)
+        {
+            using (var conexion = new SqlConnection(_connectionString))
+            {
+                conexion.Open();
+
+                var query = @"
+            UPDATE Ingresos 
+            SET Estado = @Estado,
+                MatriculaDoctor = @MatriculaDoctor,
+                InformeMedico = @InformeMedico
+            WHERE FechaIngreso = @FechaIngreso 
+            AND IdPaciente = (SELECT Id FROM Pacientes WHERE CUIL = @Cuil)";
+
+                using (var cmd = new SqlCommand(query, conexion))
+                {
+                    // 1. Estado
+                    cmd.Parameters.AddWithValue("@Estado", (int)ingreso.Estado);
+
+                    // 2. Matricula Doctor (Manejo de Nulos)
+                    if (ingreso.Atencion != null && ingreso.Atencion.Doctor != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MatriculaDoctor", ingreso.Atencion.Doctor.Matricula);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MatriculaDoctor", DBNull.Value);
+                    }
+
+                    // 3. Informe Médico (Manejo de Nulos)
+                    // Asumimos que guardamos el informe completo de la atención
+                    object informeVal = ingreso.Atencion?.Informe ?? (object)DBNull.Value;
+                    cmd.Parameters.AddWithValue("@InformeMedico", informeVal);
+
+                    // 4. Fecha Ingreso (CRÍTICO: Usar DateTime2 para precisión exacta)
+                    cmd.Parameters.Add("@FechaIngreso", SqlDbType.DateTime2).Value = ingreso.FechaIngreso;
+
+                    // 5. CUIL (Necesario para la subquery que busca el IdPaciente)
+                    cmd.Parameters.AddWithValue("@Cuil", ingreso.Paciente.CUIL);
+
+                    // Ejecutar y validar que se haya tocado alguna fila
+                    int filasAfectadas = cmd.ExecuteNonQuery();
+
+                    if (filasAfectadas == 0)
+                    {
+                        throw new Exception("Error de Concurrencia: No se actualizó el ingreso. Verifica que la FechaIngreso en la BD coincida exactamente (nanosegundos) con la del objeto.");
+                    }
+                }
+            }
+        }
+
+        public void RemoverIngreso(Ingreso ingreso)
+        {
+            // En base de datos no borramos, solo actualizamos estado.
+            // La lógica de negocio ya llama a "ActualizarIngreso" después de esto,
+            // así que este método puede quedar vacío o usarse para logs.
+        }
+
+        // --- Helpers ---
+
+        private int ObtenerIdPacientePorCuil(string cuil, SqlConnection conexion)
+        {
+            var cmd = new SqlCommand("SELECT Id FROM Pacientes WHERE CUIL = @Cuil", conexion);
+            cmd.Parameters.AddWithValue("@Cuil", cuil);
+            var result = cmd.ExecuteScalar();
+            if (result == null) throw new Exception($"Error de Integridad: Paciente {cuil} no encontrado.");
+            return (int)result;
+        }
+
+        private Ingreso MapearIngreso(SqlDataReader reader)
+        {
+            // Reconstruimos el objeto Paciente (versión resumida para la lista)
+            var paciente = new Paciente
+            {
+                CUIL = reader["CUIL"].ToString(),
+                Nombre = reader["Nombre"].ToString(),
+                Apellido = reader["Apellido"].ToString(),
+                DNI = Convert.ToInt32(reader["DNI"]),
+                // Nota: Podrías necesitar traer el domicilio si lo muestras en la lista
+            };
+
+            var enfermera = new Enfermera
+            {
+                Matricula = reader["MatriculaEnfermera"].ToString(),
+                Nombre = "Enfermera",
+                Apellido = "Guardia"
+            };
+
+            // Usamos el constructor de tu Dominio para asegurar que las reglas se cumplan
+            var ingreso = new Ingreso(
+                paciente,
+                enfermera,
+                reader["Informe"].ToString(),
+                (NivelEmergencia)Convert.ToInt32(reader["NivelEmergencia"]),
+                Convert.ToDouble(reader["Temperatura"]),
+                Convert.ToDouble(reader["FrecuenciaCardiaca"]),
+                Convert.ToDouble(reader["FrecuenciaRespiratoria"]),
+                Convert.ToDouble(reader["TensionSistolica"]),
+                Convert.ToDouble(reader["TensionDiastolica"])
+            );
+
+            // Completamos los datos que no están en el constructor
+            ingreso.FechaIngreso = Convert.ToDateTime(reader["FechaIngreso"]);
+            ingreso.Estado = (EstadoIngreso)Convert.ToInt32(reader["Estado"]);
+
+            if (reader["MatriculaDoctor"] != DBNull.Value)
+            {
+                ingreso.Atencion.Doctor = new Doctor
+                {
+                    Matricula = reader["MatriculaDoctor"].ToString(),
+                    Nombre = "Doctor",
+                    Apellido = "Guardia"
+                };
+            }
+
+            return ingreso;
+        }
+    }
+}

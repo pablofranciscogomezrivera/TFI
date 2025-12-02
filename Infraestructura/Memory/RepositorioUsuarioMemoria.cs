@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infraestructura;
+namespace Infraestructura.Memory;
 
 public class RepositorioUsuarioMemoria : IRepositorioUsuario
 {

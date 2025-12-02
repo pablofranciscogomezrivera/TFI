@@ -20,7 +20,7 @@ namespace Tests.StepDefinitions
         public ModuloDeUrgenciasStepDefinitions()
         {
             // Se crea una sola vez la base de datos en memoria
-            _dbMockeada = new DBPruebaMemoria();
+            _dbMockeada = new RepositorioPacientesMemoria();
             var repositorioUrgencias = new RepositorioUrgenciasMemoria();
             // Se inyecta la MISMA instancia de los repositorios al servicio
             _servicioUrgencias = new ServicioUrgencias(_dbMockeada, repositorioUrgencias);

@@ -4,6 +4,7 @@ using Dominio.Entidades;
 using Dominio.Interfaces;
 using Web.DTOs.Atenciones;
 using Web.DTOs.Common;
+using Infraestructura.Memory;
 
 namespace Web.Controllers;
 
@@ -130,7 +131,7 @@ public class AtencionesController : ControllerBase
         // Usamos reflexión para acceder a la lista privada del repositorio
         // Esto es un workaround temporal. En producción deberías agregar un método
         // en IRepositorioUrgencias para obtener ingresos por estado o por paciente
-        var repositorio = _repositorioUrgencias as Infraestructura.RepositorioUrgenciasMemoria;
+        var repositorio = _repositorioUrgencias as RepositorioUrgenciasMemoria;
         if (repositorio != null)
         {
             var field = repositorio.GetType().GetField("_ingresos",

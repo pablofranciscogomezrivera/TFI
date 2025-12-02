@@ -15,7 +15,7 @@ public class ServicioAtencionTests
 
     public ServicioAtencionTests()
     {
-        var repositorioPacientes = new DBPruebaMemoria();
+        var repositorioPacientes = new RepositorioPacientesMemoria();
         var repositorioUrgencias = new RepositorioUrgenciasMemoria();
         _servicioUrgencias = new ServicioUrgencias(repositorioPacientes, repositorioUrgencias);
         _servicioAtencion = new ServicioAtencion();

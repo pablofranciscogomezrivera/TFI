@@ -2,6 +2,7 @@ using Aplicacion;
 using Aplicacion.Intefaces;
 using Dominio.Interfaces;
 using Infraestructura;
+using Infraestructura.Memory;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore; 
 
@@ -26,9 +27,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSingleton<IRepositorioUrgencias, RepositorioUrgenciasMemoria>();
-builder.Services.AddSingleton<IRepositorioPacientes, DBPruebaMemoria>();
-builder.Services.AddSingleton<IRepositorioObraSocial, RepositorioObraSocialMemoria>();
+//builder.Services.AddSingleton<IRepositorioUrgencias, RepositorioUrgenciasMemoria>();
+builder.Services.AddScoped<IRepositorioUrgencias, RepositorioUrgenciasADO>();
+builder.Services.AddScoped<IRepositorioPacientes, RepositorioPacientesADO>();
+//builder.Services.AddSingleton<IRepositorioPacientes, DBPruebaMemoria>();
+//builder.Services.AddSingleton<IRepositorioObraSocial, RepositorioObraSocialMemoria>();
+builder.Services.AddScoped<IRepositorioObraSocial, RepositorioObraSocialADO>();
 builder.Services.AddSingleton<IRepositorioUsuario, RepositorioUsuarioMemoria>();
 
 builder.Services.AddScoped<IServicioUrgencias, ServicioUrgencias>();

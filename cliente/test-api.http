@@ -1,25 +1,25 @@
-### API Testing - Módulo de Urgencias
+### API Testing - Mï¿½dulo de Urgencias
 ### Archivo de pruebas HTTP para VSCode REST Client Extension
 ### Puedes ejecutar estas peticiones directamente en VSCode
 
-@baseUrl = http://localhost:5000/api
+@baseUrl = https://localhost:5284/api
 @matriculaEnfermera = ENF123
 @matriculaDoctor = MP12345
 
-### 1. Health Check - Verificar que la API está corriendo
+### 1. Health Check - Verificar que la API estï¿½ corriendo
 GET {{baseUrl}}/urgencias/lista-espera
 
-### 2. Obtener lista de espera vacía (al inicio)
+### 2. Obtener lista de espera vacï¿½a (al inicio)
 GET {{baseUrl}}/urgencias/lista-espera
 
-### 3. Registrar primera urgencia - Caso CRÍTICO
+### 3. Registrar primera urgencia - Caso CRï¿½TICO
 POST {{baseUrl}}/urgencias
 Content-Type: application/json
 X-Enfermera-Matricula: {{matriculaEnfermera}}
 
 {
   "cuilPaciente": "20-12345678-9",
-  "informe": "Paciente con dolor torácico intenso, sudoración y dificultad respiratoria. Posible infarto agudo de miocardio.",
+  "informe": "Paciente con dolor torï¿½cico intenso, sudoraciï¿½n y dificultad respiratoria. Posible infarto agudo de miocardio.",
   "temperatura": 38.2,
   "nivelEmergencia": 0,
   "frecuenciaCardiaca": 125,
@@ -35,7 +35,7 @@ X-Enfermera-Matricula: {{matriculaEnfermera}}
 
 {
   "cuilPaciente": "27-23456789-0",
-  "informe": "Fractura de muñeca por caída. Dolor moderado y limitación de movimiento.",
+  "informe": "Fractura de muï¿½eca por caï¿½da. Dolor moderado y limitaciï¿½n de movimiento.",
   "temperatura": 36.5,
   "nivelEmergencia": 2,
   "frecuenciaCardiaca": 85,
@@ -60,14 +60,14 @@ X-Enfermera-Matricula: {{matriculaEnfermera}}
   "frecuenciaDiastolica": 85
 }
 
-### 6. Ver lista de espera ordenada (debería estar: Crítico, Emergencia, Urgencia)
+### 6. Ver lista de espera ordenada (deberï¿½a estar: Crï¿½tico, Emergencia, Urgencia)
 GET {{baseUrl}}/urgencias/lista-espera
 
-### 7. Reclamar paciente (el primero de la lista - caso crítico)
+### 7. Reclamar paciente (el primero de la lista - caso crï¿½tico)
 POST {{baseUrl}}/urgencias/reclamar
 X-Doctor-Matricula: {{matriculaDoctor}}
 
-### 8. Ver lista de espera después de reclamar (el crítico ya no debería estar)
+### 8. Ver lista de espera despuï¿½s de reclamar (el crï¿½tico ya no deberï¿½a estar)
 GET {{baseUrl}}/urgencias/lista-espera
 
 ### 9. Registrar paciente nuevo
@@ -75,12 +75,13 @@ POST {{baseUrl}}/pacientes
 Content-Type: application/json
 
 {
-  "cuil": "20-98765432-1",
+  "cuil": "20-43837604-7",
   "nombre": "Pedro",
-  "apellido": "González",
+  "apellido": "Gonzalez",
   "calle": "Av. Independencia",
   "numero": 999,
-  "localidad": "San Miguel de Tucumán",
+  "localidad": "San Miguel de Tucuman",
+  "fechaNacimiento": "1990-05-15",
   "obraSocialId": 1,
   "numeroAfiliado": "PG999"
 }
@@ -92,7 +93,7 @@ X-Enfermera-Matricula: {{matriculaEnfermera}}
 
 {
   "cuilPaciente": "20-98765432-1",
-  "informe": "Fiebre alta y tos persistente. Sospecha de neumonía.",
+  "informe": "Fiebre alta y tos persistente. Sospecha de neumonï¿½a.",
   "temperatura": 39.5,
   "nivelEmergencia": 1,
   "frecuenciaCardiaca": 110,
@@ -117,7 +118,7 @@ X-Enfermera-Matricula: {{matriculaEnfermera}}
   "frecuenciaDiastolica": 80
 }
 
-### 12. ERROR: Registrar urgencia con frecuencia cardíaca negativa (debe fallar)
+### 12. ERROR: Registrar urgencia con frecuencia cardï¿½aca negativa (debe fallar)
 POST {{baseUrl}}/urgencias
 Content-Type: application/json
 X-Enfermera-Matricula: {{matriculaEnfermera}}

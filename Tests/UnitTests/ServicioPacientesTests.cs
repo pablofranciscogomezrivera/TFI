@@ -2,7 +2,7 @@
 using Dominio.Entidades;
 using Dominio.Interfaces;
 using FluentAssertions;
-using Infraestructura;
+using Infraestructura.Memory;
 using Xunit;
 
 namespace Tests.UnitTests;
@@ -15,7 +15,7 @@ public class ServicioPacientesTests
 
     public ServicioPacientesTests()
     {
-        _repositorioPacientes = new DBPruebaMemoria();
+        _repositorioPacientes = new RepositorioPacientesMemoria();
         _repositorioObraSocial = new RepositorioObraSocialMemoria();
         _servicioPacientes = new ServicioPacientes(_repositorioPacientes, _repositorioObraSocial);
     }
