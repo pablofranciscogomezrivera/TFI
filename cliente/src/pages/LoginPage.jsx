@@ -26,6 +26,10 @@ const LoginPage = () => {
         try {
             const response = await api.post('/auth/login', { email, password });
 
+            console.log('Login Response:', response.data);
+            console.log('Token recibido:', response.data.token);
+            console.log('Usuario:', response.data.usuario);
+
             localStorage.setItem('authToken', response.data.token);
             localStorage.setItem('userRole', response.data.usuario.tipoAutoridad);
 

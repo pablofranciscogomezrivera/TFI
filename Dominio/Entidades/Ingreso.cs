@@ -9,34 +9,40 @@ namespace Dominio.Entidades;
 
 public class Ingreso : IComparable<Ingreso>
 {
-    public Atencion Atencion { get; set; }
     public Paciente Paciente { get; set; }
     public Enfermera Enfermera { get; set; }
     public NivelEmergencia NivelEmergencia { get; set; }
     public EstadoIngreso Estado { get; set; }
     public DateTime FechaIngreso { get; set; }
+
+    // Informe inicial de la enfermera al ingresar
+    public string InformeIngreso { get; set; }
+
+    // Signos vitales
     public Temperatura Temperatura { get; set; }
     public TensionArterial TensionArterial { get; set; }
     public FrecuenciaCardiaca FrecuenciaCardiaca { get; set; }
     public FrecuenciaRespiratoria FrecuenciaRespiratoria { get; set; }
 
+    
+    public Atencion? Atencion { get; set; }
+
     public Ingreso(Paciente paciente, Enfermera enfermera,
-        string informe, NivelEmergencia nivelEmergencia,
+        string informeIngreso, NivelEmergencia nivelEmergencia,
         double temperatura, double frecCardiaca, double frecRespiratoria,
         double frecSistolica, double frecDiastolica)
     {
         Paciente = paciente;
         Enfermera = enfermera;
-        Atencion = new Atencion();
-        Atencion.Informe = informe;
+        InformeIngreso = informeIngreso;
         NivelEmergencia = nivelEmergencia;
-        Temperatura = new Temperatura();
-        Temperatura.Valor = temperatura;
+        Temperatura = new Temperatura(temperatura);
         FrecuenciaCardiaca = new FrecuenciaCardiaca(frecCardiaca);
         FrecuenciaRespiratoria = new FrecuenciaRespiratoria(frecRespiratoria);
         TensionArterial = new TensionArterial(frecSistolica, frecDiastolica);
         FechaIngreso = DateTime.Now;
         Estado = EstadoIngreso.PENDIENTE;
+        Atencion = null; 
     }
 
     public int CompareTo(Ingreso? ingreso)

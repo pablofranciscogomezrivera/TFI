@@ -4,7 +4,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -15,29 +16,44 @@
 
 .formulario-container {
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
     max-height: 90vh;
     overflow-y: auto;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .formulario-card {
     margin: 20px 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .formulario-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 32px;
-    padding-bottom: 24px;
-    border-bottom: 2px solid #f3f4f6;
+    padding: 24px 24px 16px;
+    border-bottom: 2px solid #e5e7eb;
 }
 
 .formulario-title {
     font-size: 24px;
     font-weight: 700;
     color: #1f2937;
-    margin: 0 0 8px 0;
+    margin: 0 0 4px 0;
 }
 
 .formulario-subtitle {
@@ -49,55 +65,68 @@
 .btn-close {
     background: none;
     border: none;
+    font-size: 32px;
+    color: #9ca3af;
     cursor: pointer;
-    padding: 8px;
-    color: #6b7280;
-    transition: all 0.2s ease;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 6px;
+    transition: all 0.2s;
 }
 
     .btn-close:hover {
-        background: #f3f4f6;
-        color: #1f2937;
-    }
-
-    .btn-close svg {
-        width: 24px;
-        height: 24px;
+        background-color: #fee2e2;
+        color: #dc2626;
     }
 
 .formulario-form {
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 24px;
 }
 
 .form-section {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    transition: all 0.2s ease;
 }
 
+    .form-section:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
 .section-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     color: #1f2937;
-    margin: 0;
+    margin: 0 0 8px 0;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .section-icon {
-    width: 20px;
-    height: 20px;
+    font-size: 20px;
 }
 
 .form-section-subtitle {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
     color: #6b7280;
-    margin-top: 8px;
+    margin: -4px 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .form-row {
@@ -256,27 +285,149 @@
 }
 
 .new-patient-section {
-    background-color: #fff7ed; /* Naranja muy suave */
-    border: 1px solid #fed7aa;
-    border-radius: 8px;
-    padding: 16px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 20px;
     margin-top: 16px;
-    animation: slideDown 0.3s ease;
+    animation: slideDown 0.4s ease, pulseGlow 2s ease-in-out;
+    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1), 0 2px 4px -1px rgba(245, 158, 11, 0.06);
 }
 
 .new-patient-header {
     display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.new-patient-icon-wrapper {
+    background: white;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: bounceIn 0.6s ease;
+}
+
+.new-patient-icon {
+    font-size: 24px;
+}
+
+.new-patient-text {
+    flex: 1;
+}
+
+.new-patient-title {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #92400e;
+    display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 16px;
-    color: #9a3412;
+}
+
+.new-patient-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+.new-patient-description {
+    margin: 0;
     font-size: 14px;
-    font-weight: 500;
+    color: #78350f;
+    line-height: 1.5;
+}
+
+/* Estilos para los inputs dentro de la sección de paciente nuevo */
+.new-patient-section .input-group {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #fbbf24;
+    transition: all 0.2s ease;
+}
+
+    .new-patient-section .input-group:focus-within {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        transform: translateY(-1px);
+    }
+
+.new-patient-section .form-row {
+    gap: 12px;
 }
 
 .warning-icon {
     font-size: 18px;
 }
+
+/* Estilos para el select de obra social */
+.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .form-select:hover {
+        border-color: #9ca3af;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+.input-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.new-patient-section .form-select {
+    background-color: white;
+    border-color: #fbbf24;
+}
+
+    .new-patient-section .form-select:focus {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
 
 .three-cols {
     grid-template-columns: 1fr 1fr 1fr;
@@ -301,11 +452,41 @@
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-20px);
     }
 
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    70% {
+        transform: scale(0.9);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1), 0 2px 4px -1px rgba(245, 158, 11, 0.06);
+    }
+
+    50% {
+        box-shadow: 0 8px 12px -2px rgba(245, 158, 11, 0.2), 0 4px 8px -2px rgba(245, 158, 11, 0.12);
     }
 }

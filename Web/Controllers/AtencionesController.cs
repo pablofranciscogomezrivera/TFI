@@ -4,7 +4,6 @@ using Dominio.Entidades;
 using Dominio.Interfaces;
 using Web.DTOs.Atenciones;
 using Web.DTOs.Common;
-using Infraestructura.Memory;
 
 namespace Web.Controllers;
 
@@ -29,35 +28,38 @@ public class AtencionesController : ControllerBase
     /// <summary>
     /// Registra la atención médica de un paciente
     /// </summary>
-    /// <param name="cuilPaciente">CUIL del paciente</param>
-    /// <param name="request">Informe médico</param>
+    /// <param name="request">Datos de la atención (CUIL del paciente e informe médico)</param>
     /// <param name="matriculaDoctor">Matrícula del doctor</param>
     /// <returns>Datos de la atención registrada</returns>
-    [HttpPost("{cuilPaciente}")]
+    [HttpPost]
     [ProducesResponseType(typeof(AtencionResponse), 200)]
     [ProducesResponseType(typeof(ErrorResponse), 400)]
     [ProducesResponseType(typeof(ErrorResponse), 404)]
     public IActionResult RegistrarAtencion(
-        string cuilPaciente,
         [FromBody] RegistrarAtencionRequest request,
         [FromHeader(Name = "X-Doctor-Matricula")] string matriculaDoctor)
     {
         try
         {
+            // Validar request
+            if (string.IsNullOrWhiteSpace(request.CuilPaciente))
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Message = "El CUIL del paciente es requerido",
+                    StatusCode = 400
+                });
+            }
+
             // Buscar el ingreso EN_PROCESO del paciente
-            // Nota: En una implementación real, deberías tener una forma mejor de trackear
-            // qué ingreso está atendiendo cada doctor. Aquí simplificamos buscando todos
-            // los ingresos y filtrando.
-            var todosIngresos = ObtenerTodosLosIngresos();
-            var ingreso = todosIngresos
-                .FirstOrDefault(i => i.Paciente.CUIL == cuilPaciente && i.Estado == EstadoIngreso.EN_PROCESO);
+            var ingreso = _repositorioUrgencias.BuscarIngresoPorCuilYEstado(request.CuilPaciente, EstadoIngreso.EN_PROCESO);
 
             if (ingreso == null)
             {
-                _logger.LogWarning("No se encontró ingreso en proceso para paciente: {Cuil}", cuilPaciente);
+                _logger.LogWarning("No se encontró ingreso en proceso para paciente: {Cuil}", request.CuilPaciente);
                 return NotFound(new ErrorResponse
                 {
-                    Message = $"No se encontró un ingreso en proceso para el paciente con CUIL {cuilPaciente}",
+                    Message = $"No se encontró un ingreso en proceso para el paciente con CUIL {request.CuilPaciente}",
                     StatusCode = 404
                 });
             }
@@ -88,7 +90,7 @@ public class AtencionesController : ControllerBase
 
             _logger.LogInformation(
                 "Atención registrada para paciente {Cuil} por doctor {Matricula}",
-                cuilPaciente,
+                request.CuilPaciente,
                 matriculaDoctor);
 
             return Ok(response);
@@ -122,23 +124,4 @@ public class AtencionesController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Obtiene todos los ingresos del repositorio (helper method)
-    /// En una implementación real, esto debería estar en el repositorio
-    /// </summary>
-    private List<Ingreso> ObtenerTodosLosIngresos()
-    {
-        // Usamos reflexión para acceder a la lista privada del repositorio
-        // Esto es un workaround temporal. En producción deberías agregar un método
-        // en IRepositorioUrgencias para obtener ingresos por estado o por paciente
-        var repositorio = _repositorioUrgencias as RepositorioUrgenciasMemoria;
-        if (repositorio != null)
-        {
-            var field = repositorio.GetType().GetField("_ingresos",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var ingresos = field?.GetValue(repositorio) as List<Ingreso>;
-            return ingresos ?? new List<Ingreso>();
-        }
-        return new List<Ingreso>();
-    }
 }

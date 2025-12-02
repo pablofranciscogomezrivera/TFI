@@ -45,4 +45,18 @@ public class RepositorioUrgenciasMemoria : IRepositorioUrgencias
         // Este método está para mantener la interfaz completa y por si en el futuro
         // necesitamos implementar un repositorio con persistencia real
     }
+
+    public Ingreso? BuscarIngresoPorCuilYEstado(string cuil, EstadoIngreso estado)
+    {
+        if (string.IsNullOrWhiteSpace(cuil))
+            throw new ArgumentException("El CUIL no puede estar vacío", nameof(cuil));
+
+        return _ingresos.FirstOrDefault(i => i.Paciente.CUIL == cuil && i.Estado == estado);
+    }
+
+    public List<Ingreso> ObtenerTodosLosIngresos()
+    {
+        return _ingresos.ToList();
+    }
 }
+

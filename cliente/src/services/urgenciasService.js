@@ -1,9 +1,15 @@
-import api from './api';
+ï»¿import api from './api';
 
 export const urgenciasService = {
-    // Obtener lista de espera
+    // Obtener lista de espera (pendientes)
     obtenerListaEspera: async () => {
         const response = await api.get('/urgencias/lista-espera');
+        return response.data;
+    },
+
+    // Obtener ingresos en proceso (reclamados pero no finalizados)
+    obtenerIngresosEnProceso: async () => {
+        const response = await api.get('/urgencias/en-proceso');
         return response.data;
     },
 
@@ -17,9 +23,22 @@ export const urgenciasService = {
         return response.data;
     },
 
-    // Reclamar paciente (para médicos)
+    // Reclamar paciente (para mï¿½dicos)
     reclamarPaciente: async (matriculaDoctor) => {
         const response = await api.post('/urgencias/reclamar', {}, {
+            headers: {
+                'X-Doctor-Matricula': matriculaDoctor
+            }
+        });
+        return response.data;
+    },
+
+    // Registrar atenciï¿½n mï¿½dica
+    registrarAtencion: async (cuilPaciente, informeMedico, matriculaDoctor) => {
+        const response = await api.post('/atenciones', {
+            cuilPaciente,
+            informeMedico
+        }, {
             headers: {
                 'X-Doctor-Matricula': matriculaDoctor
             }

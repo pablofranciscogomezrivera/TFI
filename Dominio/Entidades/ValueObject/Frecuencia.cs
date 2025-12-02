@@ -8,7 +8,7 @@ namespace Dominio.Entidades.ValueObject;
 
 public abstract class Frecuencia
 {
-    public  double Valor {  get; set; }
+    public double Valor { get; protected set; }
 
     protected Frecuencia(double valor)
     {

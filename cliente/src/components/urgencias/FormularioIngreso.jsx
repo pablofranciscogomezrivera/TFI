@@ -1,9 +1,10 @@
-﻿import { useState } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Input, { TextArea } from '../ui/Input';
 import { NivelesEmergencia } from '../../constants/enums';
-import pacientesService from '../../services/pacientesService'; // Importamos el servicio aquí
+import pacientesService from '../../services/pacientesService';
+import obrasSocialesService from '../../services/obrasSocialesService';
 import './FormularioIngreso.css';
 import React from 'react';
 
@@ -28,16 +29,55 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         apellido: '',
         calle: '',
         numero: '',
-        localidad: ''
+        localidad: '',
+        email: '',
+        telefono: '',
+        obraSocialId: '',
+        numeroAfiliado: ''
     });
 
     // Estados de Control
     const [pacienteEncontrado, setPacienteEncontrado] = useState(null); // null: sin buscar, true: existe, false: nuevo
     const [buscandoPaciente, setBuscandoPaciente] = useState(false);
     const [nombrePacienteDisplay, setNombrePacienteDisplay] = useState(''); // Para mostrar si ya existe
+    const [mostrarMensajePacienteNuevo, setMostrarMensajePacienteNuevo] = useState(false);
+    const [obrasSociales, setObrasSociales] = useState([]);
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+
+    // Ref para hacer scroll a la sección de paciente nuevo
+    const seccionPacienteNuevoRef = useRef(null);
+
+    // Cargar obras sociales al montar el componente
+    useEffect(() => {
+        const cargarObrasSociales = async () => {
+            try {
+                const obras = await obrasSocialesService.obtenerTodas();
+                setObrasSociales(obras);
+            } catch (error) {
+                console.error('Error al cargar obras sociales:', error);
+            }
+        };
+        cargarObrasSociales();
+    }, []);
+
+    // Hacer scroll automático cuando se detecta paciente nuevo
+    useEffect(() => {
+        if (pacienteEncontrado === false && seccionPacienteNuevoRef.current) {
+            setMostrarMensajePacienteNuevo(true);
+            // Pequeño delay para que el DOM se actualice
+            setTimeout(() => {
+                seccionPacienteNuevoRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                // Opcional: hacer focus en el primer campo
+                const primerInput = seccionPacienteNuevoRef.current?.querySelector('input');
+                primerInput?.focus();
+            }, 100);
+        }
+    }, [pacienteEncontrado]);
 
     // Manejadores de cambios
     const handleChange = (e) => {
@@ -128,12 +168,12 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                 return;
             }
 
-             /*CASO ESPECIAL: Es paciente nuevo y el usuario recién lo descubre
-             Si acabamos de descubrir que es nuevo (estaba en null y pasó a false),
-             detenemos el envío para mostrarle los campos opcionales.*/
-            if (existe === false && pacienteEncontrado === null) {
+            /*CASO ESPECIAL: Es paciente nuevo y el usuario recién lo descubre
+            Si acabamos de descubrir que es nuevo (estaba en null y pasó a false),
+            detenemos el envío para mostrarle los campos opcionales.*/
+            if (existe === false && !mostrarMensajePacienteNuevo) {
                 setLoading(false);
-                alert("Paciente nuevo detectado. Complete los datos opcionales si lo desea o confirme nuevamente.");
+                // El useEffect se encargará del scroll y mostrar el mensaje
                 return;
             }
             // 1. Preparar datos de Urgencia
@@ -152,13 +192,21 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             // 2. Preparar datos de Paciente (Solo si es nuevo)
             let datosPacienteNuevo = null;
             if (existe === false) {
+                const numeroParseado = pacienteData.numero ? parseInt(pacienteData.numero) : null;
+                const telefonoParseado = pacienteData.telefono ? parseInt(pacienteData.telefono.replace(/\D/g, '')) : null;
+                const obraSocialIdParseado = pacienteData.obraSocialId ? parseInt(pacienteData.obraSocialId) : null;
+
                 datosPacienteNuevo = {
                     cuil: formData.cuilPaciente.trim(),
-                    nombre: pacienteData.nombre.trim() || "Sin Registrar",
-                    apellido: pacienteData.apellido.trim() || "Sin Registrar",
-                    calle: pacienteData.calle.trim() || "Sin Registrar",
-                    numero: pacienteData.numero ? parseInt(pacienteData.numero) : 999,
-                    localidad: pacienteData.localidad.trim() || "San Miguel de Tucuman",
+                    nombre: pacienteData.nombre.trim() || null,
+                    apellido: pacienteData.apellido.trim() || null,
+                    calle: pacienteData.calle.trim() || null,
+                    numero: (numeroParseado && !isNaN(numeroParseado)) ? numeroParseado : null,
+                    localidad: pacienteData.localidad.trim() || null,
+                    email: pacienteData.email.trim() || null,
+                    telefono: (telefonoParseado && !isNaN(telefonoParseado)) ? telefonoParseado : null,
+                    obraSocialId: obraSocialIdParseado,
+                    numeroAfiliado: pacienteData.numeroAfiliado.trim() || null,
                     fechaNacimiento: new Date("1900-01-01").toISOString()
                 };
             }
@@ -172,7 +220,11 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                 frecuenciaRespiratoria: '', frecuenciaSistolica: '', frecuenciaDiastolica: ''
             });
             setPacienteEncontrado(null);
-            setPacienteData({ nombre: '', apellido: '', calle: '', numero: '', localidad: '' });
+            setMostrarMensajePacienteNuevo(false);
+            setPacienteData({
+                nombre: '', apellido: '', calle: '', numero: '', localidad: '',
+                email: '', telefono: '', obraSocialId: '', numeroAfiliado: ''
+            });
 
         } catch (error) {
             console.error(error);
@@ -197,6 +249,12 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
                         {/* --- SECCIÓN 1: IDENTIFICACIÓN Y PACIENTE --- */}
                         <div className="form-section">
+                            <h3 className="section-title">
+                                <span className="section-icon">🆔</span>
+                                Identificación del Paciente
+                            </h3>
+                            <p className="form-section-subtitle">Verificación y datos del paciente</p>
+
                             <div className="form-row">
                                 <div className="input-group">
                                     <Input
@@ -230,20 +288,65 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
                             {/* CAMPOS OPCIONALES DE PACIENTE (Solo si NO existe) */}
                             {pacienteEncontrado === false && (
-                                <div className="new-patient-section fade-in">
+                                <div ref={seccionPacienteNuevoRef} className="new-patient-section fade-in">
                                     <div className="new-patient-header">
-                                        <span className="warning-icon">⚠️</span>
-                                        <p>Paciente no registrado. Complete los datos o deje en blanco para usar genéricos.</p>
+                                        <div className="new-patient-icon-wrapper">
+                                            <span className="new-patient-icon">👤</span>
+                                        </div>
+                                        <div className="new-patient-text">
+                                            <h4 className="new-patient-title">
+                                                Paciente No Registrado
+                                                <span className="new-patient-badge">Nuevo</span>
+                                            </h4>
+                                            <p className="new-patient-description">
+                                                Complete los datos del paciente o déjelos en blanco. El sistema usará valores genéricos automáticamente.
+                                            </p>
+                                        </div>
                                     </div>
 
                                     <div className="form-row">
                                         <Input label="Nombre (Opcional)" name="nombre" value={pacienteData.nombre} onChange={handlePacienteChange} placeholder="Sin Registrar" />
                                         <Input label="Apellido (Opcional)" name="apellido" value={pacienteData.apellido} onChange={handlePacienteChange} placeholder="Sin Registrar" />
                                     </div>
+
+                                    <div className="form-row">
+                                        <Input label="Email (Opcional)" name="email" type="email" value={pacienteData.email} onChange={handlePacienteChange} placeholder="ejemplo@email.com" />
+                                        <Input label="Teléfono (Opcional)" name="telefono" type="tel" value={pacienteData.telefono} onChange={handlePacienteChange} placeholder="3814567890" />
+                                    </div>
+
                                     <div className="form-row three-cols">
-                                        <Input label="Calle (Opcional)" name="calle" value={pacienteData.calle} onChange={handlePacienteChange} placeholder = "San Martin" />
+                                        <Input label="Calle (Opcional)" name="calle" value={pacienteData.calle} onChange={handlePacienteChange} placeholder="San Martin" />
                                         <Input label="Número (Opcional)" name="numero" type="number" value={pacienteData.numero} onChange={handlePacienteChange} placeholder="999" />
                                         <Input label="Localidad" name="localidad" value={pacienteData.localidad} onChange={handlePacienteChange} placeholder="Tucumán" />
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="input-group">
+                                            <label className="input-label">Obra Social (Opcional)</label>
+                                            <select
+                                                name="obraSocialId"
+                                                value={pacienteData.obraSocialId}
+                                                onChange={handlePacienteChange}
+                                                className="form-select"
+                                            >
+                                                <option value="">Sin Obra Social</option>
+                                                {obrasSociales.map(obra => (
+                                                    <option key={obra.id} value={obra.id}>
+                                                        {obra.nombre}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        {pacienteData.obraSocialId && (
+                                            <Input
+                                                label="Número de Afiliado"
+                                                name="numeroAfiliado"
+                                                value={pacienteData.numeroAfiliado}
+                                                onChange={handlePacienteChange}
+                                                placeholder="123456"
+                                                required={!!pacienteData.obraSocialId}
+                                            />
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -251,7 +354,11 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
                         {/* --- SECCIÓN 2: TRIAGE (Niveles) --- */}
                         <div className="form-section">
-                            <h3>Nivel de Emergencia</h3>
+                            <h3 className="section-title">
+                                <span className="section-icon">🚨</span>
+                                Nivel de Emergencia
+                            </h3>
+                            <p className="form-section-subtitle">Seleccione el nivel de prioridad según triage</p>
                             <div className="niveles-grid">
                                 {NIVELES_EMERGENCIA.map((nivel) => (
                                     <div
@@ -269,10 +376,14 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
                         {/* --- SECCIÓN 3: SIGNOS VITALES --- */}
                         <div className="form-section">
-                            <h3>Signos Vitales</h3>
+                            <h3 className="section-title">
+                                <span className="section-icon">🩺</span>
+                                Signos Vitales
+                            </h3>
+                            <p className="form-section-subtitle">Mediciones iniciales del paciente</p>
                             <div className="form-row">
-                                <Input label="Temp (°C)" placeholder = "36.5" name="temperatura" type="number" step="0.1" value={formData.temperatura} onChange={handleChange} required error={errors.temperatura} />
-                                <Input label="FC (lpm)" placeholder="80"  name="frecuenciaCardiaca" type="number" value={formData.frecuenciaCardiaca} onChange={handleChange} required error={errors.frecuenciaCardiaca} />
+                                <Input label="Temp (°C)" placeholder="36.5" name="temperatura" type="number" step="0.1" value={formData.temperatura} onChange={handleChange} required error={errors.temperatura} />
+                                <Input label="FC (lpm)" placeholder="80" name="frecuenciaCardiaca" type="number" value={formData.frecuenciaCardiaca} onChange={handleChange} required error={errors.frecuenciaCardiaca} />
                                 <Input label="FR (rpm)" placeholder="16" name="frecuenciaRespiratoria" type="number" value={formData.frecuenciaRespiratoria} onChange={handleChange} required error={errors.frecuenciaRespiratoria} />
                             </div>
                             <div className="form-row">
@@ -283,15 +394,23 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
                         {/* --- SECCIÓN 4: INFORME --- */}
                         <div className="form-section">
+                            <h3 className="section-title">
+                                <span className="section-icon">📝</span>
+                                Informe de Ingreso
+                            </h3>
+                            <p className="form-section-subtitle">Motivo de consulta, síntomas y observaciones iniciales</p>
                             <TextArea
-                                label="Informe de Ingreso"
                                 name="informe"
-                                placeholder="Informe de Ingreso..."
+                                placeholder="Describa el motivo de consulta, síntomas principales y cualquier observación relevante..."
                                 value={formData.informe}
                                 onChange={handleChange}
                                 required
                                 error={errors.informe}
+                                rows={6}
                             />
+                            <div className="helper-text" style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px', padding: '12px', background: '#f0f9ff', borderLeft: '3px solid #3b82f6', borderRadius: '4px' }}>
+                                💡 Incluya: motivo de consulta, síntomas principales, duración de síntomas y cualquier antecedente relevante.
+                            </div>
                         </div>
 
                         <div className="form-actions">

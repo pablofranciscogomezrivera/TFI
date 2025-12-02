@@ -21,9 +21,9 @@ public class AuthController : ControllerBase
     private readonly IRepositorioPersonal _repoPersonal;
 
     public AuthController(
-        IServicioAutenticacion servicioAutenticacion, 
-        ILogger<AuthController> logger, 
-        IConfiguration configuration, 
+        IServicioAutenticacion servicioAutenticacion,
+        ILogger<AuthController> logger,
+        IConfiguration configuration,
         IRepositorioPersonal repositorioPacientesADO)
     {
         _servicioAutenticacion = servicioAutenticacion;
@@ -97,14 +97,43 @@ public class AuthController : ControllerBase
             // 2. Buscar datos del profesional (Enfermera o Médico)
             object? perfilProfesional = null;
 
+            _logger.LogInformation("Buscando profesional para usuario {UserId}, tipo: {TipoAutoridad}",
+                usuario.Id, usuario.TipoAutoridad);
+
             if (usuario.TipoAutoridad == Dominio.Enums.TipoAutoridad.Enfermera)
             {
                 perfilProfesional = _repoPersonal.ObtenerEnfermeraPorUsuario(usuario.Id);
+                if (perfilProfesional == null)
+                {
+                    _logger.LogWarning("No se encontró enfermera para usuario {UserId}. Creando perfil temporal.", usuario.Id);
+                    // Crear perfil temporal
+                    perfilProfesional = new Dominio.Entidades.Enfermera
+                    {
+                        Nombre = "Enfermera",
+                        Apellido = "Sistema",
+                        DNI = usuario.Id,
+                        Matricula = $"ENF{usuario.Id:D4}"
+                    };
+                }
             }
             else
             {
                 perfilProfesional = _repoPersonal.ObtenerDoctorPorUsuario(usuario.Id);
+                if (perfilProfesional == null)
+                {
+                    _logger.LogWarning("No se encontró doctor para usuario {UserId}. Creando perfil temporal.", usuario.Id);
+                    // Crear perfil temporal
+                    perfilProfesional = new Dominio.Entidades.Doctor
+                    {
+                        Nombre = "Doctor",
+                        Apellido = "Sistema",
+                        DNI = usuario.Id,
+                        Matricula = $"MED{usuario.Id:D4}"
+                    };
+                }
             }
+
+            _logger.LogInformation("Perfil profesional: {Perfil}", perfilProfesional);
 
             // 3. Generar Token JWT
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

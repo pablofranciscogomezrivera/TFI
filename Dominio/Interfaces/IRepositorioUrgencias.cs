@@ -13,4 +13,7 @@ public interface IRepositorioUrgencias
     List<Ingreso> ObtenerIngresosPendientes();
     void RemoverIngreso(Ingreso ingreso);
     void ActualizarIngreso(Ingreso ingreso);
+
+    Ingreso? BuscarIngresoPorCuilYEstado(string cuil, EstadoIngreso estado);
+    List<Ingreso> ObtenerTodosLosIngresos();
 }

@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import DashboardUrgencias from '../components/urgencias/DashboardUrgencias';
 import ColaPrioridad from '../components/urgencias/ColaPrioridad';
 import FormularioIngreso from '../components/urgencias/FormularioIngreso';
+import ModalAtencionMedica from '../components/urgencias/ModalAtencionMedica';
 import Button from '../components/ui/Button';
 import urgenciasService from '../services/urgenciasService';
-import pacientesService from '../services/pacientesService'; 
 import Notification from '../components/ui/Notification';
 import './UrgenciasPage.css';
 import React from 'react';
@@ -19,6 +19,10 @@ export const UrgenciasPage = () => {
     // Estados para el flujo de ingreso
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
     const [vistaActual, setVistaActual] = useState('cola');
+
+    // Estados para el modal de atención médica
+    const [mostrarModalAtencion, setMostrarModalAtencion] = useState(false);
+    const [ingresoSeleccionado, setIngresoSeleccionado] = useState(null);
 
     const userRole = parseInt(localStorage.getItem('userRole'));
     const esMedico = userRole === 0;
@@ -37,8 +41,11 @@ export const UrgenciasPage = () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await urgenciasService.obtenerListaEspera();
-            setPacientes(data);
+
+            // Cargar pacientes pendientes
+            const dataPendientes = await urgenciasService.obtenerListaEspera();
+            setPacientes(dataPendientes);
+
         } catch (err) {
             console.error('Error al cargar pacientes:', err);
             if (err.response?.status === 401) navigate('/login');
@@ -57,21 +64,33 @@ export const UrgenciasPage = () => {
 
     const handleRegistrarIngresoCompleto = async (urgenciaData, pacienteNuevoData) => {
         try {
-            // 1. Si viene pacienteNuevoData, primero registramos al paciente
-            if (pacienteNuevoData) {
-                try {
-                    await pacientesService.registrarPaciente(pacienteNuevoData);
-                    showNotification('Paciente nuevo registrado automáticamente.', 'success');
-                } catch (err) {
-                    // Si falla el registro del paciente, detenemos todo
-                    throw new Error(err.response?.data?.message || 'Error al registrar datos del paciente.');
-                }
-            }
+            // Combinar los datos de urgencia con los datos opcionales del paciente
+            const datosCompletos = {
+                ...urgenciaData,
+                // Si hay datos del paciente nuevo, agregarlos
+                nombrePaciente: pacienteNuevoData?.nombre || null,
+                apellidoPaciente: pacienteNuevoData?.apellido || null,
+                callePaciente: pacienteNuevoData?.calle || null,
+                numeroPaciente: pacienteNuevoData?.numero || null,
+                localidadPaciente: pacienteNuevoData?.localidad || null,
+                emailPaciente: pacienteNuevoData?.email || null,
+                telefonoPaciente: pacienteNuevoData?.telefono || null,
+                obraSocialIdPaciente: pacienteNuevoData?.obraSocialId || null,
+                numeroAfiliadoPaciente: pacienteNuevoData?.numeroAfiliado || null,
+                fechaNacimientoPaciente: pacienteNuevoData?.fechaNacimiento || null
+            };
 
-            // 2. Registramos la urgencia (el paciente ya existe en BD ahora)
-            await urgenciasService.registrarUrgencia(urgenciaData, dniEnfermera);
+            // Debug: Ver qué se está enviando
+            console.log('Datos a enviar:', JSON.stringify(datosCompletos, null, 2));
 
-            showNotification('Ingreso registrado exitosamente.', 'success');
+            // Registrar la urgencia (el backend creará el paciente automáticamente si no existe)
+            await urgenciasService.registrarUrgencia(datosCompletos, dniEnfermera);
+
+            const mensaje = pacienteNuevoData
+                ? 'Ingreso registrado exitosamente. Paciente creado automáticamente.'
+                : 'Ingreso registrado exitosamente.';
+
+            showNotification(mensaje, 'success');
             await cargarPacientes();
 
             // Volver a la cola
@@ -79,8 +98,10 @@ export const UrgenciasPage = () => {
             setVistaActual('cola');
 
         } catch (err) {
-            console.error(err);
-            const msg = err.message || err.response?.data?.message || 'Error al procesar el ingreso.';
+            console.error('Error completo:', err);
+            console.error('Response data:', err.response?.data);
+            console.error('Response status:', err.response?.status);
+            const msg = err.response?.data?.message || err.message || 'Error al procesar el ingreso.';
             showNotification(msg, 'error');
         }
     };
@@ -92,16 +113,40 @@ export const UrgenciasPage = () => {
 
     const handleReclamarPaciente = async () => {
         try {
-            const paciente = await urgenciasService.reclamarPaciente(matriculaDoctor);
+            const ingresoReclamado = await urgenciasService.reclamarPaciente(matriculaDoctor);
 
-            // Aquí podrías usar un Modal o una notificación persistente/larga
-            // Usamos success por ahora
-            showNotification(`ASIGNADO: ${paciente.nombrePaciente} ${paciente.apellidoPaciente}. Revise el informe.`, 'success');
-
+            // Recargar lista de pacientes en espera
             await cargarPacientes();
+
+            // Abrir directamente el modal de atención con el paciente reclamado
+            setIngresoSeleccionado(ingresoReclamado);
+            setMostrarModalAtencion(true);
+
+            showNotification(`Paciente asignado: ${ingresoReclamado.nombrePaciente} ${ingresoReclamado.apellidoPaciente}`, 'success');
         } catch (err) {
             const msg = err.response?.data?.message || 'No hay pacientes en espera.';
-            showNotification(msg, 'info'); // Info porque "no hay pacientes" no es necesariamente un error grave
+            showNotification(msg, 'info');
+        }
+    };
+
+
+    const handleCerrarModalAtencion = () => {
+        setMostrarModalAtencion(false);
+        setIngresoSeleccionado(null);
+    };
+
+    const handleRegistrarAtencion = async (cuilPaciente, informeMedico) => {
+        try {
+            await urgenciasService.registrarAtencion(cuilPaciente, informeMedico, matriculaDoctor);
+
+            showNotification('Atención registrada exitosamente. Paciente dado de alta.', 'success');
+
+            // Cerrar modal y recargar datos
+            handleCerrarModalAtencion();
+            await cargarPacientes();
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Error al registrar la atención';
+            throw new Error(msg);
         }
     };
 
@@ -111,7 +156,7 @@ export const UrgenciasPage = () => {
     };
 
     const cancelarFlujo = () => {
-        
+
         setMostrarFormulario(false);
         setVistaActual('cola');
     };
@@ -162,15 +207,27 @@ export const UrgenciasPage = () => {
                         <DashboardUrgencias pacientes={pacientes} />
 
                         {esMedico && (
-                            <div style={{ marginBottom: '20px', padding: '20px', background: '#e0f2fe', borderRadius: '8px', border: '1px solid #bae6fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
-                                    <h3 style={{ margin: 0, color: '#0369a1' }}>Panel Médico</h3>
-                                    <p style={{ margin: 0, color: '#0c4a6e' }}>Hay {pacientes.length} pacientes esperando atención.</p>
+                            <>
+                                <div style={{ marginBottom: '20px', padding: '20px', background: '#e0f2fe', borderRadius: '8px', border: '1px solid #bae6fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <h3 style={{ margin: 0, color: '#0369a1' }}>Panel Médico</h3>
+                                        <p style={{ margin: 0, color: '#0c4a6e' }}>
+                                            {pacientes.length > 0
+                                                ? `${pacientes.length} paciente${pacientes.length !== 1 ? 's' : ''} esperando atención`
+                                                : 'No hay pacientes en espera'}
+                                        </p>
+                                    </div>
+                                    <Button
+                                        onClick={handleReclamarPaciente}
+                                        size="large"
+                                        disabled={pacientes.length === 0}
+                                    >
+                                        Llamar Siguiente Paciente
+                                    </Button>
                                 </div>
-                                <Button onClick={handleReclamarPaciente} size="large">
-                                    Llamar Siguiente Paciente
-                                </Button>
-                            </div>
+
+                               
+                            </>
                         )}
 
                         {loading && !pacientes.length ? (
@@ -187,7 +244,7 @@ export const UrgenciasPage = () => {
                 {vistaActual === 'formulario' && mostrarFormulario && (
                     <div className="formulario-section">
                         <FormularioIngreso
-                            onSubmit={handleRegistrarIngresoCompleto} // Pasamos el nuevo handler
+                            onSubmit={handleRegistrarIngresoCompleto}
                             onClose={() => {
                                 setMostrarFormulario(false);
                                 setVistaActual('cola');
@@ -197,6 +254,15 @@ export const UrgenciasPage = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modal de Atención Médica */}
+            {mostrarModalAtencion && ingresoSeleccionado && (
+                <ModalAtencionMedica
+                    ingreso={ingresoSeleccionado}
+                    onSubmit={handleRegistrarAtencion}
+                    onClose={handleCerrarModalAtencion}
+                />
+            )}
         </div>
     );
 };
