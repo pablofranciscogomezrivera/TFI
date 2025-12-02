@@ -219,7 +219,7 @@ public class ServicioAtencionTests
 
         // Assert
         act.Should().Throw<ArgumentException>()
-            .WithMessage("El informe del paciente es mandatorio");
+            .WithMessage("El informe médico es mandatorio");
     }
 
     [Fact]
@@ -245,7 +245,7 @@ public class ServicioAtencionTests
 
         // Assert
         act.Should().Throw<ArgumentException>()
-            .WithMessage("El informe del paciente es mandatorio");
+            .WithMessage("El informe médico es mandatorio");
     }
 
     [Fact]
@@ -271,7 +271,7 @@ public class ServicioAtencionTests
 
         // Assert
         act.Should().Throw<ArgumentException>()
-            .WithMessage("El informe del paciente es mandatorio");
+            .WithMessage("El informe médico es mandatorio");
     }
 
     #endregion

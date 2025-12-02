@@ -64,7 +64,7 @@ public class ReclamarPacienteTests
         // Assert
         ingresoReclamado.Should().NotBeNull();
         ingresoReclamado.Estado.Should().Be(EstadoIngreso.EN_PROCESO);
-        ingresoReclamado.Atencion.Doctor.Should().Be(_doctor);
+        ingresoReclamado.Atencion.Should().BeNull(); // Atención aún no se ha registrado
         ingresoReclamado.Paciente.Should().NotBeNull();
         ingresoReclamado.Paciente.CUIL.Should().Be(cuil);
 
@@ -324,10 +324,10 @@ public class ReclamarPacienteTests
         segundo.Estado.Should().Be(EstadoIngreso.EN_PROCESO);
         tercero.Estado.Should().Be(EstadoIngreso.EN_PROCESO);
 
-        // Verificar que cada uno tiene su doctor asignado
-        primero.Atencion.Doctor.Should().Be(_doctor);
-        segundo.Atencion.Doctor.Should().Be(doctor2);
-        tercero.Atencion.Doctor.Should().Be(doctor3);
+        // Verificar que la atención aún no está creada (se crea al registrar atención médica)
+        primero.Atencion.Should().BeNull();
+        segundo.Atencion.Should().BeNull();
+        tercero.Atencion.Should().BeNull();
 
         // Verificar que la lista está vacía
         _servicioUrgencias.ObtenerIngresosPendientes().Should().BeEmpty();
