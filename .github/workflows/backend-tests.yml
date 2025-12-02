@@ -1,0 +1,56 @@
+name: Backend Tests
+
+on:
+  # Se ejecuta ante un PR a la rama principal
+  pull_request:
+    branches:
+      - master
+      - main
+    paths:
+      - 'Aplicacion/**'
+      - 'Dominio/**'
+      - 'Infraestructura/**'
+      - 'Web/**'
+      - 'Tests/**'
+      - '*.sln'
+      - '**.csproj'
+
+  # Permite ejecución manual
+  workflow_dispatch:
+
+  # Opcional: ejecutar en push a main/master
+  # push:
+  #   branches:
+  #     - master
+  #     - main
+
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore TFI.sln
+
+      - name: Build Solution
+        run: dotnet build TFI.sln --configuration Release --no-restore
+
+      - name: Run Unit Tests
+        run: dotnet test Tests/Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Tests Completed
+        if: success()
+        run: echo "✅ All tests passed successfully!"
+
+      - name: Tests Failed
+        if: failure()
+        run: echo "❌ Some tests failed. Please check the logs above."
