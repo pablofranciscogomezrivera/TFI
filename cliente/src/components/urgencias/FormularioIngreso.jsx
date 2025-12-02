@@ -145,6 +145,9 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         // Validar negativos
         if (parseFloat(formData.frecuenciaCardiaca) < 0) newErrors.frecuenciaCardiaca = 'No negativo';
         if (parseFloat(formData.frecuenciaRespiratoria) < 0) newErrors.frecuenciaRespiratoria = 'No negativo';
+        if (parseFloat(formData.temperatura) < 0) newErrors.temperatura = 'No negativo';
+        if (parseFloat(formData.frecuenciaSistolica) < 0) newErrors.frecuenciaSistolica = 'No negativo';
+        if (parseFloat(formData.frecuenciaDiastolica) < 0) newErrors.frecuenciaDiastolica = 'No negativo';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
