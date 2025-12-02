@@ -73,7 +73,16 @@ public class ServicioPacientes : IServicioPacientes
         // Registrar el paciente en el repositorio
         return _repositorioPacientes.RegistrarPaciente(paciente);
     }
+    public Paciente? BuscarPacientePorCuil(string cuil)
+    {
+        // Opcional: Validar formato antes de buscar
+        if (!ValidadorCUIL.EsValido(cuil))
+        {
+            throw new ArgumentException("El CUIL no tiene un formato válido");
+        }
 
+        return _repositorioPacientes.BuscarPacientePorCuil(cuil);
+    }
     private void ValidarCamposMandatorios(
         string cuil,
         string nombre,

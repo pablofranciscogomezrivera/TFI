@@ -1,7 +1,8 @@
-import { useState } from 'react';
+Ôªøimport { useState, useEffect } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
+import obrasSocialesService from '../../services/obrasSocialesService';
 import './FormularioNuevoPaciente.css';
 
 export const FormularioNuevoPaciente = ({ onSubmit, onCancel, cuilInicial = '' }) => {
@@ -15,9 +16,21 @@ export const FormularioNuevoPaciente = ({ onSubmit, onCancel, cuilInicial = '' }
         obraSocialId: '',
         numeroAfiliado: '',
     });
-
+    const [obrasSociales, setObrasSociales] = useState([]);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const cargarObrasSociales = async () => {
+            try {
+                const data = await obrasSocialesService.obtenerTodas();
+                setObrasSociales(data);
+            } catch (error) {
+                console.error("Error cargando obras sociales", error);
+            }
+        };
+        cargarObrasSociales();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -83,7 +96,7 @@ export const FormularioNuevoPaciente = ({ onSubmit, onCancel, cuilInicial = '' }
                 localidad: formData.localidad.trim(),
             };
 
-            // Solo agregar obra social si se proporcionÛ
+            // Solo agregar obra social si se proporcion√≥
             if (formData.obraSocialId && formData.numeroAfiliado) {
                 dataToSubmit.obraSocialId = parseInt(formData.obraSocialId);
                 dataToSubmit.numeroAfiliado = formData.numeroAfiliado.trim();
@@ -157,7 +170,7 @@ export const FormularioNuevoPaciente = ({ onSubmit, onCancel, cuilInicial = '' }
                                     name="calle"
                                     value={formData.calle}
                                     onChange={handleChange}
-                                    placeholder="San MartÌn"
+                                    placeholder="San Martin"
                                     required
                                     error={errors.calle}
                                 />
@@ -188,22 +201,35 @@ export const FormularioNuevoPaciente = ({ onSubmit, onCancel, cuilInicial = '' }
                             <h3 className="section-title">Obra Social (Opcional)</h3>
 
                             <div className="form-row">
+                                {/* REEMPLAZAMOS EL INPUT DE ID POR UN SELECT */}
+                                <div className="input-group">
+                                    <label className="input-label">Obra Social</label>
+                                    <select
+                                        name="obraSocialId"
+                                        value={formData.obraSocialId}
+                                        onChange={handleChange}
+                                        className="input-field" // Reusamos la clase del input para que se vea igual
+                                        style={{ height: '48px' }} // Ajuste visual si es necesario
+                                    >
+                                        <option value="">Seleccione una opci√≥n...</option>
+                                        {obrasSociales.map((os) => (
+                                            <option key={os.id} value={os.id}>
+                                                {os.nombre}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.obraSocialId && <span className="input-error-message">{errors.obraSocialId}</span>}
+                                </div>
+
                                 <Input
-                                    label="ID Obra Social"
-                                    name="obraSocialId"
-                                    type="number"
-                                    value={formData.obraSocialId}
-                                    onChange={handleChange}
-                                    placeholder="1"
-                                    error={errors.obraSocialId}
-                                />
-                                <Input
-                                    label="N˙mero de Afiliado"
+                                    label="N√∫mero de Afiliado"
                                     name="numeroAfiliado"
                                     value={formData.numeroAfiliado}
                                     onChange={handleChange}
-                                    placeholder="12345"
+                                    placeholder="Ej: 123456"
                                     error={errors.numeroAfiliado}
+                                    // Deshabilitamos si no eligi√≥ obra social
+                                    disabled={!formData.obraSocialId}
                                 />
                             </div>
                         </div>

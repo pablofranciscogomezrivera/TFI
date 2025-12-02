@@ -236,3 +236,76 @@
             width: 100%;
         }
 }
+
+.searching-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.patient-found-badge {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background-color: #d1fae5; /* Verde suave */
+    color: #065f46;
+    border-radius: 6px;
+    font-size: 14px;
+    border: 1px solid #a7f3d0;
+    animation: fadeIn 0.3s ease;
+}
+
+.new-patient-section {
+    background-color: #fff7ed; /* Naranja muy suave */
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+    animation: slideDown 0.3s ease;
+}
+
+.new-patient-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    color: #9a3412;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.warning-icon {
+    font-size: 18px;
+}
+
+.three-cols {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.error-text {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

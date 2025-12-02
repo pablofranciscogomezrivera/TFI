@@ -79,7 +79,31 @@ namespace Infraestructura
                 }
             }
         }
+        public List<ObraSocial> ObtenerTodas()
+        {
+            var lista = new List<ObraSocial>();
+            using (var conexion = new SqlConnection(_connectionString))
+            {
+                conexion.Open();
+                var query = "SELECT Id, Nombre FROM ObrasSociales ORDER BY Nombre ASC";
 
+                using (var cmd = new SqlCommand(query, conexion))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new ObraSocial
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Nombre = reader["Nombre"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
         public bool EstaAfiliadoAObraSocial(int obraSocialId, string numeroAfiliado)
         {
             using (var conexion = new SqlConnection(_connectionString))

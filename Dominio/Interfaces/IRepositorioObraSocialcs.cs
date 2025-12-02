@@ -13,4 +13,6 @@ public interface IRepositorioObraSocial
     ObraSocial? BuscarObraSocialPorId(int id);
     bool ExisteObraSocial(int id);
     bool EstaAfiliadoAObraSocial(int obraSocialId, string numeroAfiliado);
+
+    List<ObraSocial> ObtenerTodas();
 }

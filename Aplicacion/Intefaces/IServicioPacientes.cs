@@ -19,4 +19,6 @@ public interface IServicioPacientes
         DateTime fechaNacimiento,
         int? obraSocialId = null,
         string? numeroAfiliado = null);
+
+    Paciente? BuscarPacientePorCuil(string cuil);
 }

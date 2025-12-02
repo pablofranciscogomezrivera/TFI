@@ -86,4 +86,62 @@ public class PacientesController : ControllerBase
             });
         }
     }
+
+    /// <summary>
+    /// Busca un paciente por su CUIL
+    /// </summary>
+    /// <param name="cuil">CUIL del paciente</param>
+    /// <returns>Datos del paciente si existe</returns>
+    [HttpGet("{cuil}")]
+    [ProducesResponseType(typeof(PacienteResponse), 200)]
+    [ProducesResponseType(typeof(ErrorResponse), 404)]
+    [ProducesResponseType(typeof(ErrorResponse), 400)]
+    public IActionResult BuscarPaciente(string cuil)
+    {
+        try
+        {
+            var paciente = _servicioPacientes.BuscarPacientePorCuil(cuil);
+
+            if (paciente == null)
+            {
+                // Este 404 es el que espera tu frontend para abrir el formulario de registro
+                return NotFound(new ErrorResponse
+                {
+                    Message = $"No se encontró un paciente con CUIL {cuil}",
+                    StatusCode = 404
+                });
+            }
+
+            // Mapeamos la entidad a la respuesta DTO
+            var response = new PacienteResponse
+            {
+                Cuil = paciente.CUIL,
+                Nombre = paciente.Nombre,
+                Apellido = paciente.Apellido,
+                Domicilio = new DomicilioDto
+                {
+                    Calle = paciente.Domicilio.Calle,
+                    Numero = paciente.Domicilio.Numero,
+                    Localidad = paciente.Domicilio.Localidad
+                },
+                Afiliado = paciente.Afiliado != null ? new AfiliadoDto
+                {
+                    NumeroAfiliado = paciente.Afiliado.NumeroAfiliado,
+                    ObraSocial = paciente.Afiliado.ObraSocial.Nombre
+                } : null
+            };
+
+            _logger.LogInformation("Paciente encontrado: {Cuil}", cuil);
+            return Ok(response);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new ErrorResponse { Message = ex.Message, StatusCode = 400 });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al buscar paciente");
+            return StatusCode(500, new ErrorResponse { Message = "Error interno del servidor", StatusCode = 500 });
+        }
+    }
 }

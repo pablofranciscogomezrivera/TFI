@@ -49,4 +49,9 @@ public class RepositorioObraSocialMemoria : IRepositorioObraSocial
 
         return _afiliados[obraSocialId].Contains(numeroAfiliado);
     }
+
+    public List<ObraSocial> ObtenerTodas()
+    {
+        return _obrasSociales.Values.ToList();
+    }
 }

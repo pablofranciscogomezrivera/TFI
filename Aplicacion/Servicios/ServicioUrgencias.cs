@@ -66,14 +66,7 @@ public class ServicioUrgencias : IServicioUrgencias
         }
         var paciente = _repositorioPacientes.BuscarPacientePorCuil(CUILPaciente);
 
-        if (paciente is null)
-        {
-            var nuevoPaciente = new Paciente
-            {
-                CUIL = CUILPaciente
-            };
-            paciente = _repositorioPacientes.RegistrarPaciente(nuevoPaciente);
-        }
+        if (paciente is null) throw new ArgumentException($"El paciente con CUIL {CUILPaciente} no existe. Debe registrarlo primero.");
 
         var ingreso = new Ingreso(
             paciente,

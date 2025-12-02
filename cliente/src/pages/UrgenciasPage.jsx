@@ -1,32 +1,37 @@
 ﻿import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Para logout si quieres
+import { useNavigate } from 'react-router-dom';
 import DashboardUrgencias from '../components/urgencias/DashboardUrgencias';
 import ColaPrioridad from '../components/urgencias/ColaPrioridad';
 import FormularioIngreso from '../components/urgencias/FormularioIngreso';
 import Button from '../components/ui/Button';
 import urgenciasService from '../services/urgenciasService';
+import pacientesService from '../services/pacientesService'; 
+import Notification from '../components/ui/Notification';
 import './UrgenciasPage.css';
 import React from 'react';
 
 export const UrgenciasPage = () => {
     const [pacientes, setPacientes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [notification, setNotification] = useState(null);
     const [error, setError] = useState(null);
+
+    // Estados para el flujo de ingreso
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
     const [vistaActual, setVistaActual] = useState('cola');
-    const dniEnfermera = localStorage.getItem('profesionalDNI') || 'Sin Identificar';
-    
-    // 0: Medico, 1: Enfermera 
+
     const userRole = parseInt(localStorage.getItem('userRole'));
     const esMedico = userRole === 0;
     const esEnfermera = userRole === 1;
-    // --------------------------------------
 
     const navigate = useNavigate();
 
-    // Matrículas hardcodeadas por ahora (esto lo toma el interceptor api.js también)
-    const matriculaEnfermera = '87654321';
-    const matriculaDoctor = 'MP12345';
+    const dniEnfermera = localStorage.getItem('profesionalDNI') || '';
+    const matriculaDoctor = localStorage.getItem('matricula') || '';
+
+    const showNotification = (message, type = 'info') => {
+        setNotification({ message, type });
+    };
 
     const cargarPacientes = async () => {
         try {
@@ -38,6 +43,7 @@ export const UrgenciasPage = () => {
             console.error('Error al cargar pacientes:', err);
             if (err.response?.status === 401) navigate('/login');
             setError('No se pudo cargar la lista de pacientes');
+            showNotification('No se pudo actualizar la lista', 'error');
         } finally {
             setLoading(false);
         }
@@ -49,43 +55,77 @@ export const UrgenciasPage = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const handleRegistrarIngreso = async (data) => {
+    const handleRegistrarIngresoCompleto = async (urgenciaData, pacienteNuevoData) => {
         try {
-            await urgenciasService.registrarUrgencia(data, matriculaEnfermera);
-            alert('Paciente registrado exitosamente');
+            // 1. Si viene pacienteNuevoData, primero registramos al paciente
+            if (pacienteNuevoData) {
+                try {
+                    await pacientesService.registrarPaciente(pacienteNuevoData);
+                    showNotification('Paciente nuevo registrado automáticamente.', 'success');
+                } catch (err) {
+                    // Si falla el registro del paciente, detenemos todo
+                    throw new Error(err.response?.data?.message || 'Error al registrar datos del paciente.');
+                }
+            }
+
+            // 2. Registramos la urgencia (el paciente ya existe en BD ahora)
+            await urgenciasService.registrarUrgencia(urgenciaData, dniEnfermera);
+
+            showNotification('Ingreso registrado exitosamente.', 'success');
             await cargarPacientes();
+
+            // Volver a la cola
             setMostrarFormulario(false);
             setVistaActual('cola');
+
         } catch (err) {
-            console.error('Error al registrar ingreso:', err);
-            alert('Error al registrar el paciente');
+            console.error(err);
+            const msg = err.message || err.response?.data?.message || 'Error al procesar el ingreso.';
+            showNotification(msg, 'error');
         }
+    };
+
+    const iniciarNuevoIngreso = () => {
+        setVistaActual('formulario');
+        setMostrarFormulario(true);
     };
 
     const handleReclamarPaciente = async () => {
         try {
             const paciente = await urgenciasService.reclamarPaciente(matriculaDoctor);
 
-            // Mostrar modal o alerta con el paciente asignado
-            alert(`PACIENTE ASIGNADO:\n\n${paciente.nombrePaciente} ${paciente.apellidoPaciente}\n\nInforme: ${paciente.informeInicial}`);
+            // Aquí podrías usar un Modal o una notificación persistente/larga
+            // Usamos success por ahora
+            showNotification(`ASIGNADO: ${paciente.nombrePaciente} ${paciente.apellidoPaciente}. Revise el informe.`, 'success');
 
-            // Recargar la lista (el paciente debería desaparecer de la cola)
             await cargarPacientes();
         } catch (err) {
-            console.error(err);
-            alert(err.response?.data?.message || 'No hay pacientes en espera o error al reclamar.');
+            const msg = err.response?.data?.message || 'No hay pacientes en espera.';
+            showNotification(msg, 'info'); // Info porque "no hay pacientes" no es necesariamente un error grave
         }
     };
-    // -----------------------------------------------------
 
     const handleLogout = () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userRole');
+        localStorage.clear();
         navigate('/login');
+    };
+
+    const cancelarFlujo = () => {
+        
+        setMostrarFormulario(false);
+        setVistaActual('cola');
     };
 
     return (
         <div className="urgencias-page">
+            {/* Renderizar Notificación Global */}
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <header className="urgencias-header">
                 <div className="header-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
@@ -102,22 +142,15 @@ export const UrgenciasPage = () => {
                 <div className="tabs-navigation">
                     <button
                         className={`tab-button ${vistaActual === 'cola' ? 'tab-button-active' : ''}`}
-                        onClick={() => {
-                            setVistaActual('cola');
-                            setMostrarFormulario(false);
-                        }}
+                        onClick={() => cancelarFlujo()}
                     >
                         Cola de Prioridad
                     </button>
 
-                    {/* Solo Enfermera ve el botón de Nuevo Ingreso */}
                     {esEnfermera && (
                         <button
                             className={`tab-button ${vistaActual === 'formulario' ? 'tab-button-active' : ''}`}
-                            onClick={() => {
-                                setVistaActual('formulario');
-                                setMostrarFormulario(true);
-                            }}
+                            onClick={iniciarNuevoIngreso}
                         >
                             Nuevo Ingreso
                         </button>
@@ -128,19 +161,17 @@ export const UrgenciasPage = () => {
                     <>
                         <DashboardUrgencias pacientes={pacientes} />
 
-                        {/* --- NUEVO: Botón de Acción para Médico --- */}
                         {esMedico && (
                             <div style={{ marginBottom: '20px', padding: '20px', background: '#e0f2fe', borderRadius: '8px', border: '1px solid #bae6fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
-                                    <h3 style={{ margin: 0, color: '#0369a1' }}>Panel Medico</h3>
-                                    <p style={{ margin: 0, color: '#0c4a6e' }}>Hay {pacientes.length} pacientes esperando atencion.</p>
+                                    <h3 style={{ margin: 0, color: '#0369a1' }}>Panel Médico</h3>
+                                    <p style={{ margin: 0, color: '#0c4a6e' }}>Hay {pacientes.length} pacientes esperando atención.</p>
                                 </div>
                                 <Button onClick={handleReclamarPaciente} size="large">
                                     Llamar Siguiente Paciente
                                 </Button>
                             </div>
                         )}
-                        {/* ----------------------------------------- */}
 
                         {loading && !pacientes.length ? (
                             <div className="loading-container"><p>Cargando...</p></div>
@@ -156,7 +187,7 @@ export const UrgenciasPage = () => {
                 {vistaActual === 'formulario' && mostrarFormulario && (
                     <div className="formulario-section">
                         <FormularioIngreso
-                            onSubmit={handleRegistrarIngreso}
+                            onSubmit={handleRegistrarIngresoCompleto} // Pasamos el nuevo handler
                             onClose={() => {
                                 setMostrarFormulario(false);
                                 setVistaActual('cola');
