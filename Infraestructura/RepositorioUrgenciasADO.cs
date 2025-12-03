@@ -55,7 +55,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                // AQUÍ LA BASE DE DATOS HACE EL TRABAJO DE LA COLA DE PRIORIDAD
+                
                 // Ordenamos por Nivel (0 es Crítico) y luego por Fecha (FIFO)
                 var query = SqlQueries.Urgencias.ObtenerIngresosPendientes;
 
@@ -100,7 +100,6 @@ namespace Infraestructura
                     }
 
                     // 3. Informe Médico (Manejo de Nulos)
-                    // Asumimos que guardamos el informe completo de la atención
                     object informeVal = ingreso.Atencion?.Informe ?? (object)DBNull.Value;
                     cmd.Parameters.AddWithValue("@InformeMedico", informeVal);
 
@@ -110,7 +109,6 @@ namespace Infraestructura
                     // 5. CUIL (Necesario para la subquery que busca el IdPaciente)
                     cmd.Parameters.AddWithValue("@Cuil", ingreso.Paciente.CUIL);
 
-                    // Ejecutar y validar que se haya tocado alguna fila
                     int filasAfectadas = cmd.ExecuteNonQuery();
                     Console.WriteLine($"[RepositorioUrgenciasADO] Filas afectadas: {filasAfectadas}");
 
@@ -138,8 +136,7 @@ namespace Infraestructura
             {
                 conexion.Open();
 
-                // Buscamos el ingreso que coincida con el CUIL y el Estado solicitado
-                // Hacemos los JOINs necesarios para llenar el objeto
+                
                 var query = SqlQueries.Urgencias.BuscarIngresoPorCuilYEstado;
 
                 using (var cmd = new SqlCommand(query, conexion))
@@ -156,7 +153,7 @@ namespace Infraestructura
                     }
                 }
             }
-            return null; // No se encontró
+            return null; 
         }
 
         public List<Ingreso> ObtenerTodosLosIngresos()
@@ -227,13 +224,11 @@ namespace Infraestructura
                 Convert.ToDouble(reader["TensionDiastolica"])
             );
 
-            // Completamos los datos que no están en el constructor
+            
             ingreso.FechaIngreso = Convert.ToDateTime(reader["FechaIngreso"]);
             ingreso.Estado = (EstadoIngreso)Convert.ToInt32(reader["Estado"]);
 
-            // Si existe atención médica registrada, la reconstruimos
-            // IMPORTANTE: Este bloque solo funciona si las columnas existen en la BD
-            // Si no has ejecutado la migración, simplemente se salta este paso
+            
             try
             {
                 // Intentar acceder a las columnas de atención médica

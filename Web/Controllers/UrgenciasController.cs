@@ -40,12 +40,9 @@ public class UrgenciasController : ControllerBase
     {
         try
         {
-            // Las validaciones del request las maneja automáticamente FluentValidation
-
-            // SEGURIDAD: Extraer la matrícula del token JWT (no del header, que puede ser manipulado)
+            
             var matriculaEnfermera = User.GetMatricula();
 
-            // Debug: Log completo de la request
             _logger.LogInformation("=== REGISTRO DE URGENCIA ===");
             _logger.LogInformation("Matrícula Enfermera (desde JWT): {Matricula}", matriculaEnfermera);
             _logger.LogInformation("CUIL: {Cuil}", request.CuilPaciente);
@@ -57,18 +54,18 @@ public class UrgenciasController : ControllerBase
             _logger.LogInformation("Paciente Nuevo - Nombre: {Nombre}, Apellido: {Apellido}",
                 request.NombrePaciente ?? "null", request.ApellidoPaciente ?? "null");
 
-            // Normalizar el CUIL (remover guiones si existen)
+            
             var cuilNormalizado = CuilHelper.Normalize(request.CuilPaciente);
             _logger.LogInformation("CUIL normalizado: {CuilOriginal} -> {CuilNormalizado}",
                 request.CuilPaciente, cuilNormalizado);
 
-            // Obtener información adicional del profesional desde el token
+           
             var emailEnfermera = User.GetEmail();
 
-            // Crear el objeto enfermera con la información del token autenticado
+            
             var enfermera = new Enfermera
             {
-                Nombre = "Enfermera", // En producción, esto también vendría del token o BD
+                Nombre = "Enfermera", 
                 Apellido = "Sistema",
                 Matricula = matriculaEnfermera
             };

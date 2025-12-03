@@ -28,8 +28,8 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!informeMedico.trim()) {
-            setError('El informe médico es obligatorio');
+        if (!informeMedico.trim() || informeMedico.trim().length < 10) {
+            setError('El informe médico debe tener al menos 10 caracteres');
             return;
         }
 

@@ -38,9 +38,9 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
     });
 
     // Estados de Control
-    const [pacienteEncontrado, setPacienteEncontrado] = useState(null); // null: sin buscar, true: existe, false: nuevo
+    const [pacienteEncontrado, setPacienteEncontrado] = useState(null); 
     const [buscandoPaciente, setBuscandoPaciente] = useState(false);
-    const [nombrePacienteDisplay, setNombrePacienteDisplay] = useState(''); // Para mostrar si ya existe
+    const [nombrePacienteDisplay, setNombrePacienteDisplay] = useState(''); 
     const [mostrarMensajePacienteNuevo, setMostrarMensajePacienteNuevo] = useState(false);
     const [obrasSociales, setObrasSociales] = useState([]);
 
@@ -112,14 +112,14 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             if (paciente) {
                 setPacienteEncontrado(true);
                 setNombrePacienteDisplay(`${paciente.nombre} ${paciente.apellido}`);
-                return true; // Encontrado
+                return true; 
             } else {
                 setPacienteEncontrado(false);
-                return false; // No encontrado (Nuevo)
+                return false; 
             }
         } catch (error) {
             console.error("Error buscando paciente", error);
-            setPacienteEncontrado(false); // Asumimos nuevo si falla
+            setPacienteEncontrado(false); 
             return false;
         } finally {
             setBuscandoPaciente(false);
@@ -177,7 +177,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             detenemos el envío para mostrarle los campos opcionales.*/
             if (existe === false && !mostrarMensajePacienteNuevo) {
                 setLoading(false);
-                // El useEffect se encargará del scroll y mostrar el mensaje
+                
                 return;
             }
             // 1. Preparar datos de Urgencia
@@ -255,7 +255,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
                     <form onSubmit={handleSubmit} className="formulario-form">
 
-                        {/* --- SECCIÓN 1: IDENTIFICACIÓN Y PACIENTE --- */}
+                        
                         <div className="form-section">
                             <h3 className="section-title">
                                 <span className="section-icon">🆔</span>
@@ -273,12 +273,12 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                         placeholder="Ej: 20-12345678-9"
                                         required
                                         error={errors.cuilPaciente}
-                                        // Al salir del foco, buscamos al paciente
+                                        
                                         onBlur={verificarCuil}
                                     />
                                     {buscandoPaciente && <span className="searching-text">Buscando paciente...</span>}
 
-                                    {/* Feedback Visual: Paciente Encontrado */}
+                                    
                                     {pacienteEncontrado === true && (
                                         <div className="patient-found-badge">
                                             ✓ Paciente identificado: <strong>{nombrePacienteDisplay}</strong>
@@ -294,7 +294,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                 />
                             </div>
 
-                            {/* CAMPOS OPCIONALES DE PACIENTE (Solo si NO existe) */}
+                            
                             {pacienteEncontrado === false && (
                                 <div ref={seccionPacienteNuevoRef} className="new-patient-section fade-in">
                                     <div className="new-patient-header">

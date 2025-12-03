@@ -176,7 +176,7 @@ public class AuthController : ControllerBase
                     usuario.Email,
                     usuario.TipoAutoridad
                 },
-                Profesional = perfilProfesional // Esto enviará Nombre, Apellido, Matricula, etc.
+                Profesional = perfilProfesional 
             });
         }
         catch (ArgumentException ex)

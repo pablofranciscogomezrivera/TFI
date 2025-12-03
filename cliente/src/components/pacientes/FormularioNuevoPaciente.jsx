@@ -201,15 +201,14 @@ export const FormularioNuevoPaciente = ({ onSubmit, onCancel, cuilInicial = '' }
                             <h3 className="section-title">Obra Social (Opcional)</h3>
 
                             <div className="form-row">
-                                {/* REEMPLAZAMOS EL INPUT DE ID POR UN SELECT */}
                                 <div className="input-group">
                                     <label className="input-label">Obra Social</label>
                                     <select
                                         name="obraSocialId"
                                         value={formData.obraSocialId}
                                         onChange={handleChange}
-                                        className="input-field" // Reusamos la clase del input para que se vea igual
-                                        style={{ height: '48px' }} // Ajuste visual si es necesario
+                                        className="input-field" 
+                                        style={{ height: '48px' }} 
                                     >
                                         <option value="">Seleccione una opción...</option>
                                         {obrasSociales.map((os) => (

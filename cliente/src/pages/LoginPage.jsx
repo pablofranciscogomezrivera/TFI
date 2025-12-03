@@ -38,7 +38,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setNotification(null); // Limpiar anteriores
+        setNotification(null); 
 
         try {
             const response = await api.post('/auth/login', { email, password });
