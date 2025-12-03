@@ -1,9 +1,9 @@
-# ?? Sistema de Gesti¨®n de Urgencias Cl¨ªnicas
+# 🏥 Sistema de Gestión de Urgencias Clínicas
 ### Trabajo Final Integrador (TFI)
 
-Proyecto desarrollado para la materia **Ingenier¨ªa de Software** del curso 4K2 en la **Universidad Tecnol¨®gica Nacional - Facultad Regional Tucum¨¢n**. 
+Proyecto desarrollado para la materia **Ingeniería de Software** del curso 4K2 en la **Universidad Tecnológica Nacional - Facultad Regional Tucumán**.
 
-#### Integrantes del Grupo
+#### 👥 Integrantes del Grupo
 
 | Legajo | Apellido y Nombre      |
 | :--- |:---------------------|
@@ -11,104 +11,148 @@ Proyecto desarrollado para la materia **Ingenier¨ªa de Software** del curso 4K
 | 46646  | Ponce, Facundo         |
 | 46380  | Cancino, Micaela       |
 | 48235  | Bellor, Maria          |
-| 48308  | Herrera, Macarena      |
-| 52467  | G¨®mez, Pablo           |
+| 52467  | Gómez, Pablo           |
 
 ---
 
-## ?? Descripcion del Proyecto
+## 📋 Descripción del Proyecto
 
-El sistema est¨¢ dise?ado para gestionar el flujo de admisiones en la sala de urgencias de una cl¨ªnica. Permite al personal de enfermer¨ªa registrar el ingreso de pacientes, capturar sus signos vitales y priorizarlos autom¨¢ticamente en una cola de atenci¨®n.
+El sistema está diseñado para gestionar el flujo crítico de admisiones en la sala de urgencias de una clínica. Su objetivo principal es optimizar el tiempo de atención mediante un sistema de **Triage**.
 
-La l¨®gica de negocio se basa en el enfoque de **Desarrollo Guiado por el Comportamiento (BDD)**, a partir de las siguientes historias de usuario:
-* **IS2025-001**: Modelado del m¨®dulo de urgencias, incluyendo el registro de ingresos y el ordenamiento de la cola de atenci¨®n por prioridad.
+El flujo de trabajo contempla:
+1.  **Admisión (Enfermería):** Registro de pacientes y toma de signos vitales.
+2.  **Triage:** Clasificación automática o manual del nivel de urgencia (Crítica, Emergencia, Urgencia, etc.).
+3.  **Cola de Espera:** Priorización automática de pacientes basada en su gravedad y tiempo de llegada.
+4.  **Atención (Médicos):** Los doctores reclaman pacientes de la cola, visualizan su historial de ingreso y registran el diagnóstico/tratamiento para dar el alta.
 
-## ??? Tecnolog¨ªas Utilizadas
+La lógica de negocio se basa en el enfoque de **Desarrollo Guiado por el Comportamiento (BDD)**.
 
-El backend est¨¢ construido sobre la plataforma .NET, mientras que la tecnolog¨ªa para el frontend est¨¢ en proceso de definici¨®n.
+## 🛠️ Tecnologías Utilizadas
 
-| Componente | Tecnolog¨ªa |
-| :--- | :--- |
-| **Framework** | `.NET 8` |
-| **Lenguaje** | `C#` |
-| **Pruebas BDD** | `Reqnroll (Gherkin)` |
-| **Framework de Pruebas** | `xUnit` |
-| **Aserciones** | `Fluent Assertions` |
-| **Interfaz de Usuario**| `React`  |
+El sistema es una solución Full Stack moderna, separada en Backend (API) y Frontend (Cliente).
 
-## ?? Estructura del Proyecto
+| Área | Componente | Tecnología |
+| :--- | :--- | :--- |
+| **Backend** | Framework | `.NET 8 (ASP.NET Core Web API)` |
+| | Lenguaje | `C#` |
+| | Base de Datos | `SQL Server` (Implementación con ADO.NET) |
+| | Seguridad | `JWT` (JSON Web Tokens) + `BCrypt` |
+| | Documentación | `Scalar` (OpenAPI/Swagger moderno) |
+| | Validación | `FluentValidation` |
+| **Frontend** | Librería UI | `React 19` |
+| | Build Tool | `Vite` |
+| | Http Client | `Axios` |
+| **Calidad** | Pruebas BDD | `Reqnroll (Gherkin)` |
+| | Unit Testing | `xUnit` |
+| | Aserciones | `Fluent Assertions` |
+| | CI/CD | `GitHub Actions` |
 
-El sistema sigue una arquitectura por capas para garantizar la separaci¨®n de responsabilidades y la mantenibilidad.
+## 🏗️ Estructura del Proyecto
 
-* **`Dominio`**: ?? Contiene las entidades, objetos de valor y reglas de negocio. Es el coraz¨®n de la aplicaci¨®n.
-* **`Aplicacion`**: ?? Orquesta la l¨®gica del dominio a trav¨¦s de servicios, actuando como intermediario entre la UI y el n¨²cleo.
-* **`Infraestructura`**: ?? Implementa las interfaces del dominio (ej. repositorios). Actualmente usa una base de datos en memoria para las pruebas.
-* **`Webb`**: ??? Proyecto destinado a la capa de presentaci¨®n (frontend) de la aplicaci¨®n.
-* **`Tests`**: ?? Contiene todas las pruebas BDD, con los archivos `.feature` y sus implementaciones.
+El sistema sigue una **Arquitectura en Capas (Clean Architecture)** para garantizar la separación de responsabilidades:
 
-## ?? C¨®mo Ejecutar las Pruebas
+* **`Dominio`**: 🧠 Contiene las entidades (`Paciente`, `Ingreso`, `Usuario`), objetos de valor (`SignosVitales`) y reglas de negocio puras. No tiene dependencias externas.
+* **`Aplicacion`**: ⚙️ Contiene los servicios (`ServicioUrgencias`, `ServicioAtencion`) y define las interfaces. Orquesta la lógica de negocio.
+* **`Infraestructura`**: 💾 Implementa el acceso a datos. Utiliza **ADO.NET** (`RepositorioUrgenciasADO`, etc.) para comunicarse con SQL Server y ejecutar consultas optimizadas.
+* **`Web` (API)**: 🌐 La capa de entrada. Contiene los Controllers, configuración de JWT, Inyección de Dependencias y la documentación con Scalar.
+* **`cliente`**: 💻 Proyecto Frontend en React. Contiene las vistas para Enfermería (Ingresos) y Médicos (Atención), componentes UI y lógica de consumo de API.
+* **`Tests`**: 🧪 Contiene todas las pruebas BDD (`.feature`) y Unitarias.
 
-Para verificar el comportamiento implementado, puedes ejecutar las pruebas de aceptaci¨®n automatizadas desde tu editor de preferencia o desde la l¨ªnea de comandos.
+## 🚀 Guía de Instalación y Ejecución
 
-### ?? Scripts de Ejecuci¨®n R¨¢pida
+### Prerrequisitos
+* .NET 8.0 SDK
+* Node.js (v18 o superior)
+* SQL Server (LocalDB o instancia completa)
 
+### 1. Configuración de Base de Datos
+Asegúrate de que la cadena de conexión en `Web/appsettings.json` apunte a tu instancia local de SQL Server. El sistema incluye un **DataSeeder** que poblará datos iniciales (Usuarios, Obras Sociales) al arrancar.
 
-### ?? Desde la L¨ªnea de Comandos
+### 2. Ejecutar el Backend (API)
 
 ```bash
+# Navegar a la carpeta del proyecto Web
+cd Web
+
 # Restaurar dependencias
-dotnet restore TFI.sln
+dotnet restore
 
-# Compilar la soluci¨®n
-dotnet build TFI.sln --configuration Release
+# Ejecutar la aplicación
+dotnet run
+````
 
+  * La API estará disponible en: `https://localhost:5284`
+  * Documentación interactiva (Scalar): `https://localhost:5284/scalar`
+
+### 3. Ejecutar el Frontend (Cliente)
+
+```bash
+# Navegar a la carpeta cliente
+cd cliente
+
+# Instalar dependencias
+npm install
+
+# Ejecutar servidor de desarrollo
+npm run dev
+```
+
+  * La aplicación abrirá en: `http://localhost:5173`
+
+-----
+
+## 🧪 Cómo Ejecutar las Pruebas
+
+Para verificar el comportamiento implementado, puedes ejecutar las pruebas automatizadas (Unitarias y BDD).
+
+### Desde la Línea de Comandos
+
+```bash
+# Ubicarse en la raíz de la solución
 # Ejecutar todos los tests
-dotnet test TFI.sln --configuration Release
-
+dotnet test TFI.sln
 ```
 
 ### En Visual Studio
 
-1.  **Abrir la Soluci¨®n**: Abre el archivo `TFI.sln`.
-2.  **Restaurar Dependencias**: Haz clic derecho en la soluci¨®n y selecciona "Restaurar paquetes NuGet".
-3.  **Compilar**: Usa el atajo `Ctrl+Shift+B`.
-4.  **Ejecutar Pruebas**: Abre el **Explorador de Pruebas** (`Test > Explorador de pruebas`) y haz clic en "Run All Tests".
+1.  Abrir el **Explorador de Pruebas** (`Test > Explorador de pruebas`).
+2.  Hacer clic en el botón "Ejecutar todas las pruebas" (ícono de play verde).
 
-### En Visual Studio Code
+## 🔄 Funcionalidades Implementadas
 
-1.  **Instalar Extensiones**: Aseg¨²rate de tener instalada la extensi¨®n **C# Dev Kit** de Microsoft.
-2.  **Abrir la Carpeta**: Abre la carpeta ra¨ªz del repositorio en VS Code.
-3.  **Cargar Soluci¨®n**: Espera a que el C# Dev Kit cargue el archivo `TFI.sln`.
-4.  **Ejecutar Pruebas**: Ve al ¨ªcono de matraz (Testing) en la barra de actividades del lado izquierdo y ejecuta las pruebas desde all¨ª.
+### Módulo de Autenticación
 
+  * Login con JWT para roles **Médico** y **Enfermera**.
+  * Registro de nuevos usuarios con contraseñas hasheadas.
 
-## ?? CI/CD - GitHub Actions
+### Módulo de Pacientes
 
-El proyecto incluye workflows de GitHub Actions que se ejecutan autom¨¢ticamente en Pull Requests para garantizar la calidad del c¨®digo.
+  * Búsqueda de pacientes por CUIL.
+  * Registro de pacientes nuevos con validación de CUIL y Obras Sociales.
 
-### Workflows Disponibles
+### Módulo de Urgencias (Enfermería)
 
-#### 2. **Backend Tests ** 
-- ? Se ejecuta autom¨¢ticamente en PRs a `master` o `main`
-- ? Permite ejecuci¨®n manual
-- ? Feedback r¨¢pido sin reportes adicionales
+  * Formulario de Triage.
+  * Registro de signos vitales (Temperatura, FC, FR, Tensión).
+  * Algoritmo de priorización (Niveles: Crítica, Emergencia, Urgencia, etc.).
 
-### ?? Ejecutar Manualmente
+### Módulo de Atención (Médicos)
 
-1. Ve a la pesta?a **"Actions"** en GitHub
-2. Selecciona el workflow deseado
-3. Click en **"Run workflow"**
-4. Selecciona la rama
-5. Click en **"Run workflow"** (bot¨®n verde)
+  * Dashboard en tiempo real de la cola de espera.
+  * Acción de "Llamar paciente" (cambia estado a `En Proceso`).
+  * Registro de informe médico y finalización de la atención.
 
-### ?? Interpretar Resultados
+## 🤖 CI/CD - GitHub Actions
 
-- ? **Verde**: Todos los tests pasaron
-- ? **Rojo**: Uno o m¨¢s tests fallaron - revisa los logs
-- ?? **Amarillo**: Tests con warnings - verifica la cobertura
+El proyecto cuenta con integración continua configurada.
 
-### ?? Documentaci¨®n Completa de CI/CD
+  * ✅ **Backend Tests:** Se ejecuta automáticamente en cada Pull Request a la rama `main` o `master` para asegurar que no se rompa la lógica de negocio existente.
 
-Para m¨¢s informaci¨®n sobre los workflows, consulta [.github/workflows/README.md](.github/workflows/README.md).
+-----
 
-prueba de workflow
+### Cambios realizados con respecto a tu versión anterior:
+1.  **Limpieza:** Se eliminaron los `??` y `???` que aparecían por problemas de codificación.
+2.  **Frontend:** Se agregó la sección completa de tecnologías del frontend (React, Vite) y cómo ejecutarlo (`npm run dev`), ya que antes solo mencionaba .NET.
+3.  **Arquitectura:** Se especificó que la infraestructura usa **ADO.NET** (visto en tu código `RepositorioPacientesADO.cs`), lo cual es un detalle técnico importante.
+4.  **Scalar:** Se actualizó la referencia a la documentación, ya que en tu `Program.cs` usas `Scalar` en lugar del Swagger UI tradicional.
+5.  **Funcionalidades:** Se detallaron los módulos basándose en los controladores que tienes (`AuthController`, `UrgenciasController`, `AtencionesController`).
