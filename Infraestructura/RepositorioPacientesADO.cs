@@ -1,6 +1,6 @@
 ﻿using Dominio.Entidades;
 using Dominio.Interfaces;
-using Microsoft.Data.SqlClient; 
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
@@ -20,12 +20,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = @"
-                    SELECT p.*, d.Calle, d.Numero, d.Localidad, d.Ciudad, d.Provincia, os.Nombre as NombreObraSocial
-                    FROM Pacientes p
-                    INNER JOIN Domicilios d ON p.IdDomicilio = d.Id
-                    LEFT JOIN ObrasSociales os ON p.IdObraSocial = os.Id
-                    WHERE p.CUIL = @Cuil";
+                var query = SqlQueries.Pacientes.BuscarPorCuil;
 
                 using (var comando = new SqlCommand(query, conexion))
                 {
@@ -52,10 +47,7 @@ namespace Infraestructura
                 {
                     try
                     {
-                        var queryDomicilio = @"
-                            INSERT INTO Domicilios (Calle, Numero, Localidad, Ciudad, Provincia)
-                            VALUES (@Calle, @Numero, @Localidad, @Ciudad, @Provincia);
-                            SELECT CAST(SCOPE_IDENTITY() as int);";
+                        var queryDomicilio = SqlQueries.Pacientes.InsertarDomicilio;
 
                         int idDomicilio;
                         using (var cmdDom = new SqlCommand(queryDomicilio, conexion, transaccion))
@@ -70,9 +62,7 @@ namespace Infraestructura
                             idDomicilio = (int)cmdDom.ExecuteScalar();
                         }
 
-                        var queryPaciente = @"
-                            INSERT INTO Pacientes (CUIL, DNI, Nombre, Apellido, Email, Telefono, FechaNacimiento, IdDomicilio, IdObraSocial, NumeroAfiliado)
-                            VALUES (@CUIL, @DNI, @Nombre, @Apellido, @Email, @Telefono, @FechaNacimiento, @IdDomicilio, @IdObraSocial, @NumeroAfiliado)";
+                        var queryPaciente = SqlQueries.Pacientes.InsertarPaciente;
 
                         using (var cmdPac = new SqlCommand(queryPaciente, conexion, transaccion))
                         {

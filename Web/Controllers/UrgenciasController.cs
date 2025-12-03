@@ -1,11 +1,12 @@
-﻿using Aplicacion.Intefaces;
+﻿using Web.Extensions;
+using API.Helpers;
+using Aplicacion.Intefaces;
 using Dominio.Entidades;
 using Dominio.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.DTOs.Common;
 using Web.DTOs.Urgencias;
-
 namespace Web.Controllers;
 
 [ApiController]
@@ -30,18 +31,23 @@ public class UrgenciasController : ControllerBase
     /// Registra una nueva urgencia en el sistema
     /// </summary>
     /// <param name="request">Datos de la urgencia</param>
-    /// <param name="matriculaEnfermera">Matrícula de la enfermera que registra</param>
     /// <returns>Confirmación del registro</returns>
     [Authorize(Roles = "Enfermera")]
     [HttpPost]
     [ProducesResponseType(typeof(object), 201)]
     [ProducesResponseType(typeof(ErrorResponse), 400)]
-    public IActionResult RegistrarUrgencia([FromBody] RegistrarUrgenciaRequest request, [FromHeader(Name = "X-Enfermera-Matricula")] string? matriculaEnfermera)
+    public IActionResult RegistrarUrgencia([FromBody] RegistrarUrgenciaRequest request)
     {
         try
         {
+            // Las validaciones del request las maneja automáticamente FluentValidation
+
+            // SEGURIDAD: Extraer la matrícula del token JWT (no del header, que puede ser manipulado)
+            var matriculaEnfermera = User.GetMatricula();
+
             // Debug: Log completo de la request
             _logger.LogInformation("=== REGISTRO DE URGENCIA ===");
+            _logger.LogInformation("Matrícula Enfermera (desde JWT): {Matricula}", matriculaEnfermera);
             _logger.LogInformation("CUIL: {Cuil}", request.CuilPaciente);
             _logger.LogInformation("Informe: {Informe}", request.Informe);
             _logger.LogInformation("Nivel Emergencia: {Nivel}", request.NivelEmergencia);
@@ -51,28 +57,24 @@ public class UrgenciasController : ControllerBase
             _logger.LogInformation("Paciente Nuevo - Nombre: {Nombre}, Apellido: {Apellido}",
                 request.NombrePaciente ?? "null", request.ApellidoPaciente ?? "null");
 
-            // Validar que venga la matrícula
-            if (string.IsNullOrWhiteSpace(matriculaEnfermera))
-            {
-                _logger.LogWarning("Matrícula de enfermera no proporcionada");
-                return BadRequest(new ErrorResponse
-                {
-                    Message = "La matrícula de la enfermera es requerida",
-                    StatusCode = 400
-                });
-            }
+            // Normalizar el CUIL (remover guiones si existen)
+            var cuilNormalizado = CuilHelper.Normalize(request.CuilPaciente);
+            _logger.LogInformation("CUIL normalizado: {CuilOriginal} -> {CuilNormalizado}",
+                request.CuilPaciente, cuilNormalizado);
 
-            // TODO: En una implementación real, deberías obtener la enfermera del token de autenticación
-            // Por ahora creamos una enfermera mock
+            // Obtener información adicional del profesional desde el token
+            var emailEnfermera = User.GetEmail();
+
+            // Crear el objeto enfermera con la información del token autenticado
             var enfermera = new Enfermera
             {
-                Nombre = "Enfermera",
+                Nombre = "Enfermera", // En producción, esto también vendría del token o BD
                 Apellido = "Sistema",
                 Matricula = matriculaEnfermera
             };
 
             _servicioUrgencias.RegistrarUrgencia(
-                request.CuilPaciente,
+                cuilNormalizado,
                 enfermera,
                 request.Informe,
                 request.Temperatura,
@@ -220,21 +222,24 @@ public class UrgenciasController : ControllerBase
     /// <summary>
     /// Reclama el siguiente paciente de la lista de espera
     /// </summary>
-    /// <param name="matriculaDoctor">Matrícula del doctor que reclama</param>
     /// <returns>Datos del ingreso reclamado</returns>
     [Authorize(Roles = "Medico")]
     [HttpPost("reclamar")]
     [ProducesResponseType(typeof(IngresoResponse), 200)]
     [ProducesResponseType(typeof(ErrorResponse), 400)]
-    public IActionResult ReclamarPaciente([FromHeader(Name = "X-Doctor-Matricula")] string matriculaDoctor)
+    public IActionResult ReclamarPaciente()
     {
         try
         {
-            // TODO: En una implementación real, deberías obtener el doctor del token de autenticación
-            // Por ahora creamos un doctor mock
+            // SEGURIDAD: Extraer la matrícula del token JWT (no del header, que puede ser manipulado)
+            var matriculaDoctor = User.GetMatricula();
+
+            _logger.LogInformation("Doctor reclama paciente - Matrícula (desde JWT): {Matricula}", matriculaDoctor);
+
+            // Crear el objeto doctor con la información del token autenticado
             var doctor = new Doctor
             {
-                Nombre = "Doctor",
+                Nombre = "Doctor", // En producción, esto también vendría del token o BD
                 Apellido = "Sistema",
                 Matricula = matriculaDoctor
             };

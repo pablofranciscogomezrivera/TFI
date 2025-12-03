@@ -25,18 +25,7 @@ namespace Infraestructura
                 // 1. Necesitamos el ID del paciente en la BD
                 var idPaciente = ObtenerIdPacientePorCuil(ingreso.Paciente.CUIL, conexion);
 
-                var query = @"
-                    INSERT INTO Ingresos (
-                        IdPaciente, MatriculaEnfermera, FechaIngreso, Informe, 
-                        NivelEmergencia, Estado, Temperatura, 
-                        FrecuenciaCardiaca, FrecuenciaRespiratoria, 
-                        TensionSistolica, TensionDiastolica
-                    ) VALUES (
-                        @IdPaciente, @MatriculaEnfermera, @FechaIngreso, @Informe, 
-                        @NivelEmergencia, @Estado, @Temperatura, 
-                        @FrecuenciaCardiaca, @FrecuenciaRespiratoria, 
-                        @TensionSistolica, @TensionDiastolica
-                    )";
+                var query = SqlQueries.Urgencias.InsertarIngreso;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -68,12 +57,7 @@ namespace Infraestructura
                 conexion.Open();
                 // AQUÍ LA BASE DE DATOS HACE EL TRABAJO DE LA COLA DE PRIORIDAD
                 // Ordenamos por Nivel (0 es Crítico) y luego por Fecha (FIFO)
-                var query = @"
-                    SELECT i.*, p.CUIL, p.Nombre, p.Apellido, p.DNI
-                    FROM Ingresos i
-                    INNER JOIN Pacientes p ON i.IdPaciente = p.Id
-                    WHERE i.Estado = 0 -- 0 = PENDIENTE
-                    ORDER BY i.NivelEmergencia ASC, i.FechaIngreso ASC";
+                var query = SqlQueries.Urgencias.ObtenerIngresosPendientes;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -97,13 +81,7 @@ namespace Infraestructura
             {
                 conexion.Open();
 
-                var query = @"
-            UPDATE Ingresos 
-            SET Estado = @Estado,
-                MatriculaDoctor = @MatriculaDoctor,
-                InformeMedico = @InformeMedico
-            WHERE FechaIngreso = @FechaIngreso 
-            AND IdPaciente = (SELECT Id FROM Pacientes WHERE CUIL = @Cuil)";
+                var query = SqlQueries.Urgencias.ActualizarIngreso;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -163,12 +141,7 @@ namespace Infraestructura
             {
                 conexion.Open();
 
-                var query = @"
-                    SELECT i.*, p.CUIL, p.Nombre, p.Apellido, p.DNI
-                    FROM Ingresos i
-                    INNER JOIN Pacientes p ON i.IdPaciente = p.Id
-                    WHERE p.CUIL = @Cuil AND i.Estado = @Estado
-                    ORDER BY i.FechaIngreso DESC";
+                var query = SqlQueries.Urgencias.BuscarIngresoPorCuilYEstado;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -196,11 +169,7 @@ namespace Infraestructura
             {
                 conexion.Open();
 
-                var query = @"
-                    SELECT i.*, p.CUIL, p.Nombre, p.Apellido, p.DNI
-                    FROM Ingresos i
-                    INNER JOIN Pacientes p ON i.IdPaciente = p.Id
-                    ORDER BY i.NivelEmergencia ASC, i.FechaIngreso ASC";
+                var query = SqlQueries.Urgencias.ObtenerTodosLosIngresos;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -221,7 +190,7 @@ namespace Infraestructura
 
         private int ObtenerIdPacientePorCuil(string cuil, SqlConnection conexion)
         {
-            var cmd = new SqlCommand("SELECT Id FROM Pacientes WHERE CUIL = @Cuil", conexion);
+            var cmd = new SqlCommand(SqlQueries.Urgencias.ObtenerIdPacientePorCuil, conexion);
             cmd.Parameters.AddWithValue("@Cuil", cuil);
             var result = cmd.ExecuteScalar();
             if (result == null) throw new Exception($"Error de Integridad: Paciente {cuil} no encontrado.");

@@ -101,8 +101,21 @@ export const UrgenciasPage = () => {
             console.error('Error completo:', err);
             console.error('Response data:', err.response?.data);
             console.error('Response status:', err.response?.status);
-            const msg = err.response?.data?.message || err.message || 'Error al procesar el ingreso.';
-            showNotification(msg, 'error');
+
+            // Mostrar errores de validación de FluentValidation
+            if (err.response?.data?.errors) {
+                console.error('❌ ERRORES DE VALIDACIÓN:', err.response.data.errors);
+
+                // Construir mensaje con todos los errores
+                const errores = Object.entries(err.response.data.errors)
+                    .map(([campo, mensajes]) => `${campo}: ${mensajes.join(', ')}`)
+                    .join('\n');
+
+                showNotification(`Errores de validación:\n${errores}`, 'error');
+            } else {
+                const msg = err.response?.data?.message || err.message || 'Error al procesar el ingreso.';
+                showNotification(msg, 'error');
+            }
         }
     };
 
@@ -113,7 +126,8 @@ export const UrgenciasPage = () => {
 
     const handleReclamarPaciente = async () => {
         try {
-            const ingresoReclamado = await urgenciasService.reclamarPaciente(matriculaDoctor);
+            // Ya NO se pasa la matrícula - el backend la obtiene del JWT
+            const ingresoReclamado = await urgenciasService.reclamarPaciente();
 
             // Recargar lista de pacientes en espera
             await cargarPacientes();
@@ -137,7 +151,8 @@ export const UrgenciasPage = () => {
 
     const handleRegistrarAtencion = async (cuilPaciente, informeMedico) => {
         try {
-            await urgenciasService.registrarAtencion(cuilPaciente, informeMedico, matriculaDoctor);
+            // Ya NO se pasa la matrícula - el backend la obtiene del JWT
+            await urgenciasService.registrarAtencion(cuilPaciente, informeMedico);
 
             showNotification('Atención registrada exitosamente. Paciente dado de alta.', 'success');
 
@@ -226,7 +241,7 @@ export const UrgenciasPage = () => {
                                     </Button>
                                 </div>
 
-                               
+
                             </>
                         )}
 

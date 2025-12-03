@@ -14,34 +14,28 @@ export const urgenciasService = {
     },
 
     // Registrar nueva urgencia
-    registrarUrgencia: async (data, matriculaEnfermera) => {
-        const response = await api.post('/urgencias', data, {
-            headers: {
-                'X-Enfermera-Matricula': matriculaEnfermera
-            }
-        });
+    // NOTA: Ya NO se envía la matrícula como header
+    // El backend la extrae del JWT automáticamente por seguridad
+    registrarUrgencia: async (data) => {
+        const response = await api.post('/urgencias', data);
         return response.data;
     },
 
-    // Reclamar paciente (para m�dicos)
-    reclamarPaciente: async (matriculaDoctor) => {
-        const response = await api.post('/urgencias/reclamar', {}, {
-            headers: {
-                'X-Doctor-Matricula': matriculaDoctor
-            }
-        });
+    // Reclamar paciente (para médicos)
+    // NOTA: Ya NO se envía la matrícula como header
+    // El backend la extrae del JWT automáticamente por seguridad
+    reclamarPaciente: async () => {
+        const response = await api.post('/urgencias/reclamar');
         return response.data;
     },
 
-    // Registrar atenci�n m�dica
-    registrarAtencion: async (cuilPaciente, informeMedico, matriculaDoctor) => {
+    // Registrar atención médica
+    // NOTA: Ya NO se envía la matrícula como header
+    // El backend la extrae del JWT automáticamente por seguridad
+    registrarAtencion: async (cuilPaciente, informeMedico) => {
         const response = await api.post('/atenciones', {
             cuilPaciente,
             informeMedico
-        }, {
-            headers: {
-                'X-Doctor-Matricula': matriculaDoctor
-            }
         });
         return response.data;
     },

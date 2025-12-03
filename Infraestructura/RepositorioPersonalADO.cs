@@ -20,7 +20,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = "SELECT * FROM Enfermeros WHERE IdUsuario = @IdUsuario";
+                var query = SqlQueries.Personal.ObtenerEnfermeraPorUsuario;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -48,7 +48,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = "SELECT * FROM Doctores WHERE IdUsuario = @IdUsuario";
+                var query = SqlQueries.Personal.ObtenerDoctorPorUsuario;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {

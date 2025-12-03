@@ -21,13 +21,7 @@ namespace Infraestructura
             {
                 conexion.Open();
                 // Usamos MERGE o IF NOT EXISTS para evitar duplicados si el ID ya existe
-                var query = @"
-                    IF NOT EXISTS (SELECT 1 FROM ObrasSociales WHERE Id = @Id)
-                    BEGIN
-                        SET IDENTITY_INSERT ObrasSociales ON;
-                        INSERT INTO ObrasSociales (Id, Nombre) VALUES (@Id, @Nombre);
-                        SET IDENTITY_INSERT ObrasSociales OFF;
-                    END";
+                var query = SqlQueries.ObrasSociales.InsertarObraSocial;
 
                 using (var comando = new SqlCommand(query, conexion))
                 {
@@ -43,7 +37,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = "SELECT Id, Nombre FROM ObrasSociales WHERE Id = @Id";
+                var query = SqlQueries.ObrasSociales.BuscarPorId;
 
                 using (var comando = new SqlCommand(query, conexion))
                 {
@@ -70,7 +64,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = "SELECT COUNT(1) FROM ObrasSociales WHERE Id = @Id";
+                var query = SqlQueries.ObrasSociales.ExisteObraSocial;
 
                 using (var comando = new SqlCommand(query, conexion))
                 {
@@ -85,7 +79,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = "SELECT Id, Nombre FROM ObrasSociales ORDER BY Nombre ASC";
+                var query = SqlQueries.ObrasSociales.ObtenerTodas;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -110,7 +104,7 @@ namespace Infraestructura
             {
                 conexion.Open();
                 // Validamos contra la tabla PadronAfiliados que creamos en el paso 1
-                var query = "SELECT COUNT(1) FROM PadronAfiliados WHERE IdObraSocial = @IdObraSocial AND NumeroAfiliado = @NumeroAfiliado";
+                var query = SqlQueries.ObrasSociales.ValidarAfiliacion;
 
                 using (var comando = new SqlCommand(query, conexion))
                 {

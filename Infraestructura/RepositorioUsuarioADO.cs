@@ -21,7 +21,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = "SELECT Id, Email, PasswordHash, TipoAutoridad FROM Usuarios WHERE Email = @Email";
+                var query = SqlQueries.Usuarios.BuscarPorEmail;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -50,7 +50,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = "SELECT COUNT(1) FROM Usuarios WHERE Email = @Email";
+                var query = SqlQueries.Usuarios.ExisteUsuarioConEmail;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {
@@ -65,10 +65,7 @@ namespace Infraestructura
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                var query = @"
-                    INSERT INTO Usuarios (Email, PasswordHash, TipoAutoridad)
-                    VALUES (@Email, @PasswordHash, @TipoAutoridad);
-                    SELECT CAST(SCOPE_IDENTITY() as int);";
+                var query = SqlQueries.Usuarios.InsertarUsuario;
 
                 using (var cmd = new SqlCommand(query, conexion))
                 {

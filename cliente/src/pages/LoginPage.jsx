@@ -1,10 +1,11 @@
-﻿import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+﻿import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import Notification from '../components/ui/Notification'; // Importar
+import Notification from '../components/ui/Notification';
+import { debugToken } from '../utils/jwtHelper';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -13,10 +14,26 @@ const LoginPage = () => {
     const [notification, setNotification] = useState(null); // Estado para notificación
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const showNotification = (message, type) => {
         setNotification({ message, type });
     };
+
+    // Detectar si viene de una sesión expirada
+    useEffect(() => {
+        const reason = searchParams.get('reason');
+        if (reason === 'session_expired') {
+            // Usar setTimeout para evitar setState sincrónico en el effect
+            // Esto pospone la actualización de estado hasta después del render actual
+            setTimeout(() => {
+                setNotification({
+                    message: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+                    type: 'error'
+                });
+            }, 0);
+        }
+    }, [searchParams]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,10 +57,14 @@ const LoginPage = () => {
                 localStorage.setItem('profesionalDNI', prof.dni);
             }
 
+            // DEBUG: Verificar que el JWT contiene todos los claims necesarios
+            console.log('🔍 Verificando claims del JWT:');
+            debugToken();
+
             // Mensaje de éxito
             showNotification(`¡Bienvenido/a, ${prof ? prof.nombre : 'Usuario'}! Accediendo...`, 'success');
 
-            
+
             setTimeout(() => {
                 navigate('/urgencias');
             }, 1500);
@@ -56,7 +77,7 @@ const LoginPage = () => {
             } else {
                 showNotification('Error de conexión con el servidor. Intente más tarde.', 'error');
             }
-            setLoading(false); 
+            setLoading(false);
         }
     };
 

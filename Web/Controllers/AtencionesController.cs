@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using API.Helpers;
 using Aplicacion.Intefaces;
 using Dominio.Entidades;
 using Dominio.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Web.DTOs.Atenciones;
 using Web.DTOs.Common;
+using Web.Extensions;
 
-namespace Web.Controllers;
+namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -29,45 +32,45 @@ public class AtencionesController : ControllerBase
     /// Registra la atención médica de un paciente
     /// </summary>
     /// <param name="request">Datos de la atención (CUIL del paciente e informe médico)</param>
-    /// <param name="matriculaDoctor">Matrícula del doctor</param>
     /// <returns>Datos de la atención registrada</returns>
     [HttpPost]
     [ProducesResponseType(typeof(AtencionResponse), 200)]
     [ProducesResponseType(typeof(ErrorResponse), 400)]
     [ProducesResponseType(typeof(ErrorResponse), 404)]
-    public IActionResult RegistrarAtencion(
-        [FromBody] RegistrarAtencionRequest request,
-        [FromHeader(Name = "X-Doctor-Matricula")] string matriculaDoctor)
+    public IActionResult RegistrarAtencion([FromBody] RegistrarAtencionRequest request)
     {
         try
         {
-            // Validar request
-            if (string.IsNullOrWhiteSpace(request.CuilPaciente))
-            {
-                return BadRequest(new ErrorResponse
-                {
-                    Message = "El CUIL del paciente es requerido",
-                    StatusCode = 400
-                });
-            }
+            // Las validaciones del request las maneja automáticamente FluentValidation
+            // Si llegamos aquí, el request ya está validado
+
+            // SEGURIDAD: Extraer la matrícula del token JWT (no del header, que puede ser manipulado)
+            var matriculaDoctor = User.GetMatricula();
+
+            _logger.LogInformation("Registrando atención - Matrícula Doctor (desde JWT): {Matricula}", matriculaDoctor);
+
+            // Normalizar el CUIL (remover guiones si existen)
+            var cuilNormalizado = CuilHelper.Normalize(request.CuilPaciente);
+            _logger.LogInformation("CUIL normalizado: {CuilOriginal} -> {CuilNormalizado}",
+                request.CuilPaciente, cuilNormalizado);
 
             // Buscar el ingreso EN_PROCESO del paciente
-            var ingreso = _repositorioUrgencias.BuscarIngresoPorCuilYEstado(request.CuilPaciente, EstadoIngreso.EN_PROCESO);
+            var ingreso = _repositorioUrgencias.BuscarIngresoPorCuilYEstado(cuilNormalizado, EstadoIngreso.EN_PROCESO);
 
             if (ingreso == null)
             {
-                _logger.LogWarning("No se encontró ingreso en proceso para paciente: {Cuil}", request.CuilPaciente);
+                _logger.LogWarning("No se encontró ingreso en proceso para paciente: {Cuil}", cuilNormalizado);
                 return NotFound(new ErrorResponse
                 {
-                    Message = $"No se encontró un ingreso en proceso para el paciente con CUIL {request.CuilPaciente}",
+                    Message = $"No se encontró un ingreso en proceso para el paciente con CUIL {cuilNormalizado}",
                     StatusCode = 404
                 });
             }
 
-            // TODO: En una implementación real, deberías obtener el doctor del token de autenticación
+            // Crear el objeto doctor con la información del token autenticado
             var doctor = new Doctor
             {
-                Nombre = "Doctor",
+                Nombre = "Doctor", // En producción, esto también vendría del token o BD
                 Apellido = "Sistema",
                 Matricula = matriculaDoctor
             };
@@ -90,7 +93,7 @@ public class AtencionesController : ControllerBase
 
             _logger.LogInformation(
                 "Atención registrada para paciente {Cuil} por doctor {Matricula}",
-                request.CuilPaciente,
+                cuilNormalizado,
                 matriculaDoctor);
 
             return Ok(response);
