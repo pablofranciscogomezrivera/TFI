@@ -134,13 +134,12 @@ namespace Infraestructura
 
         public Ingreso? BuscarIngresoPorCuilYEstado(string cuil, EstadoIngreso estado)
         {
-            if (string.IsNullOrWhiteSpace(cuil))
-                throw new ArgumentException("El CUIL no puede estar vacío", nameof(cuil));
-
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
 
+                // Buscamos el ingreso que coincida con el CUIL y el Estado solicitado
+                // Hacemos los JOINs necesarios para llenar el objeto
                 var query = SqlQueries.Urgencias.BuscarIngresoPorCuilYEstado;
 
                 using (var cmd = new SqlCommand(query, conexion))
@@ -157,8 +156,7 @@ namespace Infraestructura
                     }
                 }
             }
-
-            return null;
+            return null; // No se encontró
         }
 
         public List<Ingreso> ObtenerTodosLosIngresos()

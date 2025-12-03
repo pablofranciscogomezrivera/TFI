@@ -65,8 +65,7 @@
                 SELECT i.*, p.CUIL, p.Nombre, p.Apellido, p.DNI
                 FROM Ingresos i
                 INNER JOIN Pacientes p ON i.IdPaciente = p.Id
-                WHERE p.CUIL = @Cuil AND i.Estado = @Estado
-                ORDER BY i.FechaIngreso DESC";
+                WHERE p.CUIL = @Cuil AND i.Estado = @Estado";
 
             public const string ObtenerTodosLosIngresos = @"
                 SELECT i.*, p.CUIL, p.Nombre, p.Apellido, p.DNI

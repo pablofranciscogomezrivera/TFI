@@ -7,6 +7,15 @@ import { getNivelEmergenciaInfo } from '../../constants/enums';
 import './ModalAtencionMedica.css';
 import React from 'react';
 
+const formatearCuil = (cuil) => {
+    if (!cuil) return '';
+    if (cuil.includes('-')) return cuil;
+    if (cuil.length === 11) {
+        return `${cuil.substring(0, 2)}-${cuil.substring(2, 10)}-${cuil.substring(10)}`;
+    }
+    return cuil;
+};
+
 export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
     const [informeMedico, setInformeMedico] = useState('');
     const [error, setError] = useState('');
@@ -65,7 +74,7 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
                         <div className="info-grid">
                             <div className="info-item">
                                 <span className="info-label">CUIL:</span>
-                                <span className="info-value">{ingreso.cuilPaciente}</span>
+                                <span className="resumen-value">{formatearCuil(ingreso.cuilPaciente)}</span>
                             </div>
 
                             <div className="info-item">

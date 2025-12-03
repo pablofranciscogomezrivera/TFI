@@ -33,7 +33,8 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         email: '',
         telefono: '',
         obraSocialId: '',
-        numeroAfiliado: ''
+        numeroAfiliado: '',
+        fechaNacimiento: ''
     });
 
     // Estados de Control
@@ -198,6 +199,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                 const numeroParseado = pacienteData.numero ? parseInt(pacienteData.numero) : null;
                 const telefonoParseado = pacienteData.telefono ? parseInt(pacienteData.telefono.replace(/\D/g, '')) : null;
                 const obraSocialIdParseado = pacienteData.obraSocialId ? parseInt(pacienteData.obraSocialId) : null;
+                const fechaDefault = "2000-01-01";
 
                 datosPacienteNuevo = {
                     cuil: formData.cuilPaciente.trim(),
@@ -210,7 +212,9 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                     telefono: (telefonoParseado && !isNaN(telefonoParseado)) ? telefonoParseado : null,
                     obraSocialId: obraSocialIdParseado,
                     numeroAfiliado: pacienteData.numeroAfiliado.trim() || null,
-                    fechaNacimiento: new Date("1900-01-01").toISOString()
+                    fechaNacimiento: pacienteData.fechaNacimiento
+                        ? new Date(pacienteData.fechaNacimiento).toISOString()
+                        : new Date(fechaDefault).toISOString()
                 };
             }
             // 3. Enviar todo al padre (UrgenciasPage)
@@ -226,7 +230,8 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             setMostrarMensajePacienteNuevo(false);
             setPacienteData({
                 nombre: '', apellido: '', calle: '', numero: '', localidad: '',
-                email: '', telefono: '', obraSocialId: '', numeroAfiliado: ''
+                email: '', telefono: '', obraSocialId: '', numeroAfiliado: '',
+                fechaNacimiento: ''
             });
 
         } catch (error) {
@@ -310,6 +315,13 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                     <div className="form-row">
                                         <Input label="Nombre (Opcional)" name="nombre" value={pacienteData.nombre} onChange={handlePacienteChange} placeholder="Sin Registrar" />
                                         <Input label="Apellido (Opcional)" name="apellido" value={pacienteData.apellido} onChange={handlePacienteChange} placeholder="Sin Registrar" />
+                                        <Input
+                                            label="Fecha de Nacimiento"
+                                            name="fechaNacimiento"
+                                            type="date"
+                                            value={pacienteData.fechaNacimiento}
+                                            onChange={handlePacienteChange}
+                                        />
                                     </div>
 
                                     <div className="form-row">
@@ -317,7 +329,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                         <Input label="Teléfono (Opcional)" name="telefono" type="tel" value={pacienteData.telefono} onChange={handlePacienteChange} placeholder="3814567890" />
                                     </div>
 
-                                    <div className="form-row three-cols">
+                                    <div className="form-row">
                                         <Input label="Calle (Opcional)" name="calle" value={pacienteData.calle} onChange={handlePacienteChange} placeholder="San Martin" />
                                         <Input label="Número (Opcional)" name="numero" type="number" value={pacienteData.numero} onChange={handlePacienteChange} placeholder="999" />
                                         <Input label="Localidad" name="localidad" value={pacienteData.localidad} onChange={handlePacienteChange} placeholder="Tucumán" />

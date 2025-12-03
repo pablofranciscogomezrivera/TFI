@@ -33,12 +33,11 @@ export const urgenciasService = {
     // NOTA: Ya NO se envía la matrícula como header
     // El backend la extrae del JWT automáticamente por seguridad
     registrarAtencion: async (cuilPaciente, informeMedico) => {
-        const response = await api.post('/atenciones', {
-            cuilPaciente,
-            informeMedico
+        const response = await api.post(`/atenciones/${cuilPaciente}`, {
+            informeMedico: informeMedico
         });
         return response.data;
-    },
+    }
 };
 
 export default urgenciasService;

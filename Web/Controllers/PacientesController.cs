@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Web.DTOs.Common;
 using Web.DTOs.Pacientes;
 using Webb.DTOs.Pacientes;
-
+using API.Helpers;
 namespace Webb.Controllers;
 
 [Authorize(Roles = "Enfermera")]
@@ -33,8 +33,9 @@ public class PacientesController : ControllerBase
     {
         try
         {
+            var cuilNormalizado = CuilHelper.Normalize(request.Cuil);
             var paciente = _servicioPacientes.RegistrarPaciente(
-                request.Cuil,
+                cuilNormalizado,
                 request.Nombre,
                 request.Apellido,
                 request.Calle,
@@ -100,7 +101,8 @@ public class PacientesController : ControllerBase
     {
         try
         {
-            var paciente = _servicioPacientes.BuscarPacientePorCuil(cuil);
+            var cuilNormalizado = CuilHelper.Normalize(cuil);
+            var paciente = _servicioPacientes.BuscarPacientePorCuil(cuilNormalizado);
 
             if (paciente == null)
             {

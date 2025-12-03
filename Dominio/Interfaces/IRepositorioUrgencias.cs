@@ -16,4 +16,5 @@ public interface IRepositorioUrgencias
 
     Ingreso? BuscarIngresoPorCuilYEstado(string cuil, EstadoIngreso estado);
     List<Ingreso> ObtenerTodosLosIngresos();
+
 }
