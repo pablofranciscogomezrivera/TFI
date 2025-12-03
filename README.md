@@ -148,11 +148,3 @@ El proyecto cuenta con integración continua configurada.
 
   * ✅ **Backend Tests:** Se ejecuta automáticamente en cada Pull Request a la rama `main` o `master` para asegurar que no se rompa la lógica de negocio existente.
 
------
-
-### Cambios realizados con respecto a tu versión anterior:
-1.  **Limpieza:** Se eliminaron los `??` y `???` que aparecían por problemas de codificación.
-2.  **Frontend:** Se agregó la sección completa de tecnologías del frontend (React, Vite) y cómo ejecutarlo (`npm run dev`), ya que antes solo mencionaba .NET.
-3.  **Arquitectura:** Se especificó que la infraestructura usa **ADO.NET** (visto en tu código `RepositorioPacientesADO.cs`), lo cual es un detalle técnico importante.
-4.  **Scalar:** Se actualizó la referencia a la documentación, ya que en tu `Program.cs` usas `Scalar` en lugar del Swagger UI tradicional.
-5.  **Funcionalidades:** Se detallaron los módulos basándose en los controladores que tienes (`AuthController`, `UrgenciasController`, `AtencionesController`).
