@@ -1,7 +1,7 @@
-# ?? Sistema de Gesti¨®n de Urgencias Cl¨ªnicas
+# ?? Sistema de GestiÂ¨Â®n de Urgencias ClÂ¨Âªnicas
 ### Trabajo Final Integrador (TFI)
 
-Proyecto desarrollado para la materia **Ingenier¨ªa de Software** del curso 4K2 en la **Universidad Tecnol¨®gica Nacional - Facultad Regional Tucum¨¢n**. 
+Proyecto desarrollado para la materia **IngenierÂ¨Âªa de Software** del curso 4K2 en la **Universidad TecnolÂ¨Â®gica Nacional - Facultad Regional TucumÂ¨Â¢n**. 
 
 #### Integrantes del Grupo
 
@@ -12,22 +12,22 @@ Proyecto desarrollado para la materia **Ingenier¨ªa de Software** del curso 4K2 
 | 46380  | Cancino, Micaela       |
 | 48235  | Bellor, Maria          |
 | 48308  | Herrera, Macarena      |
-| 52467  | G¨®mez, Pablo           |
+| 52467  | GÂ¨Â®mez, Pablo           |
 
 ---
 
-## ?? Descripci¨®n del Proyecto
+## ?? Descripcion del Proyecto
 
-El sistema est¨¢ dise?ado para gestionar el flujo de admisiones en la sala de urgencias de una cl¨ªnica. Permite al personal de enfermer¨ªa registrar el ingreso de pacientes, capturar sus signos vitales y priorizarlos autom¨¢ticamente en una cola de atenci¨®n.
+El sistema estÂ¨Â¢ dise?ado para gestionar el flujo de admisiones en la sala de urgencias de una clÂ¨Âªnica. Permite al personal de enfermerÂ¨Âªa registrar el ingreso de pacientes, capturar sus signos vitales y priorizarlos automÂ¨Â¢ticamente en una cola de atenciÂ¨Â®n.
 
-La l¨®gica de negocio se basa en el enfoque de **Desarrollo Guiado por el Comportamiento (BDD)**, a partir de las siguientes historias de usuario:
-* **IS2025-001**: Modelado del m¨®dulo de urgencias, incluyendo el registro de ingresos y el ordenamiento de la cola de atenci¨®n por prioridad.
+La lÂ¨Â®gica de negocio se basa en el enfoque de **Desarrollo Guiado por el Comportamiento (BDD)**, a partir de las siguientes historias de usuario:
+* **IS2025-001**: Modelado del mÂ¨Â®dulo de urgencias, incluyendo el registro de ingresos y el ordenamiento de la cola de atenciÂ¨Â®n por prioridad.
 
-## ??? Tecnolog¨ªas Utilizadas
+## ??? TecnologÂ¨Âªas Utilizadas
 
-El backend est¨¢ construido sobre la plataforma .NET, mientras que la tecnolog¨ªa para el frontend est¨¢ en proceso de definici¨®n.
+El backend estÂ¨Â¢ construido sobre la plataforma .NET, mientras que la tecnologÂ¨Âªa para el frontend estÂ¨Â¢ en proceso de definiciÂ¨Â®n.
 
-| Componente | Tecnolog¨ªa |
+| Componente | TecnologÂ¨Âªa |
 | :--- | :--- |
 | **Framework** | `.NET 8` |
 | **Lenguaje** | `C#` |
@@ -38,28 +38,28 @@ El backend est¨¢ construido sobre la plataforma .NET, mientras que la tecnolog¨ª
 
 ## ?? Estructura del Proyecto
 
-El sistema sigue una arquitectura por capas para garantizar la separaci¨®n de responsabilidades y la mantenibilidad.
+El sistema sigue una arquitectura por capas para garantizar la separaciÂ¨Â®n de responsabilidades y la mantenibilidad.
 
-* **`Dominio`**: ?? Contiene las entidades, objetos de valor y reglas de negocio. Es el coraz¨®n de la aplicaci¨®n.
-* **`Aplicacion`**: ?? Orquesta la l¨®gica del dominio a trav¨¦s de servicios, actuando como intermediario entre la UI y el n¨²cleo.
+* **`Dominio`**: ?? Contiene las entidades, objetos de valor y reglas de negocio. Es el corazÂ¨Â®n de la aplicaciÂ¨Â®n.
+* **`Aplicacion`**: ?? Orquesta la lÂ¨Â®gica del dominio a travÂ¨Â¦s de servicios, actuando como intermediario entre la UI y el nÂ¨Â²cleo.
 * **`Infraestructura`**: ?? Implementa las interfaces del dominio (ej. repositorios). Actualmente usa una base de datos en memoria para las pruebas.
-* **`Webb`**: ??? Proyecto destinado a la capa de presentaci¨®n (frontend) de la aplicaci¨®n.
+* **`Webb`**: ??? Proyecto destinado a la capa de presentaciÂ¨Â®n (frontend) de la aplicaciÂ¨Â®n.
 * **`Tests`**: ?? Contiene todas las pruebas BDD, con los archivos `.feature` y sus implementaciones.
 
-## ?? C¨®mo Ejecutar las Pruebas
+## ?? CÂ¨Â®mo Ejecutar las Pruebas
 
-Para verificar el comportamiento implementado, puedes ejecutar las pruebas de aceptaci¨®n automatizadas desde tu editor de preferencia o desde la l¨ªnea de comandos.
+Para verificar el comportamiento implementado, puedes ejecutar las pruebas de aceptaciÂ¨Â®n automatizadas desde tu editor de preferencia o desde la lÂ¨Âªnea de comandos.
 
-### ?? Scripts de Ejecuci¨®n R¨¢pida
+### ?? Scripts de EjecuciÂ¨Â®n RÂ¨Â¢pida
 
 
-### ?? Desde la L¨ªnea de Comandos
+### ?? Desde la LÂ¨Âªnea de Comandos
 
 ```bash
 # Restaurar dependencias
 dotnet restore TFI.sln
 
-# Compilar la soluci¨®n
+# Compilar la soluciÂ¨Â®n
 dotnet build TFI.sln --configuration Release
 
 # Ejecutar todos los tests
@@ -69,29 +69,29 @@ dotnet test TFI.sln --configuration Release
 
 ### En Visual Studio
 
-1.  **Abrir la Soluci¨®n**: Abre el archivo `TFI.sln`.
-2.  **Restaurar Dependencias**: Haz clic derecho en la soluci¨®n y selecciona "Restaurar paquetes NuGet".
+1.  **Abrir la SoluciÂ¨Â®n**: Abre el archivo `TFI.sln`.
+2.  **Restaurar Dependencias**: Haz clic derecho en la soluciÂ¨Â®n y selecciona "Restaurar paquetes NuGet".
 3.  **Compilar**: Usa el atajo `Ctrl+Shift+B`.
 4.  **Ejecutar Pruebas**: Abre el **Explorador de Pruebas** (`Test > Explorador de pruebas`) y haz clic en "Run All Tests".
 
 ### En Visual Studio Code
 
-1.  **Instalar Extensiones**: Aseg¨²rate de tener instalada la extensi¨®n **C# Dev Kit** de Microsoft.
-2.  **Abrir la Carpeta**: Abre la carpeta ra¨ªz del repositorio en VS Code.
-3.  **Cargar Soluci¨®n**: Espera a que el C# Dev Kit cargue el archivo `TFI.sln`.
-4.  **Ejecutar Pruebas**: Ve al ¨ªcono de matraz (Testing) en la barra de actividades del lado izquierdo y ejecuta las pruebas desde all¨ª.
+1.  **Instalar Extensiones**: AsegÂ¨Â²rate de tener instalada la extensiÂ¨Â®n **C# Dev Kit** de Microsoft.
+2.  **Abrir la Carpeta**: Abre la carpeta raÂ¨Âªz del repositorio en VS Code.
+3.  **Cargar SoluciÂ¨Â®n**: Espera a que el C# Dev Kit cargue el archivo `TFI.sln`.
+4.  **Ejecutar Pruebas**: Ve al Â¨Âªcono de matraz (Testing) en la barra de actividades del lado izquierdo y ejecuta las pruebas desde allÂ¨Âª.
 
 
 ## ?? CI/CD - GitHub Actions
 
-El proyecto incluye workflows de GitHub Actions que se ejecutan autom¨¢ticamente en Pull Requests para garantizar la calidad del c¨®digo.
+El proyecto incluye workflows de GitHub Actions que se ejecutan automÂ¨Â¢ticamente en Pull Requests para garantizar la calidad del cÂ¨Â®digo.
 
 ### Workflows Disponibles
 
 #### 2. **Backend Tests ** 
-- ? Se ejecuta autom¨¢ticamente en PRs a `master` o `main`
-- ? Permite ejecuci¨®n manual
-- ? Feedback r¨¢pido sin reportes adicionales
+- ? Se ejecuta automÂ¨Â¢ticamente en PRs a `master` o `main`
+- ? Permite ejecuciÂ¨Â®n manual
+- ? Feedback rÂ¨Â¢pido sin reportes adicionales
 
 ### ?? Ejecutar Manualmente
 
@@ -99,14 +99,16 @@ El proyecto incluye workflows de GitHub Actions que se ejecutan autom¨¢ticamente
 2. Selecciona el workflow deseado
 3. Click en **"Run workflow"**
 4. Selecciona la rama
-5. Click en **"Run workflow"** (bot¨®n verde)
+5. Click en **"Run workflow"** (botÂ¨Â®n verde)
 
 ### ?? Interpretar Resultados
 
 - ? **Verde**: Todos los tests pasaron
-- ? **Rojo**: Uno o m¨¢s tests fallaron - revisa los logs
+- ? **Rojo**: Uno o mÂ¨Â¢s tests fallaron - revisa los logs
 - ?? **Amarillo**: Tests con warnings - verifica la cobertura
 
-### ?? Documentaci¨®n Completa de CI/CD
+### ?? DocumentaciÂ¨Â®n Completa de CI/CD
 
-Para m¨¢s informaci¨®n sobre los workflows, consulta [.github/workflows/README.md](.github/workflows/README.md).
+Para mÂ¨Â¢s informaciÂ¨Â®n sobre los workflows, consulta [.github/workflows/README.md](.github/workflows/README.md).
+
+prueba de workflow
