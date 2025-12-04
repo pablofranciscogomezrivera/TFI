@@ -148,53 +148,81 @@ El proyecto cuenta con integración continua configurada.
 
   * ✅ **Backend Tests:** Se ejecuta automáticamente en cada Pull Request a la rama `main` o `master` para asegurar que no se rompa la lógica de negocio existente.
 
-## Capturas de pantalla
+---
 
- * Flujo de enfermera:
- 1- Inicio de sesión
+ ### 📸 Capturas de Pantalla y Flujos de Usuario
+ ## 🏥 Flujo de Enfermería:
+ ## 1. Inicio de sesión
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/7ff3312e-52b8-43d4-8425-604ee75b92c8" />
- ✅ Popup de inicio exitoso:
+ 
+ * ✅ Popup de inicio exitoso:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/e575f58a-4921-4709-aecc-dd9082d9eaa0" />
 
- 2- Panel de cola de prioridad e ingreso de pacientes:
+ # 2. Panel de cola de prioridad e ingreso de pacientes:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/c93bb8dc-f9d4-4cc3-8af8-a455bb43e1b3" />
- 2.1- Nuevo ingreso:
+ 
+ # 2.1 Nuevo ingreso:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/aa6dfdf2-2ea8-4a57-9896-1ac387295234" />
- 2.1.1- Ejemplo de carga paciente nuevo:
+ 
+ # 2.1.1 Ejemplo de carga paciente nuevo:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/25f9424b-f156-4589-b770-8ad4b4008b24" />
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/b20f0b3b-465f-4dc5-a95b-023b1f7d5376" />
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/40fcf105-cd4a-4142-a757-5dfecc6f8531" />
- 2.1.2- Reconoce paciente nuevo:
+ 
+ # 2.1.2 Reconoce paciente nuevo:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/114aa451-02dd-4da5-be99-fa8070c1f183" />
- 2.1.2.1- Carga de paciente nuevo:
+ 
+ # 2.1.2.1 Carga de paciente nuevo:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/d910e10a-88cf-4e1e-b50e-589942ddd6ee" />
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/7cf1c880-7b96-4bcc-bcb5-7682b78dd19c" />
- 2.2- Ingreso exitoso en cola de prioridad con popup de exito:
+ 
+ # 2.2 Ingreso exitoso en cola de prioridad con popup de exito:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/c939f9d5-a704-4b54-ab81-876d6e7d2a19" />
 
- 3- Ingreso de paciente existente y con prioridad mayor al anterior:
+ # 3. Ingreso de paciente existente y con prioridad mayor al anterior:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/244b4eee-2395-4c7e-87f2-987ec82d414a" />
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/31e42ff6-0c85-4d2e-bd37-1287c14163fb" />
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/d1538ad6-00c8-4f0a-8b9d-6da577f50831" />
- 3.1- Ingreso exitoso y acomodado en cola de prioridad:
+ 
+ # 3.1 Ingreso exitoso y acomodado en cola de prioridad:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/5657c99f-5995-459c-9b55-7b5b4ba39360" />
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/dad96b5d-ab0e-40d6-97d1-c7bf7fc23967" />
 
- *Flujo medico:
- 1- Inicio de sesión
+ ## 🩺 Flujo Médico
+ 
+ # 1. Inicio de sesión
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/560d865d-39d6-41d0-8b17-ff9c3ba902c5" />
- ✅ Popup de inicio exitoso:
+ 
+ * ✅ Popup de inicio exitoso:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/fcd6c3c4-33f0-4930-a20c-232a7effce16" />
 
- 2- Panel de medico de la cola de prioridad con posibilidad de atender al paciente para generar su informe:
+ # 2. Panel de medico de la cola de prioridad con posibilidad de atender al paciente para generar su informe:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/8b6dcf3a-0058-4eef-bfe1-f8948c6306fd" />
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/6d175fa3-79c5-4ce5-974f-4b3dbd9929c8" />
 
- 3- Llamar al paciente para ser atendido por el medico:
+ # 3. Llamar al paciente para ser atendido por el medico:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/0b5b12c2-80bf-4e46-80ba-4d349f86e44e" />
- 3.1- Panel de registro de informe con resumen del diagnostico preventivo del ingreso:
+ 
+ # 3.1 Panel de registro de informe con resumen del diagnostico preventivo del ingreso:
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/61c88c12-e406-470a-8c16-02a61a339a9a" />
- 3.2- Confirmacion del registro y dado de alta del paciente con popup de exito (con su eliminacion de la cola de prioridad):
+ 
+ # 3.2 Confirmacion del registro y dado de alta del paciente con popup de exito (con su eliminacion de la cola de prioridad):
+ 
  <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/a9828d18-809c-43fd-8a42-e7d8534a8580" />
  <img width="1919" height="1029" alt="image" src="https://github.com/user-attachments/assets/fe0ee962-9a49-47b1-8853-d086cc82594f" />
 
