@@ -71,7 +71,7 @@ api.interceptors.response.use(
                 url: error.config?.url
             });
         } else if (error.request) {
-            /
+            
             console.error('Sin respuesta del servidor:', error.request);
         } else {
             
