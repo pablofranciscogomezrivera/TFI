@@ -213,21 +213,6 @@ Asegúrate de tener instaladas las siguientes cargas de trabajo:
    - **Desarrollo de escritorio de .NET** (para ejecutar tests)
    - **Almacenamiento y procesamiento de datos** (para trabajar con SQL Server)
 
-#### Configuración Recomendada
-
-**Herramientas > Opciones:**
-
-- **Entorno > General:**
-  - Tema: Azul/Oscuro según preferencia
-  
-- **Editor de texto > C# > Avanzado:**
-  - Habilitar "Sugerencias de IntelliSense"
-  - Habilitar "Navegar a código descompilado"
-
-- **Depurador > General:**
-  - Habilitar "Usar solo mi código"
-  - Habilitar "Habilitar editar y continuar"
-
 ### 2. Configuración de Base de Datos
 
 #### Opción A: SQL Server LocalDB (Recomendado para desarrollo)
@@ -320,7 +305,7 @@ La base de datos no incluye usuarios por defecto. Debes crear usuarios mediante:
 1. **Endpoint de registro:** `POST /api/auth/registrar`
 2. **SQL directo:** Insertando en las tablas `Usuarios` y `Doctores`/`Enfermeros`
 
-**Nota:** Las contraseñas se almacenan hasheadas con BCrypt. Tambien puedes registar usuarios ejecutando el frontend en simultaneo.
+**Nota:** Las contraseñas se almacenan hasheadas con BCrypt. Tambien se puede registar usuarios ejecutando el frontend en simultaneo.
 
 ### 4. Ejecutar el Frontend
 
@@ -542,49 +527,6 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=html
 - `POST /api/urgencias/{cuil}/reclamar` - Reclamar paciente
 - `POST /api/atenciones` - Registrar atención
 - `POST /api/urgencias/{cuil}/cancelar-atencion` - Cancelar atención
-
----
-
-### Troubleshooting Común en Visual Studio
-
-#### Error "No se puede encontrar el proyecto"
-
-**Solución:**
-1. Verifica que todos los archivos `.csproj` existan
-2. Abre el archivo `.sln` en un editor de texto y verifica las rutas
-3. En Visual Studio: Click derecho en solución > "Volver a cargar solución"
-
-#### Tests no aparecen en el Explorador de pruebas
-
-**Soluciones:**
-1. Compila la solución: `Ctrl + Shift + B`
-2. Prueba > Actualizar (en el Explorador de pruebas)
-3. Cierra y reabre el Explorador de pruebas
-4. Verifica que el framework de pruebas (xUnit) esté instalado correctamente
-
-#### Error de restauración de paquetes NuGet
-
-**Solución:**
-1. Click derecho en solución > Restaurar paquetes NuGet
-2. Herramientas > NuGet > Administrador de paquetes NuGet > Configuración > Borrar caché
-3. Elimina la carpeta `packages` y restaura nuevamente
-
-#### El puerto está en uso
-
-**Solución:**
-1. Cambia el puerto en `Properties/launchSettings.json`
-2. O detén el proceso que está usando el puerto:
-```bash
-netstat -ano | findstr :5284
-taskkill /PID <número_de_proceso> /F
-```
-
-#### La aplicación no se detiene correctamente
-
-**Solución:**
-1. En lugar de cerrar el navegador, usa `Shift + F5` en Visual Studio
-2. O click en el botón "Detener" rojo
-3. Si persiste: Herramientas > Opciones > Depuración > General > "Detener todos los procesos cuando se detenga uno"
 
 ---
 
