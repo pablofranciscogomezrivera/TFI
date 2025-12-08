@@ -1,4 +1,4 @@
-﻿namespace Webb.DTOs.Pacientes;
+﻿namespace API.DTOs.Pacientes;
 
 public class RegistrarPacienteRequest
 {

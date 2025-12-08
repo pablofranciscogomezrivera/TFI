@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace Infraestructura
+namespace Infraestructura.Repositorios
 {
     public class RepositorioUrgenciasADO : IRepositorioUrgencias
     {

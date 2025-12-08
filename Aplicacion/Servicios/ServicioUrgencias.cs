@@ -45,16 +45,32 @@ public class ServicioUrgencias : IServicioUrgencias
             throw new InvalidOperationException("No hay pacientes en la lista de espera");
         }
 
-        // Obtener el primer paciente (el de mayor prioridad)
         var ingreso = listaEspera[0];
 
-        // Cambiar el estado a EN_PROCESO
         ingreso.Estado = EstadoIngreso.EN_PROCESO;
 
-        // Actualizar el ingreso (persiste el cambio de estado)
         _repositorioUrgencias.ActualizarIngreso(ingreso);
 
         return ingreso;
+    }
+
+    public void CancelarAtencion(string cuilPaciente)
+    {
+        if (string.IsNullOrWhiteSpace(cuilPaciente))
+        {
+            throw new ArgumentException("El CUIL del paciente es mandatorio");
+        }
+
+        var ingreso = _repositorioUrgencias.BuscarIngresoPorCuilYEstado(cuilPaciente, EstadoIngreso.EN_PROCESO);
+
+        if (ingreso == null)
+        {
+            throw new InvalidOperationException($"No se encontró un ingreso en proceso para el paciente con CUIL {cuilPaciente}");
+        }
+
+        ingreso.Estado = EstadoIngreso.PENDIENTE;
+
+        _repositorioUrgencias.ActualizarIngreso(ingreso);
     }
 
     public void RegistrarUrgencia(
@@ -86,10 +102,8 @@ public class ServicioUrgencias : IServicioUrgencias
 
         var paciente = _repositorioPacientes.BuscarPacientePorCuil(CUILPaciente);
 
-        // Si el paciente no existe y se proporcionaron datos, crearlo automáticamente
         if (paciente is null)
         {
-            // Crear paciente con datos proporcionados o valores por defecto
             var domicilio = new Domicilio
             {
                 Calle = callePaciente ?? "Sin Registrar",
@@ -110,7 +124,6 @@ public class ServicioUrgencias : IServicioUrgencias
                 Afiliado = null // Sin obra social por defecto
             };
 
-            // Registrar el paciente en el repositorio
             paciente = _repositorioPacientes.RegistrarPaciente(paciente);
         }
 
@@ -130,7 +143,6 @@ public class ServicioUrgencias : IServicioUrgencias
 
     private int ExtraerDniDeCuil(string cuil)
     {
-        // El CUIL tiene formato XX-XXXXXXXX-X, extraemos los 8 dígitos del medio
         var cuilLimpio = cuil.Replace("-", "");
         if (cuilLimpio.Length >= 10)
         {

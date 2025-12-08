@@ -1,4 +1,4 @@
-﻿namespace Web.DTOs.Auth;
+﻿namespace API.DTOs.Auth;
 
 public class LoginRequest
 {

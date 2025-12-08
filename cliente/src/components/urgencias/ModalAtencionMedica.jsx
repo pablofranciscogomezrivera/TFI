@@ -67,7 +67,6 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
                         <button className="btn-close" onClick={onClose}>&times;</button>
                     </div>
 
-                    {/* Datos del Ingreso - Vista Resumida */}
                     <div className="ingreso-resumen">
                         <h3 className="seccion-titulo">📋 Datos del Ingreso</h3>
 
@@ -88,7 +87,6 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Signos Vitales */}
                         <div className="signos-vitales-resumen">
                             <h4 className="subseccion-titulo">Signos Vitales</h4>
                             <div className="signos-grid">
@@ -128,7 +126,6 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Informe de la Enfermera */}
                         <div className="informe-enfermera-seccion">
                             <h4 className="subseccion-titulo">📝 Informe Inicial (Enfermera)</h4>
                             <div className="informe-enfermera-contenido">
@@ -137,7 +134,6 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Formulario de Atención Médica */}
                     <form onSubmit={handleSubmit} className="atencion-form">
                         <div className="atencion-seccion">
                             <h3 className="seccion-titulo">🩺 Informe Médico</h3>

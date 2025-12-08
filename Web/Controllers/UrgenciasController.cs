@@ -1,29 +1,26 @@
-﻿using Web.Extensions;
+﻿using API.Extensions;
 using API.Helpers;
 using Aplicacion.Intefaces;
 using Dominio.Entidades;
 using Dominio.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.DTOs.Common;
-using Web.DTOs.Urgencias;
-namespace Web.Controllers;
+using API.DTOs.Common;
+using API.DTOs.Urgencias;
+namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class UrgenciasController : ControllerBase
 {
     private readonly IServicioUrgencias _servicioUrgencias;
-    private readonly IRepositorioPacientes _repositorioPacientes;
     private readonly ILogger<UrgenciasController> _logger;
 
     public UrgenciasController(
         IServicioUrgencias servicioUrgencias,
-        IRepositorioPacientes repositorioPacientes,
         ILogger<UrgenciasController> logger)
     {
         _servicioUrgencias = servicioUrgencias;
-        _repositorioPacientes = repositorioPacientes;
         _logger = logger;
     }
 
@@ -40,7 +37,7 @@ public class UrgenciasController : ControllerBase
     {
         try
         {
-            
+
             var matriculaEnfermera = User.GetMatricula();
 
             _logger.LogInformation("=== REGISTRO DE URGENCIA ===");
@@ -54,18 +51,18 @@ public class UrgenciasController : ControllerBase
             _logger.LogInformation("Paciente Nuevo - Nombre: {Nombre}, Apellido: {Apellido}",
                 request.NombrePaciente ?? "null", request.ApellidoPaciente ?? "null");
 
-            
+
             var cuilNormalizado = CuilHelper.Normalize(request.CuilPaciente);
             _logger.LogInformation("CUIL normalizado: {CuilOriginal} -> {CuilNormalizado}",
                 request.CuilPaciente, cuilNormalizado);
 
-           
+
             var emailEnfermera = User.GetEmail();
 
-            
+
             var enfermera = new Enfermera
             {
-                Nombre = "Enfermera", 
+                Nombre = "Enfermera",
                 Apellido = "Sistema",
                 Matricula = matriculaEnfermera
             };
@@ -228,15 +225,13 @@ public class UrgenciasController : ControllerBase
     {
         try
         {
-            // SEGURIDAD: Extraer la matrícula del token JWT (no del header, que puede ser manipulado)
             var matriculaDoctor = User.GetMatricula();
 
             _logger.LogInformation("Doctor reclama paciente - Matrícula (desde JWT): {Matricula}", matriculaDoctor);
 
-            // Crear el objeto doctor con la información del token autenticado
             var doctor = new Doctor
             {
-                Nombre = "Doctor", // En producción, esto también vendría del token o BD
+                Nombre = "Doctor", 
                 Apellido = "Sistema",
                 Matricula = matriculaDoctor
             };
@@ -287,6 +282,57 @@ public class UrgenciasController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error inesperado al reclamar paciente");
+            return StatusCode(500, new ErrorResponse
+            {
+                Message = "Error interno del servidor",
+                StatusCode = 500
+            });
+        }
+    }
+
+    /// <summary>
+    /// Cancela una atención médica en proceso y devuelve el paciente a la lista de espera
+    /// </summary>
+    /// <param name="cuil">CUIL del paciente</param>
+    /// <returns>Confirmación de cancelación</returns>
+    [Authorize(Roles = "Medico")]
+    [HttpPost("cancelar/{cuil}")]
+    [ProducesResponseType(typeof(object), 200)]
+    [ProducesResponseType(typeof(ErrorResponse), 400)]
+    public IActionResult CancelarAtencion(string cuil)
+    {
+        try
+        {
+            var cuilNormalizado = CuilHelper.Normalize(cuil);
+            _logger.LogInformation("Cancelando atención para paciente: {Cuil}", cuilNormalizado);
+
+            _servicioUrgencias.CancelarAtencion(cuilNormalizado);
+
+            _logger.LogInformation("Atención cancelada para paciente: {Cuil}", cuilNormalizado);
+
+            return Ok(new { Message = "Atención cancelada exitosamente. El paciente ha vuelto a la lista de espera." });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Error al cancelar atención: {Message}", ex.Message);
+            return BadRequest(new ErrorResponse
+            {
+                Message = ex.Message,
+                StatusCode = 400
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning("Error al cancelar atención: {Message}", ex.Message);
+            return BadRequest(new ErrorResponse
+            {
+                Message = ex.Message,
+                StatusCode = 400
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error inesperado al cancelar atención");
             return StatusCode(500, new ErrorResponse
             {
                 Message = "Error interno del servidor",

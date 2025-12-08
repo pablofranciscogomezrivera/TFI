@@ -1,4 +1,4 @@
-﻿namespace Web.DTOs.Common;
+﻿namespace API.DTOs.Common;
 
 public class ErrorResponse
 {

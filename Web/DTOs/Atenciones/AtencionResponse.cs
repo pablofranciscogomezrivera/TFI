@@ -1,4 +1,4 @@
-﻿namespace Web.DTOs.Atenciones;
+﻿namespace API.DTOs.Atenciones;
 
 public class AtencionResponse
 {

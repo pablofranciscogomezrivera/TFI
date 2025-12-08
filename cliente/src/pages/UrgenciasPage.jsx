@@ -42,7 +42,6 @@ export const UrgenciasPage = () => {
             setLoading(true);
             setError(null);
 
-            // Cargar pacientes pendientes
             const dataPendientes = await urgenciasService.obtenerListaEspera();
             setPacientes(dataPendientes);
 
@@ -64,10 +63,8 @@ export const UrgenciasPage = () => {
 
     const handleRegistrarIngresoCompleto = async (urgenciaData, pacienteNuevoData) => {
         try {
-            // Combinar los datos de urgencia con los datos opcionales del paciente
             const datosCompletos = {
                 ...urgenciaData,
-                // Si hay datos del paciente nuevo, agregarlos
                 nombrePaciente: pacienteNuevoData?.nombre || null,
                 apellidoPaciente: pacienteNuevoData?.apellido || null,
                 callePaciente: pacienteNuevoData?.calle || null,
@@ -80,10 +77,8 @@ export const UrgenciasPage = () => {
                 fechaNacimientoPaciente: pacienteNuevoData?.fechaNacimiento || null
             };
 
-            // Debug: Ver qué se está enviando
             console.log('Datos a enviar:', JSON.stringify(datosCompletos, null, 2));
 
-            // Registrar la urgencia (el backend creará el paciente automáticamente si no existe)
             await urgenciasService.registrarUrgencia(datosCompletos, dniEnfermera);
 
             const mensaje = pacienteNuevoData
@@ -102,11 +97,9 @@ export const UrgenciasPage = () => {
             console.error('Response data:', err.response?.data);
             console.error('Response status:', err.response?.status);
 
-            // Mostrar errores de validación de FluentValidation
             if (err.response?.data?.errors) {
                 console.error('❌ ERRORES DE VALIDACIÓN:', err.response.data.errors);
 
-                // Construir mensaje con todos los errores
                 const errores = Object.entries(err.response.data.errors)
                     .map(([campo, mensajes]) => `${campo}: ${mensajes.join(', ')}`)
                     .join('\n');
@@ -126,10 +119,8 @@ export const UrgenciasPage = () => {
 
     const handleReclamarPaciente = async () => {
         try {
-            // Ya NO se pasa la matrícula - el backend la obtiene del JWT
             const ingresoReclamado = await urgenciasService.reclamarPaciente();
 
-            // Recargar lista de pacientes en espera
             await cargarPacientes();
 
             // Abrir directamente el modal de atención con el paciente reclamado
@@ -144,14 +135,24 @@ export const UrgenciasPage = () => {
     };
 
 
-    const handleCerrarModalAtencion = () => {
+    const handleCerrarModalAtencion = async () => {
+        if (ingresoSeleccionado && ingresoSeleccionado.cuilPaciente) {
+            try {
+                await urgenciasService.cancelarAtencion(ingresoSeleccionado.cuilPaciente);
+                showNotification('Atención cancelada. El paciente ha vuelto a la lista de espera.', 'info');
+                await cargarPacientes();
+            } catch (err) {
+                console.error('Error al cancelar atención:', err);
+                showNotification('Error al cancelar la atención', 'error');
+            }
+        }
+
         setMostrarModalAtencion(false);
         setIngresoSeleccionado(null);
     };
 
     const handleRegistrarAtencion = async (cuilPaciente, informeMedico) => {
         try {
-            // Ya NO se pasa la matrícula - el backend la obtiene del JWT
             await urgenciasService.registrarAtencion(cuilPaciente, informeMedico);
 
             showNotification('Atención registrada exitosamente. Paciente dado de alta.', 'success');
@@ -178,7 +179,6 @@ export const UrgenciasPage = () => {
 
     return (
         <div className="urgencias-page">
-            {/* Renderizar Notificación Global */}
             {notification && (
                 <Notification
                     message={notification.message}
@@ -270,7 +270,6 @@ export const UrgenciasPage = () => {
                 )}
             </div>
 
-            {/* Modal de Atención Médica */}
             {mostrarModalAtencion && ingresoSeleccionado && (
                 <ModalAtencionMedica
                     ingreso={ingresoSeleccionado}

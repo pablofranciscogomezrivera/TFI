@@ -1,6 +1,6 @@
 ﻿using Dominio.Enums;
 
-namespace Web.DTOs.Auth;
+namespace API.DTOs.Auth;
 
 public class UsuarioResponse
 {

@@ -1,4 +1,4 @@
-﻿namespace Web.DTOs.Pacientes;
+﻿namespace API.DTOs.Pacientes;
 
 public class PacienteResponse
 {

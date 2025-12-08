@@ -1,41 +1,39 @@
 ﻿using Aplicacion.Intefaces;
-using Dominio.Interfaces;
-using Infraestructura;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Web.DTOs.Auth;
-using Web.DTOs.Common;
-using Webb.DTOs.Auth;
-namespace Web.Controllers;
+using API.DTOs.Auth;
+using API.DTOs.Common;
+using API.DTOs.Auth;
+namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly IServicioAutenticacion _servicioAutenticacion;
+    private readonly IServicioPersonal _servicioPersonal;
     private readonly ILogger<AuthController> _logger;
     private readonly IConfiguration _configuration;
-    private readonly IRepositorioPersonal _repoPersonal;
 
     public AuthController(
         IServicioAutenticacion servicioAutenticacion,
+        IServicioPersonal servicioPersonal,
         ILogger<AuthController> logger,
-        IConfiguration configuration,
-        IRepositorioPersonal repositorioPacientesADO)
+        IConfiguration configuration)
     {
         _servicioAutenticacion = servicioAutenticacion;
+        _servicioPersonal = servicioPersonal;
         _logger = logger;
         _configuration = configuration;
-        _repoPersonal = repositorioPacientesADO;
     }
 
     /// <summary>
-    /// Registra un nuevo usuario en el sistema
+    /// Registra un nuevo usuario en el sistema junto con su perfil de empleado
     /// </summary>
-    /// <param name="request">Datos del usuario a registrar</param>
+    /// <param name="request">Datos del usuario y empleado a registrar</param>
     /// <returns>Usuario registrado</returns>
     [HttpPost("registrar")]
     [ProducesResponseType(typeof(UsuarioResponse), 201)]
@@ -44,10 +42,17 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var usuario = _servicioAutenticacion.RegistrarUsuario(
+            var usuario = _servicioAutenticacion.RegistrarUsuarioConEmpleado(
                 request.Email,
                 request.Password,
-                request.TipoAutoridad
+                request.TipoAutoridad,
+                request.Nombre,
+                request.Apellido,
+                request.DNI,
+                request.CUIL,
+                request.Matricula,
+                request.FechaNacimiento,
+                request.Telefono
             );
 
             var response = new UsuarioResponse
@@ -57,7 +62,7 @@ public class AuthController : ControllerBase
                 TipoAutoridad = usuario.TipoAutoridad
             };
 
-            _logger.LogInformation("Usuario registrado exitosamente: {Email}", usuario.Email);
+            _logger.LogInformation("Usuario y empleado registrados exitosamente: {Email}", usuario.Email);
 
             return CreatedAtAction(nameof(Registrar), new { id = usuario.Id }, response);
         }
@@ -94,46 +99,23 @@ public class AuthController : ControllerBase
             // 1. Validar credenciales
             var usuario = _servicioAutenticacion.IniciarSesion(request.Email, request.Password);
 
-            // 2. Buscar datos del profesional (Enfermera o Médico)
-            object? perfilProfesional = null;
-
+            // 2. Obtener datos del profesional (Enfermera o Médico) mediante el servicio
             _logger.LogInformation("Buscando profesional para usuario {UserId}, tipo: {TipoAutoridad}",
                 usuario.Id, usuario.TipoAutoridad);
 
-            if (usuario.TipoAutoridad == Dominio.Enums.TipoAutoridad.Enfermera)
+            var perfilProfesional = _servicioPersonal.ObtenerPerfilEmpleado(usuario.Id, usuario.TipoAutoridad);
+
+            if (perfilProfesional == null)
             {
-                perfilProfesional = _repoPersonal.ObtenerEnfermeraPorUsuario(usuario.Id);
-                if (perfilProfesional == null)
+                _logger.LogError("No se encontró perfil de empleado para usuario {UserId}. El perfil no fue creado correctamente.", usuario.Id);
+                return BadRequest(new ErrorResponse
                 {
-                    _logger.LogWarning("No se encontró enfermera para usuario {UserId}. Creando perfil temporal.", usuario.Id);
-                    // Crear perfil temporal
-                    perfilProfesional = new Dominio.Entidades.Enfermera
-                    {
-                        Nombre = "Enfermera",
-                        Apellido = "Sistema",
-                        DNI = usuario.Id,
-                        Matricula = $"ENF{usuario.Id:D4}"
-                    };
-                }
-            }
-            else
-            {
-                perfilProfesional = _repoPersonal.ObtenerDoctorPorUsuario(usuario.Id);
-                if (perfilProfesional == null)
-                {
-                    _logger.LogWarning("No se encontró doctor para usuario {UserId}. Creando perfil temporal.", usuario.Id);
-                    // Crear perfil temporal
-                    perfilProfesional = new Dominio.Entidades.Doctor
-                    {
-                        Nombre = "Doctor",
-                        Apellido = "Sistema",
-                        DNI = usuario.Id,
-                        Matricula = $"MED{usuario.Id:D4}"
-                    };
-                }
+                    Message = "Error en el perfil de usuario. Contacte al administrador.",
+                    StatusCode = 400
+                });
             }
 
-            _logger.LogInformation("Perfil profesional: {Perfil}", perfilProfesional);
+            _logger.LogInformation("Perfil profesional encontrado para usuario {UserId}", usuario.Id);
 
             // 3. Generar Token JWT
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -146,11 +128,9 @@ public class AuthController : ControllerBase
                 new Claim(ClaimTypes.Role, usuario.TipoAutoridad.ToString())
             };
 
-            //Agregar matrícula al token 
             if (perfilProfesional != null)
             {
                 // Usamos reflection o dynamic porque perfilProfesional es object
-                // Una forma segura es castear:
                 var matricula = (perfilProfesional as dynamic).Matricula;
                 claims.Add(new Claim("Matricula", matricula));
             }
@@ -176,7 +156,7 @@ public class AuthController : ControllerBase
                     usuario.Email,
                     usuario.TipoAutoridad
                 },
-                Profesional = perfilProfesional 
+                Profesional = perfilProfesional
             });
         }
         catch (ArgumentException ex)

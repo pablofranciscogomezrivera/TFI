@@ -2,11 +2,10 @@
 using API.Helpers;
 using Aplicacion.Intefaces;
 using Dominio.Entidades;
-using Dominio.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Web.DTOs.Atenciones;
-using Web.DTOs.Common;
-using Web.Extensions;
+using API.DTOs.Atenciones;
+using API.DTOs.Common;
+using API.Extensions;
 
 namespace API.Controllers;
 
@@ -15,16 +14,13 @@ namespace API.Controllers;
 public class AtencionesController : ControllerBase
 {
     private readonly IServicioAtencion _servicioAtencion;
-    private readonly IRepositorioUrgencias _repositorioUrgencias;
     private readonly ILogger<AtencionesController> _logger;
 
     public AtencionesController(
         IServicioAtencion servicioAtencion,
-        IRepositorioUrgencias repositorioUrgencias,
         ILogger<AtencionesController> logger)
     {
         _servicioAtencion = servicioAtencion;
-        _repositorioUrgencias = repositorioUrgencias;
         _logger = logger;
     }
 
@@ -41,10 +37,7 @@ public class AtencionesController : ControllerBase
     {
         try
         {
-            // Las validaciones del request las maneja automáticamente FluentValidation
-
-
-            // SEGURIDAD: Extraer la matrícula del token JWT (no del header, que puede ser manipulado)
+            
             var matriculaDoctor = User.GetMatricula();
 
             _logger.LogInformation("Registrando atención - Matrícula Doctor (desde JWT): {Matricula}", matriculaDoctor);
@@ -53,36 +46,24 @@ public class AtencionesController : ControllerBase
             _logger.LogInformation("CUIL normalizado: {CuilOriginal} -> {CuilNormalizado}",
                 request.CuilPaciente, cuilNormalizado);
 
-            var ingreso = _repositorioUrgencias.BuscarIngresoPorCuilYEstado(cuilNormalizado, EstadoIngreso.EN_PROCESO);
-
-            if (ingreso == null)
-            {
-                _logger.LogWarning("No se encontró ingreso en proceso para paciente: {Cuil}", cuilNormalizado);
-                return NotFound(new ErrorResponse
-                {
-                    Message = $"No se encontró un ingreso en proceso para el paciente con CUIL {cuilNormalizado}",
-                    StatusCode = 404
-                });
-            }
-
             var doctor = new Doctor
             {
-                Nombre = "Doctor", 
+                Nombre = "Doctor",
                 Apellido = "Sistema",
                 Matricula = matriculaDoctor
             };
 
-            var atencion = _servicioAtencion.RegistrarAtencion(
-                ingreso,
+            var atencion = _servicioAtencion.RegistrarAtencionPorCuil(
+                cuilNormalizado,
                 request.InformeMedico,
                 doctor
             );
 
             var response = new AtencionResponse
             {
-                CuilPaciente = ingreso.Paciente.CUIL,
-                NombrePaciente = ingreso.Paciente.Nombre,
-                ApellidoPaciente = ingreso.Paciente.Apellido,
+                CuilPaciente = cuilNormalizado,
+                NombrePaciente = atencion.Doctor.Nombre,
+                ApellidoPaciente = atencion.Doctor.Apellido,
                 Doctor = $"{atencion.Doctor.Nombre} {atencion.Doctor.Apellido}",
                 MatriculaDoctor = atencion.Doctor.Matricula,
                 InformeCompleto = atencion.Informe

@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Web.Extensions;
+namespace API.Extensions;
 
 /// <summary>
 /// Extensiones para extraer información de forma segura desde los Claims del usuario autenticado

@@ -1,4 +1,4 @@
-import { NivelEmergencia, getNivelEmergenciaInfo } from '../constants/enums';
+﻿import { NivelEmergencia, getNivelEmergenciaInfo } from '../constants/enums';
 
 // Mapeo de niveles de emergencia a variantes de badge
 export const getBadgeVariantByEmergency = (nivel) => {
@@ -12,7 +12,6 @@ export const getBadgeVariantByEmergency = (nivel) => {
     return variants[nivel] || 'default';
 };
 
-// Obtener etiqueta de texto para nivel de emergencia
 export const getEmergencyLabel = (nivel) => {
     return getNivelEmergenciaInfo(nivel).label;
 };

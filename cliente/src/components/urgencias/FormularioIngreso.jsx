@@ -11,7 +11,7 @@ import React from 'react';
 const NIVELES_EMERGENCIA = Object.values(NivelesEmergencia);
 
 export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => {
-    // Estado de Urgencia
+    
     const [formData, setFormData] = useState({
         cuilPaciente: '',
         informe: '',
@@ -23,7 +23,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         frecuenciaDiastolica: '',
     });
 
-    // Estado para Paciente Nuevo (Campos Opcionales)
     const [pacienteData, setPacienteData] = useState({
         nombre: '',
         apellido: '',
@@ -37,7 +36,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         fechaNacimiento: ''
     });
 
-    // Estados de Control
     const [pacienteEncontrado, setPacienteEncontrado] = useState(null); 
     const [buscandoPaciente, setBuscandoPaciente] = useState(false);
     const [nombrePacienteDisplay, setNombrePacienteDisplay] = useState(''); 
@@ -47,10 +45,8 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
-    // Ref para hacer scroll a la sección de paciente nuevo
     const seccionPacienteNuevoRef = useRef(null);
 
-    // Cargar obras sociales al montar el componente
     useEffect(() => {
         const cargarObrasSociales = async () => {
             try {
@@ -63,11 +59,9 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         cargarObrasSociales();
     }, []);
 
-    // Hacer scroll automático cuando se detecta paciente nuevo
     useEffect(() => {
         if (pacienteEncontrado === false && seccionPacienteNuevoRef.current) {
             setMostrarMensajePacienteNuevo(true);
-            // Pequeño delay para que el DOM se actualice
             setTimeout(() => {
                 seccionPacienteNuevoRef.current?.scrollIntoView({
                     behavior: 'smooth',
@@ -80,13 +74,11 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         }
     }, [pacienteEncontrado]);
 
-    // Manejadores de cambios
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
 
-        // Si cambia el CUIL, reseteamos el estado de búsqueda
         if (name === 'cuilPaciente') {
             setPacienteEncontrado(null);
             setNombrePacienteDisplay('');
@@ -143,7 +135,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         if (!formData.frecuenciaDiastolica) newErrors.frecuenciaDiastolica = 'Obligatorio';
         if (formData.nivelEmergencia === null) newErrors.nivelEmergencia = 'Seleccione un nivel';
 
-        // Validar negativos
         if (parseFloat(formData.frecuenciaCardiaca) < 0) newErrors.frecuenciaCardiaca = 'No negativo';
         if (parseFloat(formData.frecuenciaRespiratoria) < 0) newErrors.frecuenciaRespiratoria = 'No negativo';
         if (parseFloat(formData.temperatura) < 0) newErrors.temperatura = 'No negativo';
@@ -172,9 +163,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                 return;
             }
 
-            /*CASO ESPECIAL: Es paciente nuevo y el usuario recién lo descubre
-            Si acabamos de descubrir que es nuevo (estaba en null y pasó a false),
-            detenemos el envío para mostrarle los campos opcionales.*/
             if (existe === false && !mostrarMensajePacienteNuevo) {
                 setLoading(false);
                 
@@ -217,7 +205,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                         : new Date(fechaDefault).toISOString()
                 };
             }
-            // 3. Enviar todo al padre (UrgenciasPage)
             await onSubmit(urgenciaData, datosPacienteNuevo);
 
             // Limpiar
@@ -367,7 +354,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                             )}
                         </div>
 
-                        {/* --- SECCIÓN 2: TRIAGE (Niveles) --- */}
                         <div className="form-section">
                             <h3 className="section-title">
                                 <span className="section-icon">🚨</span>
@@ -389,7 +375,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                             {errors.nivelEmergencia && <p className="error-text">{errors.nivelEmergencia}</p>}
                         </div>
 
-                        {/* --- SECCIÓN 3: SIGNOS VITALES --- */}
                         <div className="form-section">
                             <h3 className="section-title">
                                 <span className="section-icon">🩺</span>
@@ -407,7 +392,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                             </div>
                         </div>
 
-                        {/* --- SECCIÓN 4: INFORME --- */}
                         <div className="form-section">
                             <h3 className="section-title">
                                 <span className="section-icon">📝</span>

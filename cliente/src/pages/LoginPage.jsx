@@ -11,7 +11,7 @@ import './LoginPage.css';
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [notification, setNotification] = useState(null); // Estado para notificación
+    const [notification, setNotification] = useState(null); 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -24,8 +24,6 @@ const LoginPage = () => {
     useEffect(() => {
         const reason = searchParams.get('reason');
         if (reason === 'session_expired') {
-            // Usar setTimeout para evitar setState sincrónico en el effect
-            // Esto pospone la actualización de estado hasta después del render actual
             setTimeout(() => {
                 setNotification({
                     message: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
@@ -38,7 +36,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setNotification(null); 
+        setNotification(null);
 
         try {
             const response = await api.post('/auth/login', { email, password });
@@ -57,11 +55,9 @@ const LoginPage = () => {
                 localStorage.setItem('profesionalDNI', prof.dni);
             }
 
-            // DEBUG: Verificar que el JWT contiene todos los claims necesarios
             console.log('🔍 Verificando claims del JWT:');
             debugToken();
 
-            // Mensaje de éxito
             showNotification(`¡Bienvenido/a, ${prof ? prof.nombre : 'Usuario'}! Accediendo...`, 'success');
 
 
@@ -71,7 +67,6 @@ const LoginPage = () => {
 
         } catch (err) {
             console.error(err);
-            // Mensajes de error personalizados
             if (err.response && err.response.status === 401) {
                 showNotification('Credenciales incorrectas. Verifique su email y contraseña.', 'error');
             } else {
@@ -83,7 +78,6 @@ const LoginPage = () => {
 
     return (
         <div className="login-container">
-            {/* Componente de Notificación */}
             {notification && (
                 <Notification
                     message={notification.message}
@@ -123,6 +117,22 @@ const LoginPage = () => {
                         <Button type="submit" fullWidth disabled={loading}>
                             {loading ? 'Validando...' : 'Iniciar Sesión'}
                         </Button>
+                    </div>
+
+                    <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                        <span style={{ color: '#64748b', fontSize: '14px' }}>
+                            ¿No tienes cuenta?{' '}
+                            <a
+                                href="/register"
+                                style={{
+                                    color: '#3b82f6',
+                                    textDecoration: 'none',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                Registrarse
+                            </a>
+                        </span>
                     </div>
                 </form>
             </Card>

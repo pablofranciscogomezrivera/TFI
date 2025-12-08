@@ -1,4 +1,4 @@
-﻿namespace Infraestructura
+﻿namespace Infraestructura.Repositorios
 {
     /// <summary>
     /// Clase que centraliza todas las consultas SQL del sistema
@@ -133,6 +133,14 @@
 
             public const string ObtenerDoctorPorUsuario =
                 "SELECT * FROM Doctores WHERE IdUsuario = @IdUsuario";
+
+            public const string InsertarEnfermera = @"
+                INSERT INTO Enfermeros (IdUsuario, Nombre, Apellido, DNI, CUIL, Matricula, Email, Telefono, FechaNacimiento)
+                VALUES (@IdUsuario, @Nombre, @Apellido, @DNI, @CUIL, @Matricula, @Email, @Telefono, @FechaNacimiento)";
+
+            public const string InsertarDoctor = @"
+                INSERT INTO Doctores (IdUsuario, Nombre, Apellido, DNI, CUIL, Matricula, Email, Telefono, FechaNacimiento)
+                VALUES (@IdUsuario, @Nombre, @Apellido, @DNI, @CUIL, @Matricula, @Email, @Telefono, @FechaNacimiento)";
         }
 
         #endregion

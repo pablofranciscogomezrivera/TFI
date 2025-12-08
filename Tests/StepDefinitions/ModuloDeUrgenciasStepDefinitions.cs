@@ -1,11 +1,11 @@
-using Reqnroll;
+Ôªøusing Aplicacion;
+using Aplicacion.Intefaces;
+using Aplicacion.Servicios;
 using Dominio.Entidades;
 using Dominio.Interfaces;
-using Infraestructura;
-using Aplicacion;
 using FluentAssertions;
-using Aplicacion.Intefaces;
-using Infraestructura.Memory;
+using Reqnroll;
+using Tests.Memory;
 
 namespace Tests.StepDefinitions
 {
@@ -20,9 +20,10 @@ namespace Tests.StepDefinitions
         // El constructor ahora recibe las dependencias
         public ModuloDeUrgenciasStepDefinitions()
         {
-            // Se crea una sola vez la base de datos en memoria
-            _dbMockeada = new RepositorioPacientesMemoria();
-            var repositorioUrgencias = new RepositorioUrgenciasMemoria();
+            // Repositorios en memoria SOLO para tests BDD
+            // Los tests unitarios usan NSubstitute
+            _dbMockeada = new RepositorioPacientesBDD();
+            var repositorioUrgencias = new RepositorioUrgenciasBDD();
             // Se inyecta la MISMA instancia de los repositorios al servicio
             _servicioUrgencias = new ServicioUrgencias(_dbMockeada, repositorioUrgencias);
         }
@@ -30,9 +31,9 @@ namespace Tests.StepDefinitions
         [BeforeScenario]
         public void Setup()
         {
-            // En lugar de crear nuevas instancias, este mÈtodo podrÌa usarse
+            // En lugar de crear nuevas instancias, este m√©todo podr√≠a usarse
             // para limpiar el estado si fuera necesario, pero con la
-            // creaciÛn en el constructor, cada ejecuciÛn de test tendr· su propio estado.
+            // creaci√≥n en el constructor, cada ejecuci√≥n de test tendr√° su propio estado.
             _excepcionEsperada = null;
         }
 
@@ -93,8 +94,8 @@ namespace Tests.StepDefinitions
                     var informe = fila["Informe"].Trim();
 
                     if (string.IsNullOrEmpty(informe)) throw new ArgumentException("El informe es un dato mandatorio");
-                    if (!Enum.TryParse<NivelEmergencia>(fila["Nivel de Emergencia"].Trim(), true, out var nivelEmergencia)) throw new ArgumentException($"El nivel de emergencia '{fila["Nivel de Emergencia"]}' no es v·lido.");
-                    
+                    if (!Enum.TryParse<NivelEmergencia>(fila["Nivel de Emergencia"].Trim(), true, out var nivelEmergencia)) throw new ArgumentException($"El nivel de emergencia '{fila["Nivel de Emergencia"]}' no es v√°lido.");
+
                     var temperatura = double.Parse(fila["Temperatura"]);
                     var frecuenciaCardiaca = double.Parse(fila["Frecuencia Cardiaca"]);
                     var frecuenciaRespiratoria = double.Parse(fila["Frecuencia Respiratoria"]);

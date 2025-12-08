@@ -10,4 +10,5 @@ namespace Aplicacion.Intefaces;
 public interface IServicioAtencion
 {
     Atencion RegistrarAtencion(Ingreso ingreso, string informeMedico, Doctor doctor);
+    Atencion RegistrarAtencionPorCuil(string cuilPaciente, string informeMedico, Doctor doctor);
 }

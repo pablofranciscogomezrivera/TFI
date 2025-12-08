@@ -1,6 +1,6 @@
 ﻿using Dominio.Entidades;
 
-namespace Web.DTOs.Urgencias;
+namespace API.DTOs.Urgencias;
 
 public class IngresoResponse
 {

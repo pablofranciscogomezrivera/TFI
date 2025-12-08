@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace Tests.UnitTests;
+namespace Tests.UnitTests.Dominio.Validadores;
 
 public class ValidadorEmailTests
 {
@@ -11,7 +11,8 @@ public class ValidadorEmailTests
     [InlineData("test.user@dominio.com.ar")]
     [InlineData("admin@hospital.gov")]
     [InlineData("enfermera123@clinica.org")]
-    public void EsValido_EmailValido_RetornaTrue(string email)
+    [InlineData("doctor_medico@urgencias.net")]
+    public void EsValido_ConEmailValido_RetornaTrue(string email)
     {
         // Act
         var resultado = ValidadorEmail.EsValido(email);
@@ -21,14 +22,14 @@ public class ValidadorEmailTests
     }
 
     [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData("invalido")]
-    [InlineData("@ejemplo.com")]
-    [InlineData("usuario@")]
-    [InlineData("usuario @ejemplo.com")]
-    [InlineData("usuario@ejemplo .com")]
-    public void EsValido_EmailInvalido_RetornaFalse(string email)
+    [InlineData("")]               // Vacío
+    [InlineData(" ")]              // Solo espacios
+    [InlineData("invalido")]       // Sin @
+    [InlineData("@ejemplo.com")]   // Sin parte local
+    [InlineData("usuario@")]       // Sin dominio
+    [InlineData("usuario @ejemplo.com")]  // Espacio en parte local
+    [InlineData("usuario@ejemplo .com")]  // Espacio en dominio
+    public void EsValido_ConEmailInvalido_RetornaFalse(string email)
     {
         // Act
         var resultado = ValidadorEmail.EsValido(email);
@@ -38,7 +39,7 @@ public class ValidadorEmailTests
     }
 
     [Fact]
-    public void EsValido_EmailNull_RetornaFalse()
+    public void EsValido_ConEmailNull_RetornaFalse()
     {
         // Act
         var resultado = ValidadorEmail.EsValido(null);

@@ -28,6 +28,6 @@ public interface IServicioUrgencias
 
     public List<Ingreso> ObtenerIngresosPendientes();
     public List<Ingreso> ObtenerTodosLosIngresos();
-
     public Ingreso ReclamarPaciente(Doctor doctor);
+    public void CancelarAtencion(string cuilPaciente);
 }

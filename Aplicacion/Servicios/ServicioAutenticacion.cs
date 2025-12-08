@@ -15,48 +15,43 @@ namespace Aplicacion;
 public class ServicioAutenticacion : IServicioAutenticacion
 {
     private readonly IRepositorioUsuario _repositorioUsuario;
+    private readonly IRepositorioPersonal _repositorioPersonal;
 
-    public ServicioAutenticacion(IRepositorioUsuario repositorioUsuario)
+    public ServicioAutenticacion(IRepositorioUsuario repositorioUsuario, IRepositorioPersonal repositorioPersonal)
     {
         _repositorioUsuario = repositorioUsuario;
+        _repositorioPersonal = repositorioPersonal;
     }
 
     public Usuario RegistrarUsuario(string email, string password, TipoAutoridad tipoAutoridad)
     {
-        // Validar email mandatorio
         if (string.IsNullOrWhiteSpace(email))
         {
             throw new ArgumentException("El email es un campo mandatorio");
         }
 
-        // Validar formato de email
         if (!ValidadorEmail.EsValido(email))
         {
             throw new ArgumentException("El email no tiene un formato válido");
         }
 
-        // Validar contraseña mandatoria
         if (string.IsNullOrWhiteSpace(password))
         {
             throw new ArgumentException("La contraseña es un campo mandatorio");
         }
 
-        // Validar longitud mínima de contraseña
         if (password.Length < 8)
         {
             throw new ArgumentException("La contraseña debe tener al menos 8 caracteres");
         }
 
-        // Validar que el email no esté registrado
         if (_repositorioUsuario.ExisteUsuarioConEmail(email))
         {
             throw new ArgumentException("Ya existe un usuario registrado con ese email");
         }
 
-        // Hashear la contraseña usando BCrypt
         string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-        // Crear el usuario
         var usuario = new Usuario
         {
             Email = email,
@@ -64,22 +59,133 @@ public class ServicioAutenticacion : IServicioAutenticacion
             TipoAutoridad = tipoAutoridad
         };
 
-        // Guardar en el repositorio
         return _repositorioUsuario.GuardarUsuario(usuario);
+    }
+
+    public Usuario RegistrarUsuarioConEmpleado(
+        string email,
+        string password,
+        TipoAutoridad tipoAutoridad,
+        string nombre,
+        string apellido,
+        int dni,
+        string cuil,
+        string matricula,
+        DateTime? fechaNacimiento = null,
+        long? telefono = null)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            throw new ArgumentException("El email es un campo mandatorio");
+        }
+
+        if (!ValidadorEmail.EsValido(email))
+        {
+            throw new ArgumentException("El email no tiene un formato válido");
+        }
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            throw new ArgumentException("La contraseña es un campo mandatorio");
+        }
+
+        if (password.Length < 8)
+        {
+            throw new ArgumentException("La contraseña debe tener al menos 8 caracteres");
+        }
+
+        if (string.IsNullOrWhiteSpace(nombre))
+        {
+            throw new ArgumentException("El nombre es un campo mandatorio");
+        }
+
+        if (string.IsNullOrWhiteSpace(apellido))
+        {
+            throw new ArgumentException("El apellido es un campo mandatorio");
+        }
+
+        if (dni <= 0)
+        {
+            throw new ArgumentException("El DNI debe ser un número válido");
+        }
+
+        if (string.IsNullOrWhiteSpace(cuil))
+        {
+            throw new ArgumentException("El CUIL es un campo mandatorio");
+        }
+
+        if (!ValidadorCUIL.EsValido(cuil))
+        {
+            throw new ArgumentException("El CUIL no tiene un formato válido");
+        }
+
+        if (string.IsNullOrWhiteSpace(matricula))
+        {
+            throw new ArgumentException("La matrícula es un campo mandatorio");
+        }
+
+        if (_repositorioUsuario.ExisteUsuarioConEmail(email))
+        {
+            throw new ArgumentException("Ya existe un usuario registrado con ese email");
+        }
+
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+        var usuario = new Usuario
+        {
+            Email = email,
+            PasswordHash = passwordHash,
+            TipoAutoridad = tipoAutoridad
+        };
+
+        var usuarioGuardado = _repositorioUsuario.GuardarUsuario(usuario);
+
+        // Crear y guardar el empleado (Doctor o Enfermera) según el tipo de autoridad
+        if (tipoAutoridad == TipoAutoridad.Enfermera)
+        {
+            var enfermera = new Enfermera
+            {
+                Nombre = nombre,
+                Apellido = apellido,
+                DNI = dni,
+                CUIL = cuil,
+                Matricula = matricula,
+                Email = email,
+                Telefono = telefono ?? 0,
+                FechaNacimiento = fechaNacimiento ?? DateTime.MinValue
+            };
+
+            _repositorioPersonal.GuardarEnfermera(enfermera, usuarioGuardado.Id);
+        }
+        else // TipoAutoridad.Medico
+        {
+            var doctor = new Doctor
+            {
+                Nombre = nombre,
+                Apellido = apellido,
+                DNI = dni,
+                CUIL = cuil,
+                Matricula = matricula,
+                Email = email,
+                Telefono = telefono ?? 0,
+                FechaNacimiento = fechaNacimiento ?? DateTime.MinValue
+            };
+
+            _repositorioPersonal.GuardarDoctor(doctor, usuarioGuardado.Id);
+        }
+
+        return usuarioGuardado;
     }
 
     public Usuario IniciarSesion(string email, string password)
     {
-        // Validar que se proporcionen las credenciales
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
             throw new ArgumentException("Usuario o contraseña inválidos");
         }
 
-        // Buscar el usuario por email
         var usuario = _repositorioUsuario.BuscarPorEmail(email);
 
-        // Si no existe el usuario o la contraseña no coincide, lanzar el mismo error genérico
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(password, usuario.PasswordHash))
         {
             throw new ArgumentException("Usuario o contraseña inválidos");

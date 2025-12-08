@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace Tests.UnitTests;
+namespace Tests.UnitTests.Dominio.Validadores;
 
 public class ValidadorCUILTests
 {
@@ -10,7 +10,8 @@ public class ValidadorCUILTests
     [InlineData("20-30123456-3")] // CUIL válido con guiones
     [InlineData("20301234563")]    // CUIL válido sin guiones
     [InlineData("27-20123456-0")]  // CUIL femenino válido
-    public void EsValido_CUILValido_RetornaTrue(string cuil)
+    [InlineData("23-35654321-9")]  // Otro CUIL válido
+    public void EsValido_ConCUILValido_RetornaTrue(string cuil)
     {
         // Act
         var resultado = ValidadorCUIL.EsValido(cuil);
@@ -25,12 +26,25 @@ public class ValidadorCUILTests
     [InlineData("")]               // Vacío
     [InlineData(null)]             // Null
     [InlineData("20-ABCDEFGH-9")]  // Contiene letras
-    public void EsValido_CUILInvalido_RetornaFalse(string cuil)
+    [InlineData("99-12345678-0")]  // Tipo de CUIL inválido
+    public void EsValido_ConCUILInvalido_RetornaFalse(string cuil)
     {
         // Act
         var resultado = ValidadorCUIL.EsValido(cuil);
 
         // Assert
         resultado.Should().BeFalse();
+    }
+
+    [Fact]
+    public void EsValido_VerificaAlgoritmoDigitoVerificador()
+    {
+        // Arrange - CUIL conocido con dígito verificador correcto
+        string cuilValido = "20-30123456-3";
+        string cuilInvalidoDigito = "20-30123456-5"; // Mismo DNI, dígito incorrecto
+
+        // Act & Assert
+        ValidadorCUIL.EsValido(cuilValido).Should().BeTrue();
+        ValidadorCUIL.EsValido(cuilInvalidoDigito).Should().BeFalse();
     }
 }

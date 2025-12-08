@@ -1,11 +1,10 @@
 ﻿using Aplicacion.Intefaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.DTOs.Common;
-using Web.DTOs.Pacientes;
-using Webb.DTOs.Pacientes;
+using API.DTOs.Common;
+using API.DTOs.Pacientes;
 using API.Helpers;
-namespace Webb.Controllers;
+namespace API.Controllers;
 
 [Authorize(Roles = "Enfermera")]
 [ApiController]

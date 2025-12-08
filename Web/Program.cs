@@ -1,8 +1,6 @@
 ﻿using Aplicacion;
 using Aplicacion.Intefaces;
 using Dominio.Interfaces;
-using Infraestructura;
-using Infraestructura.Memory;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -11,6 +9,8 @@ using System.Text;
 using System.Text.Json;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Aplicacion.Servicios;
+using Infraestructura.Repositorios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,37 +75,10 @@ builder.Services.AddScoped<IServicioUrgencias, ServicioUrgencias>();
 builder.Services.AddScoped<IServicioPacientes, ServicioPacientes>();
 builder.Services.AddScoped<IServicioAutenticacion, ServicioAutenticacion>();
 builder.Services.AddScoped<IServicioAtencion, ServicioAtencion>();
+builder.Services.AddScoped<IServicioPersonal, ServicioPersonal>();
+builder.Services.AddScoped<IServicioObraSocial, ServicioObraSocial>();
 
 var app = builder.Build();
-
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        // Obtenemos todos los servicios necesarios
-        var repositorioPacientes = services.GetRequiredService<IRepositorioPacientes>();
-        var repositorioObraSocial = services.GetRequiredService<IRepositorioObraSocial>();
-        var servicioAutenticacion = services.GetRequiredService<IServicioAutenticacion>();
-        var configuration = services.GetRequiredService<IConfiguration>();
-
-        Web.DataSeeder.SeedData(
-            repositorioPacientes,
-            repositorioObraSocial,
-            servicioAutenticacion,
-            configuration
-        );
-
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("Datos de prueba inicializados correctamente (Pacientes, Obras Sociales y Usuarios).");
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Error al inicializar datos de prueba");
-    }
-}
 
 if (app.Environment.IsDevelopment())
 {

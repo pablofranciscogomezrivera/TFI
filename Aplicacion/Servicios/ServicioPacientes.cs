@@ -34,23 +34,14 @@ public class ServicioPacientes : IServicioPacientes
         int? obraSocialId = null,
         string? numeroAfiliado = null)
     {
-        // Validar campos mandatorios
         ValidarCamposMandatorios(cuil, nombre, apellido, calle, numero, localidad);
 
-        // Validar formato de CUIL
-        if (!ValidadorCUIL.EsValido(cuil))
-        {
-            throw new ArgumentException("El CUIL no tiene un formato válido");
-        }
-
-        // Validar obra social si se proporciona
         Afiliado? afiliado = null;
         if (obraSocialId.HasValue)
         {
             afiliado = ValidarYCrearAfiliado(obraSocialId.Value, numeroAfiliado);
         }
 
-        // Crear el domicilio
         var domicilio = new Domicilio
         {
             Calle = calle,
@@ -58,11 +49,10 @@ public class ServicioPacientes : IServicioPacientes
             Localidad = localidad
         };
 
-        // Crear el paciente
         var paciente = new Paciente
         {
             CUIL = cuil,
-            DNI = int.Parse(cuil.Substring(3, 8)), 
+            DNI = int.Parse(cuil.Substring(3, 8)),
             Nombre = nombre,
             Apellido = apellido,
             FechaNacimiento = fechaNacimiento,
@@ -70,17 +60,10 @@ public class ServicioPacientes : IServicioPacientes
             Afiliado = afiliado
         };
 
-        // Registrar el paciente en el repositorio
         return _repositorioPacientes.RegistrarPaciente(paciente);
     }
     public Paciente? BuscarPacientePorCuil(string cuil)
     {
-        // Opcional: Validar formato antes de buscar
-        if (!ValidadorCUIL.EsValido(cuil))
-        {
-            throw new ArgumentException("El CUIL no tiene un formato válido");
-        }
-
         return _repositorioPacientes.BuscarPacientePorCuil(cuil);
     }
     private void ValidarCamposMandatorios(
@@ -112,19 +95,16 @@ public class ServicioPacientes : IServicioPacientes
 
     private Afiliado ValidarYCrearAfiliado(int obraSocialId, string? numeroAfiliado)
     {
-        // Validar que el número de afiliado no esté vacío
         if (string.IsNullOrWhiteSpace(numeroAfiliado))
         {
             throw new ArgumentException("El número de afiliado es mandatorio cuando se especifica una obra social");
         }
 
-        // Validar que la obra social exista
         if (!_repositorioObraSocial.ExisteObraSocial(obraSocialId))
         {
             throw new ArgumentException("No se puede registrar al paciente con una obra social inexistente");
         }
 
-        // Validar que el paciente esté afiliado a la obra social
         if (!_repositorioObraSocial.EstaAfiliadoAObraSocial(obraSocialId, numeroAfiliado))
         {
             throw new ArgumentException("No se puede registrar el paciente dado que no está afiliado a la obra social");
