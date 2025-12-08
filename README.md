@@ -2,7 +2,7 @@
 
 ## Trabajo Final Integrador (TFI)
 
-Proyecto desarrollado para la materia **Ingeniería de Software** del curso 4K2 en la **Universidad Tecnológica Nacional - Facultad Regional Tucumán**.
+Proyecto desarrollado para la materia **Ingeniería de Software** comisión 4K2 en la **Universidad Tecnológica Nacional - Facultad Regional Tucumán**.
 
 ### Integrantes del Grupo
 
@@ -460,20 +460,6 @@ Los resultados aparecen en:
 - **Ventana de salida:** Detalles completos de ejecución
 - **Lista de errores:** Pruebas fallidas con mensajes de error
 
-### Cobertura de Código
-
-#### Usando Fine Code Coverage (Extensión recomendada)
-
-1. Instala la extensión "Fine Code Coverage" desde el Marketplace de Visual Studio
-
-2. Ejecuta las pruebas desde el Explorador de pruebas
-
-3. La cobertura se mostrará automáticamente:
-   - En el editor verás líneas resaltadas:
-     - **Verde:** Código cubierto
-     - **Rojo:** Código no cubierto
-   - Panel de cobertura con porcentajes por clase/método
-
 #### Desde Terminal
 
 ```bash
@@ -559,18 +545,6 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=html
 
 ---
 
-### Gestión de la Solución
-
-#### Explorador de Soluciones
-
-El Explorador de soluciones es tu herramienta principal:
-
-**Acciones comunes:**
-- **Agregar nuevo proyecto:** Click derecho en solución > Agregar > Nuevo proyecto
-- **Agregar clase:** Click derecho en proyecto > Agregar > Clase
-- **Establecer proyecto de inicio:** Click derecho en proyecto > Establecer como proyecto de inicio
-- **Administrar paquetes NuGet:** Click derecho en proyecto > Administrar paquetes NuGet
-
 ### Troubleshooting Común en Visual Studio
 
 #### Error "No se puede encontrar el proyecto"
@@ -611,43 +585,6 @@ taskkill /PID <número_de_proceso> /F
 1. En lugar de cerrar el navegador, usa `Shift + F5` en Visual Studio
 2. O click en el botón "Detener" rojo
 3. Si persiste: Herramientas > Opciones > Depuración > General > "Detener todos los procesos cuando se detenga uno"
-
----
-
-## Características Técnicas Destacadas
-
-### Validación Centralizada de CUIL
-
-**Backend (C#):**
-- `Dominio/Validadores/ValidadorCUIL.cs` - Fuente única de verdad
-- Valida formato (11 dígitos)
-- Valida dígito verificador según algoritmo oficial
-- Normalización automática (remueve guiones)
-
-**Frontend (JavaScript):**
-- `cliente/src/utils/cuilHelper.js` - Helper centralizado
-- Funciones: `validateCuil()`, `formatCuil()`, `normalizeCuil()`
-- Validación en tiempo real
-- Mensajes de error claros
-
-### Seguridad
-
-**Autenticación:**
-- JWT con claims personalizados
-- Tokens firmados con clave secreta
-- Expiración configurable
-- Refresh tokens (futuro)
-
-**Autorización:**
-- Middleware de autorización por roles
-- Endpoints protegidos con `[Authorize]`
-- Validación de matrícula para operaciones críticas
-
-**Validación:**
-- FluentValidation en backend
-- Validación de CUIL con dígito verificador
-- Sanitización de inputs
-- Queries parametrizadas (previene SQL Injection)
 
 ---
 
