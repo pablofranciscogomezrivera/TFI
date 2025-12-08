@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Dominio.Entidades.ValueObject;
-
+//workflow
 public abstract class Frecuencia
 {
     public double Valor { get; protected set; }
