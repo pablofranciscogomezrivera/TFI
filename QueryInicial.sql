@@ -40,7 +40,7 @@ INSERT INTO ObrasSociales (Nombre) VALUES
 ('OSDE'), ('Swiss Medical'), ('Subsidio de Salud'), ('Fondo de Bikini SA'), ('Galeno');
 
 
--- 1. Tabla para simular el Padrón de afiliados válidos
+-- 1. Tabla para simular el PadrÃ³n de afiliados vÃ¡lidos
 CREATE TABLE PadronAfiliados (
     Id INT PRIMARY KEY IDENTITY(1,1),
     IdObraSocial INT NOT NULL,
@@ -51,9 +51,8 @@ CREATE TABLE PadronAfiliados (
 );
 
 -- 2. Insertar afiliados autorizados ("Lista Blanca")
--- Aquí insertamos a "PG999" en la Obra Social 1 (OSDE) para que tu test pase
 INSERT INTO PadronAfiliados (IdObraSocial, NumeroAfiliado, Nombre, Apellido)
-VALUES (1, 'PG999', 'Pedro', 'González');
+VALUES (1, 'PG999', 'Pedro', 'GonzÃ¡lez');
 
 -- Insertar otros afiliados de prueba si quieres
 INSERT INTO PadronAfiliados (IdObraSocial, NumeroAfiliado) VALUES (2, '67890'); -- Swiss Medical
@@ -65,7 +64,7 @@ CREATE TABLE Ingresos (
     Id INT PRIMARY KEY IDENTITY(1,1),
     IdPaciente INT NOT NULL,
     
-    -- Guardamos las matrículas para saber quién hizo qué
+    -- Guardamos las matrÃ­culas para saber quiÃ©n hizo quÃ©
     MatriculaEnfermera NVARCHAR(50) NOT NULL,
     MatriculaDoctor NVARCHAR(50) NULL,
     
@@ -73,7 +72,7 @@ CREATE TABLE Ingresos (
     Informe NVARCHAR(MAX) NOT NULL,
     InformeMedico NVARCHAR(MAX) NULL, 
     
-    -- Enums guardados como números (0, 1, 2...)
+    -- Enums guardados como nÃºmeros (0, 1, 2...)
     NivelEmergencia INT NOT NULL, 
     Estado INT NOT NULL,          
     
@@ -99,7 +98,7 @@ CREATE TABLE Usuarios (
 -- Tabla para Enfermeras vinculada a un Usuario
 CREATE TABLE Enfermeros (
     Id INT PRIMARY KEY IDENTITY(1,1),
-    IdUsuario INT NOT NULL UNIQUE, -- Relación 1 a 1
+    IdUsuario INT NOT NULL UNIQUE,
     Nombre NVARCHAR(100) NOT NULL,
     Apellido NVARCHAR(100) NOT NULL,
     DNI INT NOT NULL,
