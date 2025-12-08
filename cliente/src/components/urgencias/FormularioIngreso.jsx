@@ -172,6 +172,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             const urgenciaData = {
                 cuilPaciente: formData.cuilPaciente.trim(),
                 informe: formData.informe.trim(),
+                // Usamos || 0 para evitar NaN, aunque la validación previa debería atajarlo
                 temperatura: parseFloat(formData.temperatura) || 0,
                 nivelEmergencia: parseInt(formData.nivelEmergencia),
                 frecuenciaCardiaca: parseFloat(formData.frecuenciaCardiaca) || 0,
@@ -249,8 +250,8 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                             </h3>
                             <p className="form-section-subtitle">Verificación y datos del paciente</p>
 
-                            <div className="form-row">
-                                <div>
+                            <div className="row g-3">
+                                <div className="col-12 col-md-6">
                                     <Input
                                         label="CUIL Paciente"
                                         name="cuilPaciente"
@@ -269,12 +270,14 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                     )}
                                 </div>
 
-                                <Input
-                                    label="DNI Enfermera"
-                                    value={matriculaEnfermera}
-                                    readOnly
-                                    style={{ backgroundColor: '#f3f4f6' }}
-                                />
+                                <div className="col-12 col-md-6">
+                                    <Input
+                                        label="DNI Enfermera"
+                                        value={matriculaEnfermera}
+                                        readOnly
+                                        style={{ backgroundColor: '#f3f4f6' }}
+                                    />
+                                </div>
                             </div>
 
 
@@ -295,31 +298,47 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                         </div>
                                     </div>
 
-                                    <div className="form-row three-cols">
-                                        <Input label="Nombre (Opcional)" name="nombre" value={pacienteData.nombre} onChange={handlePacienteChange} placeholder="Sin Registrar" />
-                                        <Input label="Apellido (Opcional)" name="apellido" value={pacienteData.apellido} onChange={handlePacienteChange} placeholder="Sin Registrar" />
-                                        <Input
-                                            label="Fecha de Nacimiento"
-                                            name="fechaNacimiento"
-                                            type="date"
-                                            value={pacienteData.fechaNacimiento}
-                                            onChange={handlePacienteChange}
-                                        />
+                                    <div className="row g-3">
+                                        <div className="col-12 col-md-4">
+                                            <Input label="Nombre (Opcional)" name="nombre" value={pacienteData.nombre} onChange={handlePacienteChange} placeholder="Sin Registrar" />
+                                        </div>
+                                        <div className="col-12 col-md-4">
+                                            <Input label="Apellido (Opcional)" name="apellido" value={pacienteData.apellido} onChange={handlePacienteChange} placeholder="Sin Registrar" />
+                                        </div>
+                                        <div className="col-12 col-md-4">
+                                            <Input
+                                                label="Fecha de Nacimiento"
+                                                name="fechaNacimiento"
+                                                type="date"
+                                                value={pacienteData.fechaNacimiento}
+                                                onChange={handlePacienteChange}
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div className="form-row">
-                                        <Input label="Email (Opcional)" name="email" type="email" value={pacienteData.email} onChange={handlePacienteChange} placeholder="ejemplo@email.com" />
-                                        <Input label="Teléfono (Opcional)" name="telefono" type="tel" value={pacienteData.telefono} onChange={handlePacienteChange} placeholder="3814567890" />
+                                    <div className="row g-3">
+                                        <div className="col-12 col-md-6">
+                                            <Input label="Email (Opcional)" name="email" type="email" value={pacienteData.email} onChange={handlePacienteChange} placeholder="ejemplo@email.com" />
+                                        </div>
+                                        <div className="col-12 col-md-6">
+                                            <Input label="Teléfono (Opcional)" name="telefono" type="tel" value={pacienteData.telefono} onChange={handlePacienteChange} placeholder="3814567890" />
+                                        </div>
                                     </div>
 
-                                    <div className="form-row three-cols">
-                                        <Input label="Calle (Opcional)" name="calle" value={pacienteData.calle} onChange={handlePacienteChange} placeholder="San Martin" />
-                                        <Input label="Número (Opcional)" name="numero" type="number" value={pacienteData.numero} onChange={handlePacienteChange} placeholder="999" />
-                                        <Input label="Localidad" name="localidad" value={pacienteData.localidad} onChange={handlePacienteChange} placeholder="Tucumán" />
+                                    <div className="row g-3">
+                                        <div className="col-12 col-md-5">
+                                            <Input label="Calle (Opcional)" name="calle" value={pacienteData.calle} onChange={handlePacienteChange} placeholder="San Martin" />
+                                        </div>
+                                        <div className="col-12 col-md-3">
+                                            <Input label="Número (Opcional)" name="numero" type="number" value={pacienteData.numero} onChange={handlePacienteChange} placeholder="999" />
+                                        </div>
+                                        <div className="col-12 col-md-4">
+                                            <Input label="Localidad" name="localidad" value={pacienteData.localidad} onChange={handlePacienteChange} placeholder="Tucumán" />
+                                        </div>
                                     </div>
 
-                                    <div className="form-row">
-                                        <div className="input-group">
+                                    <div className="row g-3">
+                                        <div className="col-12 col-md-6">
                                             <label className="input-label">Obra Social (Opcional)</label>
                                             <select
                                                 name="obraSocialId"
@@ -336,14 +355,16 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                             </select>
                                         </div>
                                         {pacienteData.obraSocialId && (
-                                            <Input
-                                                label="Número de Afiliado"
-                                                name="numeroAfiliado"
-                                                value={pacienteData.numeroAfiliado}
-                                                onChange={handlePacienteChange}
-                                                placeholder="123456"
-                                                required={!!pacienteData.obraSocialId}
-                                            />
+                                            <div className="col-12 col-md-6">
+                                                <Input
+                                                    label="Número de Afiliado"
+                                                    name="numeroAfiliado"
+                                                    value={pacienteData.numeroAfiliado}
+                                                    onChange={handlePacienteChange}
+                                                    placeholder="123456"
+                                                    required={!!pacienteData.obraSocialId}
+                                                />
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -377,14 +398,24 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                 Signos Vitales
                             </h3>
                             <p className="form-section-subtitle">Mediciones iniciales del paciente</p>
-                            <div className="form-row three-cols">
-                                <Input label="Temp (°C)" placeholder="36.5" name="temperatura" type="number" step="0.1" value={formData.temperatura} onChange={handleChange} required error={errors.temperatura} />
-                                <Input label="FC (lpm)" placeholder="80" name="frecuenciaCardiaca" type="number" value={formData.frecuenciaCardiaca} onChange={handleChange} required error={errors.frecuenciaCardiaca} />
-                                <Input label="FR (rpm)" placeholder="16" name="frecuenciaRespiratoria" type="number" value={formData.frecuenciaRespiratoria} onChange={handleChange} required error={errors.frecuenciaRespiratoria} />
+                            <div className="row g-3">
+                                <div className="col-12 col-md-4">
+                                    <Input label="Temp (°C)" placeholder="36.5" name="temperatura" type="number" step="0.1" value={formData.temperatura} onChange={handleChange} required error={errors.temperatura} />
+                                </div>
+                                <div className="col-12 col-md-4">
+                                    <Input label="FC (lpm)" placeholder="80" name="frecuenciaCardiaca" type="number" value={formData.frecuenciaCardiaca} onChange={handleChange} required error={errors.frecuenciaCardiaca} />
+                                </div>
+                                <div className="col-12 col-md-4">
+                                    <Input label="FR (rpm)" placeholder="16" name="frecuenciaRespiratoria" type="number" value={formData.frecuenciaRespiratoria} onChange={handleChange} required error={errors.frecuenciaRespiratoria} />
+                                </div>
                             </div>
-                            <div className="form-row">
-                                <Input label="TA Sistólica" placeholder="120" name="frecuenciaSistolica" type="number" value={formData.frecuenciaSistolica} onChange={handleChange} required error={errors.frecuenciaSistolica} />
-                                <Input label="TA Diastólica" placeholder="80" name="frecuenciaDiastolica" type="number" value={formData.frecuenciaDiastolica} onChange={handleChange} required error={errors.frecuenciaDiastolica} />
+                            <div className="row g-3">
+                                <div className="col-12 col-md-6">
+                                    <Input label="TA Sistólica" placeholder="120" name="frecuenciaSistolica" type="number" value={formData.frecuenciaSistolica} onChange={handleChange} required error={errors.frecuenciaSistolica} />
+                                </div>
+                                <div className="col-12 col-md-6">
+                                    <Input label="TA Diastólica" placeholder="80" name="frecuenciaDiastolica" type="number" value={formData.frecuenciaDiastolica} onChange={handleChange} required error={errors.frecuenciaDiastolica} />
+                                </div>
                             </div>
                         </div>
 

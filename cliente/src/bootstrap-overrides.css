@@ -1,0 +1,26 @@
+﻿/* 
+ * Bootstrap Grid Overrides
+ * Ajustes para mantener la estética actual
+ */
+
+/* Asegurar que Bootstrap herede la fuente del proyecto */
+.container,
+.container-fluid,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl,
+.row,
+[class*="col-"] {
+    font-family: inherit;
+}
+
+    .row .input-group {
+        margin-bottom: 0;
+    }
+
+    .row > [class*="col-"] {
+        display: flex;
+        flex-direction: column;
+    }

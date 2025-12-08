@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/ui/Card';
@@ -127,11 +127,10 @@ const RegisterPage = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="register-form">
-                    {/* Tipo de Empleado */}
                     <div className="form-section">
                         <h3 className="section-title">Tipo de Empleado</h3>
-                        <div className="form-row">
-                            <div className="form-field full-width">
+                        <div className="row g-3">
+                            <div className="col-12">
                                 <select
                                     name="tipoAutoridad"
                                     value={formData.tipoAutoridad}
@@ -140,8 +139,8 @@ const RegisterPage = () => {
                                     disabled={loading}
                                     className="form-select"
                                 >
-                                    <option value={0}>👨‍⚕️ Médico</option>
-                                    <option value={1}>👩‍⚕️ Enfermera</option>
+                                    <option value={0}>Médico/a</option>
+                                    <option value={1}>Enfermero/a</option>
                                 </select>
                             </div>
                         </div>
@@ -149,8 +148,8 @@ const RegisterPage = () => {
 
                     <div className="form-section">
                         <h3 className="section-title">Credenciales</h3>
-                        <div className="form-row">
-                            <div className="form-field full-width">
+                        <div className="row g-3">
+                            <div className="col-12">
                                 <Input
                                     label="Email"
                                     type="email"
@@ -163,8 +162,8 @@ const RegisterPage = () => {
                                 />
                             </div>
                         </div>
-                        <div className="form-row two-columns">
-                            <div className="form-field">
+                        <div className="row g-3">
+                            <div className="col-12 col-md-6">
                                 <Input
                                     label="Contraseña"
                                     type="password"
@@ -176,7 +175,7 @@ const RegisterPage = () => {
                                     disabled={loading}
                                 />
                             </div>
-                            <div className="form-field">
+                            <div className="col-12 col-md-6">
                                 <Input
                                     label="Confirmar Contraseña"
                                     type="password"
@@ -193,8 +192,8 @@ const RegisterPage = () => {
 
                     <div className="form-section">
                         <h3 className="section-title">Datos Personales</h3>
-                        <div className="form-row two-columns">
-                            <div className="form-field">
+                        <div className="row g-3">
+                            <div className="col-12 col-md-6">
                                 <Input
                                     label="Nombre"
                                     type="text"
@@ -206,7 +205,7 @@ const RegisterPage = () => {
                                     disabled={loading}
                                 />
                             </div>
-                            <div className="form-field">
+                            <div className="col-12 col-md-6">
                                 <Input
                                     label="Apellido"
                                     type="text"
@@ -219,8 +218,8 @@ const RegisterPage = () => {
                                 />
                             </div>
                         </div>
-                        <div className="form-row two-columns">
-                            <div className="form-field">
+                        <div className="row g-3">
+                            <div className="col-12 col-md-6">
                                 <Input
                                     label="DNI"
                                     type="number"
@@ -232,29 +231,27 @@ const RegisterPage = () => {
                                     disabled={loading}
                                 />
                             </div>
-                            <div className="form-field">
-                                <div>
-                                    <Input
-                                        label="CUIL"
-                                        type="text"
-                                        name="cuil"
-                                        value={formData.cuil}
-                                        onChange={handleChange}
-                                        placeholder="20-12345678-9"
-                                        required
-                                        disabled={loading}
-                                        error={cuilError}
-                                    />
-                                    {cuilError && (
-                                        <div className="field-error">
-                                            ⚠️ {cuilError}
-                                        </div>
-                                    )}
-                                </div>
+                            <div className="col-12 col-md-6">
+                                <Input
+                                    label="CUIL"
+                                    type="text"
+                                    name="cuil"
+                                    value={formData.cuil}
+                                    onChange={handleChange}
+                                    placeholder="20-12345678-9"
+                                    required
+                                    disabled={loading}
+                                    error={cuilError}
+                                />
+                                {cuilError && (
+                                    <div className="field-error">
+                                        ⚠️ {cuilError}
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        <div className="form-row">
-                            <div className="form-field full-width">
+                        <div className="row g-3">
+                            <div className="col-12">
                                 <Input
                                     label="Matrícula Profesional"
                                     type="text"
@@ -271,8 +268,8 @@ const RegisterPage = () => {
 
                     <div className="form-section optional-section">
                         <h3 className="section-title">Información Adicional (Opcional)</h3>
-                        <div className="form-row two-columns">
-                            <div className="form-field">
+                        <div className="row g-3">
+                            <div className="col-12 col-md-6">
                                 <Input
                                     label="Fecha de Nacimiento"
                                     type="date"
@@ -282,7 +279,7 @@ const RegisterPage = () => {
                                     disabled={loading}
                                 />
                             </div>
-                            <div className="form-field">
+                            <div className="col-12 col-md-6">
                                 <Input
                                     label="Teléfono"
                                     type="tel"
@@ -296,7 +293,6 @@ const RegisterPage = () => {
                         </div>
                     </div>
 
-                    {/* Botones */}
                     <div className="form-actions">
                         <Button
                             type="button"

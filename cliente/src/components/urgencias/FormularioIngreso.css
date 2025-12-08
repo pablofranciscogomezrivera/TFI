@@ -134,26 +134,15 @@
     font-family: inherit;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
+
+.row .input-group {
+    margin-bottom: 0;
 }
 
-    .form-row:last-child {
-        margin-bottom: 0;
-    }
-
-    /* Eliminar margin-bottom de input-group cuando está dentro de form-row */
-    .form-row .input-group {
-        margin-bottom: 0;
-    }
-
-    .form-row > div {
-        display: flex;
-        flex-direction: column;
-    }
+.row > [class*="col-"] {
+    display: flex;
+    flex-direction: column;
+}
 
 .niveles-grid {
     display: grid;
@@ -173,7 +162,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    opacity: 0.7; /* Ligeramente transparente cuando no está seleccionado */
+    opacity: 0.7; 
 }
 
     .nivel-item:hover {
@@ -181,7 +170,6 @@
         opacity: 1;
     }
 
-    /* --- ESTILOS DE SELECCIÓN (NUEVO) --- */
     .nivel-item.selected {
         border-width: 3px;
         opacity: 1;
@@ -189,8 +177,6 @@
         transform: scale(1.02);
     }
 
-    /* Colores específicos para la selección */
-    /* Cuando está seleccionado (selected), forzamos el color del borde */
     .nivel-item.rojo.selected {
         border-color: #dc2626;
         background-color: #fef2f2;
@@ -216,7 +202,6 @@
         background-color: #eff6ff;
     }
 
-/* Texto dentro de las tarjetas */
 .nivel-nombre {
     font-weight: 700;
     display: block;
@@ -273,10 +258,6 @@
         border-radius: 0;
         margin: 0;
         min-height: 100vh;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
     }
 
     .form-actions {
@@ -395,7 +376,6 @@
     font-family: inherit;
 }
 
-/* Estilos para los inputs dentro de la sección de paciente nuevo */
 .new-patient-section .input-group {
     background: white;
     padding: 12px;
@@ -411,12 +391,11 @@
         transform: translateY(-1px);
     }
 
-.new-patient-section .form-row {
-    gap: 12px;
+.new-patient-section .row {
     margin-bottom: 16px;
 }
 
-    .new-patient-section .form-row:last-child {
+    .new-patient-section .row:last-child {
         margin-bottom: 0;
     }
 
@@ -424,7 +403,6 @@
     font-size: 18px;
 }
 
-/* Estilos para el select de obra social */
 .form-select {
     width: 100%;
     padding: 10px 12px;
@@ -466,15 +444,7 @@
         box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
     }
 
-.form-row.three-cols {
-    grid-template-columns: 1fr 1fr 1fr;
-}
-
-@media (max-width: 768px) {
-    .form-row.three-cols {
-        grid-template-columns: 1fr;
-    }
-}
+/* Ya no necesitamos .three-cols - Bootstrap Grid lo maneja con col-md-4 */
 
 .error-text {
     color: #ef4444;

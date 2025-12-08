@@ -1,4 +1,4 @@
-/* RegisterPage.css - Mantener la estética del LoginPage */
+﻿/* RegisterPage.css - Mantener la estética del LoginPage */
 
 .register-form {
     display: flex;
@@ -26,29 +26,25 @@
     font-family: inherit;
 }
 
-.form-row {
-    display: flex;
-    gap: 12px;
+/* Bootstrap Grid maneja el layout - eliminamos reglas redundantes */
+
+/* Ajustes para que las columnas de Bootstrap funcionen bien con los inputs */
+.row .input-group {
     margin-bottom: 0;
 }
 
-    .form-row:last-child {
-        margin-bottom: 0;
-    }
-
-    .form-row.two-columns {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-
-.form-field {
-    flex: 1;
-    min-width: 0;
+.row > [class*="col-"] {
+    display: flex;
+    flex-direction: column;
 }
 
-    .form-field.full-width {
-        width: 100%;
+/* Spacing entre rows */
+.register-form .row {
+    margin-bottom: 16px;
+}
+
+    .register-form .row:last-child {
+        margin-bottom: 0;
     }
 
 .form-label {
@@ -134,10 +130,7 @@
 }
 
 @media (max-width: 768px) {
-    .form-row.two-columns {
-        grid-template-columns: 1fr;
-    }
-
+    /* Bootstrap Grid maneja el responsive de las columnas automáticamente */
     .form-actions {
         flex-direction: column-reverse;
     }
