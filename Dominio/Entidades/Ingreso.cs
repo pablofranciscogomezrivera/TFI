@@ -15,10 +15,8 @@ public class Ingreso : IComparable<Ingreso>
     public EstadoIngreso Estado { get; set; }
     public DateTime FechaIngreso { get; set; }
 
-    // Informe inicial de la enfermera al ingresar
     public string InformeIngreso { get; set; }
 
-    // Signos vitales
     public Temperatura Temperatura { get; set; }
     public TensionArterial TensionArterial { get; set; }
     public FrecuenciaCardiaca FrecuenciaCardiaca { get; set; }

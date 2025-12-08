@@ -4,7 +4,7 @@ using API.DTOs.Auth;
 using API.Validators;
 using Xunit;
 
-namespace Tests.UnitTests.API.Validators;
+namespace Tests.UnitTests.Web.Validators;
 
 public class RegistrarUsuarioRequestValidatorTests
 {

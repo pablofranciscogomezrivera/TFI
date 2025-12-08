@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
-namespace Tests.UnitTests.API.Controllers;
+namespace Tests.UnitTests.Web.Controllers;
 
 public class PacientesControllerTests
 {

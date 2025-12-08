@@ -10,7 +10,7 @@ using NSubstitute;
 using System.Security.Claims;
 using Xunit;
 
-namespace Tests.UnitTests.API.Controllers;
+namespace Tests.UnitTests.Web.Controllers;
 
 public class UrgenciasControllerTests
 {
@@ -84,10 +84,10 @@ public class UrgenciasControllerTests
         var resultado = _controller.RegistrarUrgencia(request);
 
         // Assert
-        resultado.Should().BeOfType<CreatedAtActionResult>(); 
+        resultado.Should().BeOfType<CreatedAtActionResult>(); // O OkObjectResult según tu implementación, CreatedAtAction es lo ideal para POST
 
         _servicioUrgencias.Received(1).RegistrarUrgencia(
-            "20301234563", 
+            "20301234563", // CUIL Normalizado
             Arg.Any<Enfermera>(),
             request.Informe,
             request.Temperatura,
@@ -168,7 +168,7 @@ public class UrgenciasControllerTests
     {
         // Arrange
         string cuil = "20-30123456-3";
-        string cuilNormalizado = "20301234563"; 
+        string cuilNormalizado = "20301234563"; // Lo que espera el servicio
 
         // Act
         var resultado = _controller.CancelarAtencion(cuil);

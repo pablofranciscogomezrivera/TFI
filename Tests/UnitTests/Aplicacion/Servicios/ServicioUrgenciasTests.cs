@@ -17,6 +17,7 @@ public class ServicioUrgenciasTests
 
     public ServicioUrgenciasTests()
     {
+        // Arrange - Mocks con NSubstitute
         _repositorioPacientes = Substitute.For<IRepositorioPacientes>();
         _repositorioUrgencias = Substitute.For<IRepositorioUrgencias>();
         _servicioUrgencias = new ServicioUrgencias(_repositorioPacientes, _repositorioUrgencias);
@@ -71,8 +72,9 @@ public class ServicioUrgenciasTests
         string cuil = "20-30123456-3";
         _repositorioPacientes.BuscarPacientePorCuil(cuil).Returns((Paciente?)null);
 
+        // Configurar que RegistrarPaciente devuelva el paciente creado
         _repositorioPacientes.RegistrarPaciente(Arg.Any<Paciente>())
-            .Returns(devuelve => devuelve.Arg<Paciente>());
+            .Returns(callInfo => callInfo.Arg<Paciente>());
 
         // Act
         _servicioUrgencias.RegistrarUrgencia(

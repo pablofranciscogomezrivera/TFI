@@ -64,7 +64,7 @@ public class IngresoTests
             37.0, 80, 18, 120, 80
         );
 
-        System.Threading.Thread.Sleep(10);
+        System.Threading.Thread.Sleep(10); // Asegurar diferente timestamp
 
         var segundoIngreso = new Ingreso(
             _paciente, _enfermera, "Segundo", NivelEmergencia.URGENCIA,

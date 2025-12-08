@@ -1,12 +1,13 @@
-﻿/* Modal Overlay */
+/* Modal Overlay */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -55,12 +56,14 @@
     font-weight: 700;
     color: #1f2937;
     margin: 0 0 4px 0;
+    font-family: inherit;
 }
 
 .modal-subtitle {
     font-size: 14px;
     color: #6b7280;
     margin: 0;
+    font-family: inherit;
 }
 
     .modal-subtitle strong {
@@ -105,6 +108,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    font-family: inherit;
 }
 
 .subseccion-titulo {
@@ -114,6 +118,7 @@
     margin: 20px 0 12px 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: inherit;
 }
 
 /* Info Grid */
@@ -136,12 +141,14 @@
     color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: inherit;
 }
 
 .info-value {
     font-size: 16px;
     font-weight: 600;
     color: #1f2937;
+    font-family: inherit;
 }
 
 /* Signos Vitales */
@@ -186,6 +193,7 @@
     color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: inherit;
 }
 
 .signo-valor {
@@ -193,6 +201,7 @@
     font-weight: 700;
     color: #1f2937;
     margin-top: 2px;
+    font-family: inherit;
 }
 
 /* Informe Enfermera */
@@ -214,6 +223,7 @@
     color: #78350f;
     white-space: pre-wrap;
     word-wrap: break-word;
+    font-family: inherit;
 }
 
 /* Formulario de Atención */
@@ -233,6 +243,7 @@
     background: #f0f9ff;
     border-left: 3px solid #3b82f6;
     border-radius: 4px;
+    font-family: inherit;
 }
 
 /* Modal Actions */

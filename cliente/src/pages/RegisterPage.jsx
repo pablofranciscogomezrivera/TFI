@@ -1,10 +1,11 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Notification from '../components/ui/Notification';
+import { validateCuilFormat } from '../utils/cuilHelper';
 import './LoginPage.css';
 import './RegisterPage.css';
 
@@ -31,19 +32,14 @@ const RegisterPage = () => {
         setNotification({ message, type });
     };
 
-    const validateCuil = (cuil) => {
-        // Formato: XX-XXXXXXXX-X
-        const cuilRegex = /^\d{2}-\d{8}-\d{1}$/;
-        if (!cuil) return true; // Si está vacío, dejar que la validación required lo maneje
-        return cuilRegex.test(cuil);
-    };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
 
         if (name === 'cuil') {
-            if (value && !validateCuil(value)) {
-                setCuilError('Formato inválido. Debe ser: XX-XXXXXXXX-X (ej: 20-12345678-9)');
+            // Validar solo formato básico (con o sin guiones)
+            // El backend validará el dígito verificador
+            if (value && !validateCuilFormat(value)) {
+                setCuilError('Formato inválido. Debe ser 11 dígitos (ej: 20-12345678-9 o 20123456789)');
             } else {
                 setCuilError('');
             }
@@ -60,9 +56,9 @@ const RegisterPage = () => {
         setLoading(true);
         setNotification(null);
 
-        if (!validateCuil(formData.cuil)) {
-            showNotification('CUIL inválido. Por favor, reingrese en formato: XX-XXXXXXXX-X', 'error');
-            setCuilError('Formato inválido. Debe ser: XX-XXXXXXXX-X (ej: 20-12345678-9)');
+        if (!validateCuilFormat(formData.cuil)) {
+            showNotification('CUIL inválido. Por favor, ingrese 11 dígitos válidos', 'error');
+            setCuilError('Formato inválido. Debe ser 11 dígitos (ej: 20-12345678-9 o 20123456789)');
             setLoading(false);
             return;
         }

@@ -17,23 +17,16 @@ namespace Tests.StepDefinitions
         private IServicioUrgencias _servicioUrgencias;
         private Exception _excepcionEsperada;
 
-        // El constructor ahora recibe las dependencias
         public ModuloDeUrgenciasStepDefinitions()
         {
-            // Repositorios en memoria SOLO para tests BDD
-            // Los tests unitarios usan NSubstitute
             _dbMockeada = new RepositorioPacientesBDD();
             var repositorioUrgencias = new RepositorioUrgenciasBDD();
-            // Se inyecta la MISMA instancia de los repositorios al servicio
             _servicioUrgencias = new ServicioUrgencias(_dbMockeada, repositorioUrgencias);
         }
 
         [BeforeScenario]
         public void Setup()
         {
-            // En lugar de crear nuevas instancias, este método podría usarse
-            // para limpiar el estado si fuera necesario, pero con la
-            // creación en el constructor, cada ejecución de test tendrá su propio estado.
             _excepcionEsperada = null;
         }
 

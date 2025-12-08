@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import Card from '../components/ui/Card';
@@ -120,14 +120,15 @@ const LoginPage = () => {
                     </div>
 
                     <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                        <span style={{ color: '#64748b', fontSize: '14px' }}>
+                        <span style={{ color: '#64748b', fontSize: '14px', fontFamily: 'inherit' }}>
                             ¿No tienes cuenta?{' '}
                             <a
                                 href="/register"
                                 style={{
                                     color: '#3b82f6',
                                     textDecoration: 'none',
-                                    fontWeight: '500'
+                                    fontWeight: '500',
+                                    fontFamily: 'inherit'
                                 }}
                             >
                                 Registrarse

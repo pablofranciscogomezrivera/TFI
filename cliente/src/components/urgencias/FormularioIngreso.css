@@ -4,8 +4,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,12 +55,14 @@
     font-weight: 700;
     color: #1f2937;
     margin: 0 0 4px 0;
+    font-family: inherit;
 }
 
 .formulario-subtitle {
     font-size: 14px;
     color: #6b7280;
     margin: 0;
+    font-family: inherit;
 }
 
 .btn-close {
@@ -88,14 +91,14 @@
     padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
 }
 
 .form-section {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -114,6 +117,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    font-family: inherit;
 }
 
 .section-icon {
@@ -127,13 +131,29 @@
     margin: -4px 0 8px 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: inherit;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
+    margin-bottom: 16px;
 }
+
+    .form-row:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Eliminar margin-bottom de input-group cuando está dentro de form-row */
+    .form-row .input-group {
+        margin-bottom: 0;
+    }
+
+    .form-row > div {
+        display: flex;
+        flex-direction: column;
+    }
 
 .niveles-grid {
     display: grid;
@@ -203,11 +223,13 @@
     margin-bottom: 4px;
     text-transform: uppercase;
     font-size: 0.85rem;
+    font-family: inherit;
 }
 
 .nivel-tiempo {
     font-size: 0.75rem;
     color: #6b7280;
+    font-family: inherit;
 }
 
 .form-actions {
@@ -271,6 +293,7 @@
     color: #6b7280;
     margin-top: 4px;
     font-style: italic;
+    font-family: inherit;
 }
 
 .patient-found-badge {
@@ -282,23 +305,27 @@
     font-size: 14px;
     border: 1px solid #a7f3d0;
     animation: fadeIn 0.3s ease;
+    font-family: inherit;
 }
 
 .new-patient-section {
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border: 2px solid #f59e0b;
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px;
     margin-top: 16px;
     animation: slideDown 0.4s ease, pulseGlow 2s ease-in-out;
     box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1), 0 2px 4px -1px rgba(245, 158, 11, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .new-patient-header {
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .new-patient-icon-wrapper {
@@ -330,6 +357,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    font-family: inherit;
 }
 
 .new-patient-badge {
@@ -344,6 +372,7 @@
     letter-spacing: 0.5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     animation: pulse 2s ease-in-out infinite;
+    font-family: inherit;
 }
 
 @keyframes pulse {
@@ -363,6 +392,7 @@
     font-size: 14px;
     color: #78350f;
     line-height: 1.5;
+    font-family: inherit;
 }
 
 /* Estilos para los inputs dentro de la sección de paciente nuevo */
@@ -372,6 +402,7 @@
     border-radius: 8px;
     border: 1px solid #fbbf24;
     transition: all 0.2s ease;
+    margin-bottom: 0;
 }
 
     .new-patient-section .input-group:focus-within {
@@ -382,7 +413,12 @@
 
 .new-patient-section .form-row {
     gap: 12px;
+    margin-bottom: 16px;
 }
+
+    .new-patient-section .form-row:last-child {
+        margin-bottom: 0;
+    }
 
 .warning-icon {
     font-size: 18px;
@@ -417,6 +453,7 @@
     font-weight: 500;
     color: #374151;
     margin-bottom: 6px;
+    font-family: inherit;
 }
 
 .new-patient-section .form-select {
@@ -429,14 +466,21 @@
         box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
     }
 
-.three-cols {
+.form-row.three-cols {
     grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+    .form-row.three-cols {
+        grid-template-columns: 1fr;
+    }
 }
 
 .error-text {
     color: #ef4444;
     font-size: 12px;
     margin-top: 4px;
+    font-family: inherit;
 }
 
 @keyframes fadeIn {

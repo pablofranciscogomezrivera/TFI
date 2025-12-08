@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using API.DTOs.Urgencias;
+using Dominio.Validadores;
 
 namespace API.Validators;
 
@@ -14,8 +15,8 @@ public class RegistrarUrgenciaRequestValidator : AbstractValidator<RegistrarUrge
         RuleFor(x => x.CuilPaciente)
             .NotEmpty()
             .WithMessage("El CUIL del paciente es requerido")
-            .Must(BeValidCuil)
-            .WithMessage("El CUIL debe tener formato válido (11 dígitos, con o sin guiones)");
+            .Must(ValidadorCUIL.EsValido)
+            .WithMessage("El CUIL no tiene un formato válido");
 
         RuleFor(x => x.Informe)
             .NotEmpty()
@@ -90,21 +91,5 @@ public class RegistrarUrgenciaRequestValidator : AbstractValidator<RegistrarUrge
                 .MaximumLength(100)
                 .WithMessage("El apellido no puede exceder 100 caracteres");
         });
-    }
-
-    private bool BeValidCuil(string? cuil)
-    {
-        if (string.IsNullOrWhiteSpace(cuil))
-            return false;
-
-        // Remover guiones si existen
-        var cuilLimpio = cuil.Replace("-", "").Replace(" ", "");
-
-        // Debe tener exactamente 11 dígitos
-        if (cuilLimpio.Length != 11)
-            return false;
-
-        // Debe contener solo números
-        return cuilLimpio.All(char.IsDigit);
     }
 }

@@ -96,10 +96,8 @@ public class AuthController : ControllerBase
     {
         try
         {
-            // 1. Validar credenciales
             var usuario = _servicioAutenticacion.IniciarSesion(request.Email, request.Password);
 
-            // 2. Obtener datos del profesional (Enfermera o Médico) mediante el servicio
             _logger.LogInformation("Buscando profesional para usuario {UserId}, tipo: {TipoAutoridad}",
                 usuario.Id, usuario.TipoAutoridad);
 
@@ -117,7 +115,6 @@ public class AuthController : ControllerBase
 
             _logger.LogInformation("Perfil profesional encontrado para usuario {UserId}", usuario.Id);
 
-            // 3. Generar Token JWT
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -130,7 +127,6 @@ public class AuthController : ControllerBase
 
             if (perfilProfesional != null)
             {
-                // Usamos reflection o dynamic porque perfilProfesional es object
                 var matricula = (perfilProfesional as dynamic).Matricula;
                 claims.Add(new Claim("Matricula", matricula));
             }
@@ -146,7 +142,6 @@ public class AuthController : ControllerBase
 
             _logger.LogInformation("Usuario autenticado: {Email}", usuario.Email);
 
-            // 4. Retornar TODO al Frontend
             return Ok(new
             {
                 Token = tokenString,

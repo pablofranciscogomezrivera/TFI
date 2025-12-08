@@ -1,4 +1,4 @@
-﻿.notification {
+.notification {
     position: fixed;
     top: 24px;
     right: 24px;
@@ -12,6 +12,7 @@
     z-index: 9999;
     animation: slideIn 0.3s ease-out;
     color: white;
+    font-family: inherit;
 }
 
 @keyframes slideIn {

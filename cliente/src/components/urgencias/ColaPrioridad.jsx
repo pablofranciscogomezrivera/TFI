@@ -1,22 +1,11 @@
-﻿import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 import { getBadgeVariantByEmergency, getEmergencyLabel } from '../../utils/emergencyLevels';
+import { formatCuil } from '../../utils/cuilHelper';
 import './ColaPrioridad.css';
 import React from 'react';
-
-
-const formatearCuil = (cuil) => {
-    if (!cuil) return '';
-    // Si ya tiene guiones, lo devolvemos igual
-    if (cuil.includes('-')) return cuil;
-    // Si es un número limpio de 11 dígitos, le ponemos guiones
-    if (cuil.length === 11) {
-        return `${cuil.substring(0, 2)}-${cuil.substring(2, 10)}-${cuil.substring(10)}`;
-    }
-    return cuil;
-};
 
 export const ColaPrioridad = ({ pacientes, onActualizar }) => {
     const formatearTiempo = (fecha) => {
@@ -67,7 +56,7 @@ export const ColaPrioridad = ({ pacientes, onActualizar }) => {
                                     <h3 className="paciente-nombre">
                                         {paciente.nombrePaciente} {paciente.apellidoPaciente}
                                     </h3>
-                                    <p className="paciente-dni">CUIL: {formatearCuil(paciente.cuilPaciente)}</p>
+                                    <p className="paciente-dni">CUIL: {formatCuil(paciente.cuilPaciente)}</p>
                                 </div>
                             </div>
                             <Badge variant={getBadgeVariantByEmergency(paciente.nivelEmergencia)}>

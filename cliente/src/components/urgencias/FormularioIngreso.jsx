@@ -11,7 +11,7 @@ import React from 'react';
 const NIVELES_EMERGENCIA = Object.values(NivelesEmergencia);
 
 export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => {
-    
+
     const [formData, setFormData] = useState({
         cuilPaciente: '',
         informe: '',
@@ -36,9 +36,9 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         fechaNacimiento: ''
     });
 
-    const [pacienteEncontrado, setPacienteEncontrado] = useState(null); 
+    const [pacienteEncontrado, setPacienteEncontrado] = useState(null);
     const [buscandoPaciente, setBuscandoPaciente] = useState(false);
-    const [nombrePacienteDisplay, setNombrePacienteDisplay] = useState(''); 
+    const [nombrePacienteDisplay, setNombrePacienteDisplay] = useState('');
     const [mostrarMensajePacienteNuevo, setMostrarMensajePacienteNuevo] = useState(false);
     const [obrasSociales, setObrasSociales] = useState([]);
 
@@ -104,14 +104,14 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             if (paciente) {
                 setPacienteEncontrado(true);
                 setNombrePacienteDisplay(`${paciente.nombre} ${paciente.apellido}`);
-                return true; 
+                return true;
             } else {
                 setPacienteEncontrado(false);
-                return false; 
+                return false;
             }
         } catch (error) {
             console.error("Error buscando paciente", error);
-            setPacienteEncontrado(false); 
+            setPacienteEncontrado(false);
             return false;
         } finally {
             setBuscandoPaciente(false);
@@ -165,14 +165,13 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
             if (existe === false && !mostrarMensajePacienteNuevo) {
                 setLoading(false);
-                
+
                 return;
             }
             // 1. Preparar datos de Urgencia
             const urgenciaData = {
                 cuilPaciente: formData.cuilPaciente.trim(),
                 informe: formData.informe.trim(),
-                // Usamos || 0 para evitar NaN, aunque la validación previa debería atajarlo
                 temperatura: parseFloat(formData.temperatura) || 0,
                 nivelEmergencia: parseInt(formData.nivelEmergencia),
                 frecuenciaCardiaca: parseFloat(formData.frecuenciaCardiaca) || 0,
@@ -242,7 +241,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
                     <form onSubmit={handleSubmit} className="formulario-form">
 
-                        
+
                         <div className="form-section">
                             <h3 className="section-title">
                                 <span className="section-icon">🆔</span>
@@ -251,7 +250,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                             <p className="form-section-subtitle">Verificación y datos del paciente</p>
 
                             <div className="form-row">
-                                <div className="input-group">
+                                <div>
                                     <Input
                                         label="CUIL Paciente"
                                         name="cuilPaciente"
@@ -260,12 +259,9 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                         placeholder="Ej: 20-12345678-9"
                                         required
                                         error={errors.cuilPaciente}
-                                        
                                         onBlur={verificarCuil}
                                     />
                                     {buscandoPaciente && <span className="searching-text">Buscando paciente...</span>}
-
-                                    
                                     {pacienteEncontrado === true && (
                                         <div className="patient-found-badge">
                                             ✓ Paciente identificado: <strong>{nombrePacienteDisplay}</strong>
@@ -281,7 +277,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                 />
                             </div>
 
-                            
+
                             {pacienteEncontrado === false && (
                                 <div ref={seccionPacienteNuevoRef} className="new-patient-section fade-in">
                                     <div className="new-patient-header">
@@ -299,7 +295,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                         </div>
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row three-cols">
                                         <Input label="Nombre (Opcional)" name="nombre" value={pacienteData.nombre} onChange={handlePacienteChange} placeholder="Sin Registrar" />
                                         <Input label="Apellido (Opcional)" name="apellido" value={pacienteData.apellido} onChange={handlePacienteChange} placeholder="Sin Registrar" />
                                         <Input
@@ -316,7 +312,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                         <Input label="Teléfono (Opcional)" name="telefono" type="tel" value={pacienteData.telefono} onChange={handlePacienteChange} placeholder="3814567890" />
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row three-cols">
                                         <Input label="Calle (Opcional)" name="calle" value={pacienteData.calle} onChange={handlePacienteChange} placeholder="San Martin" />
                                         <Input label="Número (Opcional)" name="numero" type="number" value={pacienteData.numero} onChange={handlePacienteChange} placeholder="999" />
                                         <Input label="Localidad" name="localidad" value={pacienteData.localidad} onChange={handlePacienteChange} placeholder="Tucumán" />
@@ -381,7 +377,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                 Signos Vitales
                             </h3>
                             <p className="form-section-subtitle">Mediciones iniciales del paciente</p>
-                            <div className="form-row">
+                            <div className="form-row three-cols">
                                 <Input label="Temp (°C)" placeholder="36.5" name="temperatura" type="number" step="0.1" value={formData.temperatura} onChange={handleChange} required error={errors.temperatura} />
                                 <Input label="FC (lpm)" placeholder="80" name="frecuenciaCardiaca" type="number" value={formData.frecuenciaCardiaca} onChange={handleChange} required error={errors.frecuenciaCardiaca} />
                                 <Input label="FR (rpm)" placeholder="16" name="frecuenciaRespiratoria" type="number" value={formData.frecuenciaRespiratoria} onChange={handleChange} required error={errors.frecuenciaRespiratoria} />

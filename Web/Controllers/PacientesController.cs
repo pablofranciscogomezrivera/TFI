@@ -105,7 +105,6 @@ public class PacientesController : ControllerBase
 
             if (paciente == null)
             {
-                // Este 404 es el que espera tu frontend para abrir el formulario de registro
                 return NotFound(new ErrorResponse
                 {
                     Message = $"No se encontró un paciente con CUIL {cuil}",
@@ -113,7 +112,6 @@ public class PacientesController : ControllerBase
                 });
             }
 
-            // Mapeamos la entidad a la respuesta DTO
             var response = new PacienteResponse
             {
                 Cuil = paciente.CUIL,

@@ -56,7 +56,7 @@ public class ServicioPacientesTests
         _repositorioObraSocial.EstaAfiliadoAObraSocial(obraSocialId, numeroAfiliado).Returns(true);
 
         _repositorioPacientes.RegistrarPaciente(Arg.Any<Paciente>())
-            .Returns(devuelve => devuelve.Arg<Paciente>());
+            .Returns(callInfo => callInfo.Arg<Paciente>());
 
         // Act
         var resultado = _servicioPacientes.RegistrarPaciente(

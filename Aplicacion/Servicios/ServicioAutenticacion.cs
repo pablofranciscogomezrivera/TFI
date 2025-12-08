@@ -140,7 +140,6 @@ public class ServicioAutenticacion : IServicioAutenticacion
 
         var usuarioGuardado = _repositorioUsuario.GuardarUsuario(usuario);
 
-        // Crear y guardar el empleado (Doctor o Enfermera) según el tipo de autoridad
         if (tipoAutoridad == TipoAutoridad.Enfermera)
         {
             var enfermera = new Enfermera
@@ -157,7 +156,7 @@ public class ServicioAutenticacion : IServicioAutenticacion
 
             _repositorioPersonal.GuardarEnfermera(enfermera, usuarioGuardado.Id);
         }
-        else // TipoAutoridad.Medico
+        else 
         {
             var doctor = new Doctor
             {

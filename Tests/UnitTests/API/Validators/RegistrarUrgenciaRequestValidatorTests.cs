@@ -1,10 +1,10 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using API.DTOs.Urgencias;
 using API.Validators;
 using Xunit;
 using Dominio.Entidades;
 
-namespace Tests.UnitTests.API.Validators;
+namespace Tests.UnitTests.Web.Validators;
 
 public class RegistrarUrgenciaRequestValidatorTests
 {
@@ -64,6 +64,59 @@ public class RegistrarUrgenciaRequestValidatorTests
         // Assert
         resultado.IsValid.Should().BeFalse();
         resultado.Errors.Should().Contain(e => e.PropertyName == "CuilPaciente");
+    }
+
+    [Theory]
+    [InlineData("20-30123456-9")] // Dígito verificador incorrecto
+    [InlineData("20301234569")]    // Sin guiones, dígito verificador incorrecto
+    [InlineData("123456")]          // Muy corto
+    [InlineData("ABCDEFGHIJK")]     // Letras
+    public void Validate_ConCUILInvalido_NoEsValido(string cuilInvalido)
+    {
+        // Arrange
+        var request = new RegistrarUrgenciaRequest
+        {
+            CuilPaciente = cuilInvalido,
+            Informe = "Informe válido",
+            Temperatura = 37.0,
+            NivelEmergencia = NivelEmergencia.URGENCIA,
+            FrecuenciaCardiaca = 80,
+            FrecuenciaRespiratoria = 18,
+            FrecuenciaSistolica = 120,
+            FrecuenciaDiastolica = 80
+        };
+
+        // Act
+        var resultado = _validator.Validate(request);
+
+        // Assert
+        resultado.IsValid.Should().BeFalse();
+        resultado.Errors.Should().Contain(e => e.PropertyName == "CuilPaciente");
+    }
+
+    [Theory]
+    [InlineData("20-30123456-3")] // Con guiones
+    [InlineData("20301234563")]    // Sin guiones
+    public void Validate_ConCUILValido_EsValido(string cuilValido)
+    {
+        // Arrange
+        var request = new RegistrarUrgenciaRequest
+        {
+            CuilPaciente = cuilValido,
+            Informe = "Informe válido",
+            Temperatura = 37.0,
+            NivelEmergencia = NivelEmergencia.URGENCIA,
+            FrecuenciaCardiaca = 80,
+            FrecuenciaRespiratoria = 18,
+            FrecuenciaSistolica = 120,
+            FrecuenciaDiastolica = 80
+        };
+
+        // Act
+        var resultado = _validator.Validate(request);
+
+        // Assert
+        resultado.IsValid.Should().BeTrue();
     }
 
     [Theory]

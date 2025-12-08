@@ -1,4 +1,4 @@
-/* cliente/src/pages/LoginPage.css */
+﻿/* cliente/src/pages/LoginPage.css */
 
 .login-container {
     min-height: 100vh;
@@ -12,7 +12,6 @@
 .login-card {
     width: 100%;
     max-width: 420px;
-    /* Los estilos base de la tarjeta (sombra, borde, blanco) vienen del componente Card */
 }
 
 .login-header {
@@ -54,7 +53,7 @@
     margin-top: 8px;
 }
 
-/* Animaci�n opcional para cuando hay error */
+/* Animación opcional para cuando hay error */
 @keyframes shake {
     0%, 100% {
         transform: translateX(0);
