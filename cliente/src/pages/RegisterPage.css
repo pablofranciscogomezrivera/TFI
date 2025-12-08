@@ -1,60 +1,63 @@
-﻿/* RegisterPage.css - Mantener la estética del LoginPage */
+﻿/* cliente/src/pages/RegisterPage.css */
+
+.register-page .login-card {
+    max-width: 800px !important; 
+    width: 95%;
+}
 
 .register-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px; 
     width: 100%;
 }
 
-.form-section {
-    padding: 0;
-    margin-bottom: 24px;
-}
 
-.optional-section {
-    opacity: 0.9;
+.form-section {
+    background-color: #f9fafb; 
+    border-radius: 10px;
+    padding: 10px; 
+    transition: all 0.2s ease;
 }
 
 .section-title {
     font-size: 14px;
     font-weight: 600;
-    color: #6b7280;
-    margin: 0 0 12px 0;
+    color: #1f2937; 
+    margin: 5px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb; 
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-family: inherit;
-}
-
-/* Bootstrap Grid maneja el layout - eliminamos reglas redundantes */
-
-/* Ajustes para que las columnas de Bootstrap funcionen bien con los inputs */
-.row .input-group {
-    margin-bottom: 0;
-}
-
-.row > [class*="col-"] {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }
 
-/* Spacing entre rows */
-.register-form .row {
-    margin-bottom: 16px;
+.form-row {
+    display: flex;
+    gap: 10px; 
+    margin-bottom: 14px;
 }
 
-    .register-form .row:last-child {
+    .form-row:last-child {
         margin-bottom: 0;
     }
 
-.form-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 13px;
-    color: #6b7280;
-    font-family: inherit;
+    .form-row.two-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+.form-field {
+    flex: 1;
+    min-width: 0;
 }
+
+    .form-field.full-width {
+        width: 100%;
+    }
 
 .form-select {
     width: 100%;
@@ -62,109 +65,37 @@
     border: 1px solid #d1d5db;
     border-radius: 8px;
     font-size: 16px;
-    color: #1f2937;
     background-color: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
+    transition: all 0.2s;
 }
-
-    .form-select:hover {
-        border-color: #9ca3af;
-    }
 
     .form-select:focus {
         outline: none;
-        border-color: #1f2937;
-        background-color: white;
-        box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-
-    .form-select:disabled {
-        background-color: #f3f4f6;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-.field-error {
-    margin-top: 8px;
-    padding: 10px 12px;
-    background-color: #fee2e2;
-    border: 1px solid #fecaca;
-    border-radius: 8px;
-    color: #991b1b;
-    font-size: 14px;
-    font-weight: 500;
-    animation: shake 0.5s ease-in-out;
-    font-family: inherit;
-}
-
-@keyframes shake {
-    0%, 100% {
-        transform: translateX(0);
-    }
-
-    10%, 30%, 50%, 70%, 90% {
-        transform: translateX(-4px);
-    }
-
-    20%, 40%, 60%, 80% {
-        transform: translateX(4px);
-    }
-}
 
 .form-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 32px;
-    padding-top: 0;
-}
-
-    .form-actions button {
-        flex: 1;
-    }
-
-.form-section + .form-section {
+    gap: 16px;
+    margin-top: 12px;
     padding-top: 20px;
     border-top: 1px solid #e5e7eb;
 }
 
+    .form-actions button {
+        flex: 1;
+        height: 48px; 
+        display: flex;
+    }
+
 @media (max-width: 768px) {
-    /* Bootstrap Grid maneja el responsive de las columnas automáticamente */
-    .form-actions {
-        flex-direction: column-reverse;
+    .form-row.two-columns {
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 
-        .form-actions button {
-            width: 100%;
-        }
-}
-
-.register-page .login-card {
-    max-width: 700px;
-    width: 90%;
-}
-
-.field-helper {
-    margin-top: 6px;
-    font-size: 12px;
-    color: #9ca3af;
-    font-style: italic;
-    font-family: inherit;
-}
-
-.register-form {
-    animation: fadeIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .form-section {
+        padding: 16px; 
     }
 }

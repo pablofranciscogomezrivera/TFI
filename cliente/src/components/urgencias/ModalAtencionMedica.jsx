@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { TextArea } from '../ui/Input';
@@ -128,7 +128,7 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
 
                     <form onSubmit={handleSubmit} className="atencion-form">
                         <div className="atencion-seccion">
-                            <h3 className="seccion-titulo">🩺 Informe Médico</h3>
+                            <h3 className="seccion-titulo">📝 Informe Médico</h3>
 
                             <TextArea
                                 label="Diagnóstico y Tratamiento"
