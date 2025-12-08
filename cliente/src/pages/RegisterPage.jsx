@@ -316,14 +316,15 @@ const RegisterPage = () => {
                     </div>
 
                     <div style={{ textAlign: 'center', marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
-                        <span style={{ color: '#64748b', fontSize: '14px' }}>
+                        <span style={{ color: '#64748b', fontSize: '14px', fontFamily: 'inherit' }}>
                             ¿Ya tienes cuenta?{' '}
                             <a
                                 href="/login"
                                 style={{
                                     color: '#3b82f6',
                                     textDecoration: 'none',
-                                    fontWeight: '500'
+                                    fontWeight: '500',
+                                    fontFamily: 'inherit'
                                 }}
                             >
                                 Iniciar Sesión

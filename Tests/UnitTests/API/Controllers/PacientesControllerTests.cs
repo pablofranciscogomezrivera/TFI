@@ -1,6 +1,5 @@
 ﻿using API.Controllers;
 using Aplicacion.Intefaces;
-using Castle.Core.Logging;
 using Dominio.Entidades;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -8,14 +7,13 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
-namespace Tests.UnitTests.Web.Controllers;
+namespace Tests.UnitTests.API.Controllers;
 
 public class PacientesControllerTests
 {
     private readonly IServicioPacientes _servicioPacientes;
     private readonly PacientesController _controller;
     private readonly ILogger<PacientesController> _logger;
-
 
     public PacientesControllerTests()
     {
@@ -38,7 +36,8 @@ public class PacientesControllerTests
             FechaNacimiento = new DateTime(1990, 1, 1),
             Domicilio = new Domicilio { Calle = "San Martín", Numero = 123, Localidad = "Tucumán" }
         };
-        _servicioPacientes.BuscarPacientePorCuil(cuil).Returns(paciente);
+
+        _servicioPacientes.BuscarPacientePorCuil(Arg.Any<string>()).Returns(paciente);
 
         // Act
         var resultado = _controller.BuscarPaciente(cuil);
@@ -47,7 +46,8 @@ public class PacientesControllerTests
         resultado.Should().BeOfType<OkObjectResult>();
         var okResult = resultado as OkObjectResult;
         okResult.Value.Should().NotBeNull();
-        _servicioPacientes.Received(1).BuscarPacientePorCuil(cuil);
+
+        _servicioPacientes.Received(1).BuscarPacientePorCuil("20301234563");
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class PacientesControllerTests
     {
         // Arrange
         string cuil = "20-30123456-3";
-        _servicioPacientes.BuscarPacientePorCuil(cuil).Returns((Paciente?)null);
+        _servicioPacientes.BuscarPacientePorCuil(Arg.Any<string>()).Returns((Paciente?)null);
 
         // Act
         var resultado = _controller.BuscarPaciente(cuil);
@@ -69,7 +69,8 @@ public class PacientesControllerTests
     {
         // Arrange
         string cuil = "20-30123456-3";
-        _servicioPacientes.When(x => x.BuscarPacientePorCuil(cuil))
+
+        _servicioPacientes.When(x => x.BuscarPacientePorCuil(Arg.Any<string>()))
             .Do(x => throw new Exception("Error de base de datos"));
 
         // Act

@@ -66,7 +66,6 @@ public class ServicioAtencionTests
             _paciente, _enfermera, "Consulta", NivelEmergencia.URGENCIA,
             37.0, 80, 18, 120, 80
         );
-        // Estado = PENDIENTE por defecto
 
         // Act
         Action act = () => _servicioAtencion.RegistrarAtencion(ingreso, "Informe", _doctor);

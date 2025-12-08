@@ -50,10 +50,13 @@ public class ServicioPacientesTests
         string numeroAfiliado = "12345";
 
         var obraSocial = new ObraSocial { Id = obraSocialId, Nombre = "OSDE" };
+
+        _repositorioObraSocial.ExisteObraSocial(obraSocialId).Returns(true);
         _repositorioObraSocial.BuscarObraSocialPorId(obraSocialId).Returns(obraSocial);
         _repositorioObraSocial.EstaAfiliadoAObraSocial(obraSocialId, numeroAfiliado).Returns(true);
+
         _repositorioPacientes.RegistrarPaciente(Arg.Any<Paciente>())
-            .Returns(callInfo => callInfo.Arg<Paciente>());
+            .Returns(devuelve => devuelve.Arg<Paciente>());
 
         // Act
         var resultado = _servicioPacientes.RegistrarPaciente(
@@ -66,6 +69,8 @@ public class ServicioPacientesTests
         resultado.Afiliado.Should().NotBeNull();
         resultado.Afiliado.NumeroAfiliado.Should().Be(numeroAfiliado);
         resultado.Afiliado.ObraSocial.Should().Be(obraSocial);
+
+        _repositorioObraSocial.Received(1).ExisteObraSocial(obraSocialId);
         _repositorioObraSocial.Received(1).BuscarObraSocialPorId(obraSocialId);
         _repositorioObraSocial.Received(1).EstaAfiliadoAObraSocial(obraSocialId, numeroAfiliado);
     }
@@ -75,6 +80,8 @@ public class ServicioPacientesTests
     {
         // Arrange
         int obraSocialId = 999;
+
+        _repositorioObraSocial.ExisteObraSocial(obraSocialId).Returns(false);
         _repositorioObraSocial.BuscarObraSocialPorId(obraSocialId).Returns((ObraSocial?)null);
 
         // Act
@@ -97,6 +104,8 @@ public class ServicioPacientesTests
         string numeroAfiliado = "99999";
 
         var obraSocial = new ObraSocial { Id = obraSocialId, Nombre = "OSDE" };
+
+        _repositorioObraSocial.ExisteObraSocial(obraSocialId).Returns(true);
         _repositorioObraSocial.BuscarObraSocialPorId(obraSocialId).Returns(obraSocial);
         _repositorioObraSocial.EstaAfiliadoAObraSocial(obraSocialId, numeroAfiliado).Returns(false);
 

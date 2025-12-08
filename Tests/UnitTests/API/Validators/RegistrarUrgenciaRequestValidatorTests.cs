@@ -4,7 +4,7 @@ using API.Validators;
 using Xunit;
 using Dominio.Entidades;
 
-namespace Tests.UnitTests.Web.Validators;
+namespace Tests.UnitTests.API.Validators;
 
 public class RegistrarUrgenciaRequestValidatorTests
 {

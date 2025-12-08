@@ -10,7 +10,7 @@ public class ValidadorCUILTests
     [InlineData("20-30123456-3")] // CUIL válido con guiones
     [InlineData("20301234563")]    // CUIL válido sin guiones
     [InlineData("27-20123456-0")]  // CUIL femenino válido
-    [InlineData("23-35654321-9")]  // Otro CUIL válido
+    [InlineData("27-35654321-7")]  // Otro CUIL válido
     public void EsValido_ConCUILValido_RetornaTrue(string cuil)
     {
         // Act
@@ -39,9 +39,9 @@ public class ValidadorCUILTests
     [Fact]
     public void EsValido_VerificaAlgoritmoDigitoVerificador()
     {
-        // Arrange - CUIL conocido con dígito verificador correcto
+        // Arrange 
         string cuilValido = "20-30123456-3";
-        string cuilInvalidoDigito = "20-30123456-5"; // Mismo DNI, dígito incorrecto
+        string cuilInvalidoDigito = "20-30123456-5";
 
         // Act & Assert
         ValidadorCUIL.EsValido(cuilValido).Should().BeTrue();

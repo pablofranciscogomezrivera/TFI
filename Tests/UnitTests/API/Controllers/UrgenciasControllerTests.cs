@@ -1,15 +1,16 @@
 ﻿using API.Controllers;
 using API.DTOs.Urgencias;
 using Aplicacion.Intefaces;
-using Castle.Core.Logging;
 using Dominio.Entidades;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using System.Security.Claims;
 using Xunit;
 
-namespace Tests.UnitTests.Web.Controllers;
+namespace Tests.UnitTests.API.Controllers;
 
 public class UrgenciasControllerTests
 {
@@ -22,6 +23,21 @@ public class UrgenciasControllerTests
         _servicioUrgencias = Substitute.For<IServicioUrgencias>();
         _logger = Substitute.For<ILogger<UrgenciasController>>();
         _controller = new UrgenciasController(_servicioUrgencias, _logger);
+
+        var claims = new List<Claim>
+        {
+            new Claim("Matricula", "TEST_MATRICULA"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim(ClaimTypes.Email, "test@hospital.com"),
+            new Claim(ClaimTypes.Role, "Enfermera")
+        };
+        var identity = new ClaimsIdentity(claims, "TestAuthType");
+        var claimsPrincipal = new ClaimsPrincipal(identity);
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+        };
     }
 
     [Fact]
@@ -40,7 +56,7 @@ public class UrgenciasControllerTests
         _servicioUrgencias.ObtenerIngresosPendientes().Returns(ingresos);
 
         // Act
-        var resultado = _controller.ObtenerIngresosEnProceso();
+        var resultado = _controller.ObtenerListaEspera();
 
         // Assert
         resultado.Should().BeOfType<OkObjectResult>();
@@ -68,9 +84,10 @@ public class UrgenciasControllerTests
         var resultado = _controller.RegistrarUrgencia(request);
 
         // Assert
-        resultado.Should().BeOfType<OkObjectResult>();
+        resultado.Should().BeOfType<CreatedAtActionResult>(); 
+
         _servicioUrgencias.Received(1).RegistrarUrgencia(
-            request.CuilPaciente,
+            "20301234563", 
             Arg.Any<Enfermera>(),
             request.Informe,
             request.Temperatura,
@@ -89,7 +106,7 @@ public class UrgenciasControllerTests
         var request = new RegistrarUrgenciaRequest
         {
             CuilPaciente = "20-30123456-3",
-            Informe = "", // Informe vacío (inválido)
+            Informe = "",
             Temperatura = 37.0,
             NivelEmergencia = NivelEmergencia.URGENCIA,
             FrecuenciaCardiaca = 80,
@@ -115,7 +132,6 @@ public class UrgenciasControllerTests
     public void ReclamarPaciente_ConPacienteDisponible_RetornaOk()
     {
         // Arrange
-        string matriculaDoctor = "MP001";
         var ingreso = new Ingreso(
             new Paciente { CUIL = "20-30123456-3", Nombre = "Juan" },
             new Enfermera { Nombre = "María", Matricula = "ENF001" },
@@ -137,7 +153,6 @@ public class UrgenciasControllerTests
     public void ReclamarPaciente_SinPacientesEnCola_RetornaBadRequest()
     {
         // Arrange
-        string matriculaDoctor = "MP001";
         _servicioUrgencias.When(x => x.ReclamarPaciente(Arg.Any<Doctor>()))
             .Do(x => throw new InvalidOperationException("No hay pacientes en la lista de espera"));
 
@@ -153,13 +168,15 @@ public class UrgenciasControllerTests
     {
         // Arrange
         string cuil = "20-30123456-3";
+        string cuilNormalizado = "20301234563"; 
 
         // Act
         var resultado = _controller.CancelarAtencion(cuil);
 
         // Assert
         resultado.Should().BeOfType<OkObjectResult>();
-        _servicioUrgencias.Received(1).CancelarAtencion(cuil);
+
+        _servicioUrgencias.Received(1).CancelarAtencion(cuilNormalizado);
     }
 
     [Fact]
@@ -167,7 +184,7 @@ public class UrgenciasControllerTests
     {
         // Arrange
         string cuil = "20-30123456-3";
-        _servicioUrgencias.When(x => x.CancelarAtencion(cuil))
+        _servicioUrgencias.When(x => x.CancelarAtencion(Arg.Any<string>()))
             .Do(x => throw new InvalidOperationException("No se encontró ingreso"));
 
         // Act

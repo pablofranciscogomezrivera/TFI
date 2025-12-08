@@ -1,4 +1,5 @@
-﻿/* Mantener la estética del LoginPage */
+﻿/* RegisterPage.css - Mantener la estética del LoginPage */
+
 .register-form {
     display: flex;
     flex-direction: column;
@@ -18,10 +19,11 @@
 .section-title {
     font-size: 14px;
     font-weight: 600;
-    color: #64748b;
+    color: #6b7280;
     margin: 0 0 12px 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: inherit;
 }
 
 .form-row {
@@ -54,52 +56,51 @@
     margin-bottom: 8px;
     font-weight: 500;
     font-size: 13px;
-    color: #64748b;
+    color: #6b7280;
+    font-family: inherit;
 }
 
 .form-select {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 14px;
-    color: #1e293b;
-    background-color: #f8fafc;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #1f2937;
+    background-color: white;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
     font-family: inherit;
 }
 
     .form-select:hover {
-        border-color: #cbd5e1;
-        background-color: white;
+        border-color: #9ca3af;
     }
 
     .form-select:focus {
         outline: none;
-        border-color: #3b82f6;
+        border-color: #1f2937;
         background-color: white;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        transform: translateY(-1px);
+        box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
     }
 
     .form-select:disabled {
-        background-color: #f1f5f9;
+        background-color: #f3f4f6;
         cursor: not-allowed;
         opacity: 0.6;
     }
 
 .field-error {
     margin-top: 8px;
-    padding: 10px 14px;
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-    border-left: 4px solid #dc2626;
+    padding: 10px 12px;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
     border-radius: 8px;
     color: #991b1b;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
-    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
-    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
+    animation: shake 0.5s ease-in-out;
+    font-family: inherit;
 }
 
 @keyframes shake {
@@ -129,7 +130,7 @@
 
 .form-section + .form-section {
     padding-top: 20px;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid #e5e7eb;
 }
 
 @media (max-width: 768px) {
@@ -147,20 +148,16 @@
 }
 
 .register-page .login-card {
-    max-width: 700px !important;
+    max-width: 700px;
     width: 90%;
-}
-
-.form-field input,
-.form-select {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .field-helper {
     margin-top: 6px;
     font-size: 12px;
-    color: #94a3b8;
+    color: #9ca3af;
     font-style: italic;
+    font-family: inherit;
 }
 
 .register-form {
