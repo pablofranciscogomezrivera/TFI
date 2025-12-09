@@ -6,6 +6,7 @@ using Dominio.Interfaces;
 using FluentAssertions;
 using Reqnroll;
 using Tests.Memory;
+using NSubstitute;
 
 namespace Tests.StepDefinitions
 {
@@ -16,12 +17,14 @@ namespace Tests.StepDefinitions
         private IRepositorioPacientes _dbMockeada;
         private IServicioUrgencias _servicioUrgencias;
         private Exception _excepcionEsperada;
+        private IRepositorioObraSocial _repoObraSocial;
 
         public ModuloDeUrgenciasStepDefinitions()
         {
             _dbMockeada = new RepositorioPacientesBDD();
             var repositorioUrgencias = new RepositorioUrgenciasBDD();
-            _servicioUrgencias = new ServicioUrgencias(_dbMockeada, repositorioUrgencias);
+            _repoObraSocial = Substitute.For<IRepositorioObraSocial>();
+            _servicioUrgencias = new ServicioUrgencias(_dbMockeada, repositorioUrgencias, _repoObraSocial);
         }
 
         [BeforeScenario]

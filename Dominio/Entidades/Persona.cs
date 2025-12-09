@@ -15,6 +15,8 @@ public abstract class Persona
     public long Telefono { get; set; }
     public string Nombre { get; set; }
     public string Apellido { get; set; }
+
+    public Domicilio? Domicilio { get; set; }
 }   
 
 //prueba para el workflow

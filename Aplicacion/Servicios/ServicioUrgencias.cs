@@ -3,8 +3,7 @@ using Dominio.Entidades;
 using Dominio.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+using System.Linq; 
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,11 +13,16 @@ public class ServicioUrgencias : IServicioUrgencias
 {
     private readonly IRepositorioPacientes _repositorioPacientes;
     private readonly IRepositorioUrgencias _repositorioUrgencias;
+    private readonly IRepositorioObraSocial _repositorioObraSocial;
 
-    public ServicioUrgencias(IRepositorioPacientes repositorioPacientes, IRepositorioUrgencias repositorioUrgencias)
+    public ServicioUrgencias(
+        IRepositorioPacientes repositorioPacientes,
+        IRepositorioUrgencias repositorioUrgencias,
+        IRepositorioObraSocial repositorioObraSocial)
     {
         _repositorioPacientes = repositorioPacientes;
         _repositorioUrgencias = repositorioUrgencias;
+        _repositorioObraSocial = repositorioObraSocial;
     }
 
     public List<Ingreso> ObtenerIngresosPendientes()
@@ -86,7 +90,6 @@ public class ServicioUrgencias : IServicioUrgencias
         double FrecRespiratoria,
         double FrecSistolica,
         double FrecDiastolica,
-        // Parámetros opcionales para crear paciente si no existe
         string? nombrePaciente = null,
         string? apellidoPaciente = null,
         string? callePaciente = null,
@@ -114,6 +117,20 @@ public class ServicioUrgencias : IServicioUrgencias
                 Localidad = localidadPaciente ?? "San Miguel de Tucumán"
             };
 
+            Afiliado? nuevoAfiliado = null;
+            if (obraSocialIdPaciente.HasValue && !string.IsNullOrWhiteSpace(numeroAfiliadoPaciente))
+            {
+                var obraSocial = _repositorioObraSocial.BuscarObraSocialPorId(obraSocialIdPaciente.Value);
+                if (obraSocial != null)
+                {
+                    nuevoAfiliado = new Afiliado
+                    {
+                        ObraSocial = obraSocial,
+                        NumeroAfiliado = numeroAfiliadoPaciente
+                    };
+                }
+            }
+
             paciente = new Paciente
             {
                 CUIL = CUILPaciente,
@@ -124,7 +141,7 @@ public class ServicioUrgencias : IServicioUrgencias
                 Email = emailPaciente ?? "",
                 Telefono = telefonoPaciente ?? 0,
                 Domicilio = domicilio,
-                Afiliado = null // Sin obra social por defecto
+                Afiliado = nuevoAfiliado
             };
 
             paciente = _repositorioPacientes.RegistrarPaciente(paciente);
@@ -155,6 +172,6 @@ public class ServicioUrgencias : IServicioUrgencias
                 return dni;
             }
         }
-        return 0; // Valor por defecto si no se puede extraer
+        return 0;
     }
 }
