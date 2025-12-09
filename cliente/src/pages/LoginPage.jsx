@@ -6,12 +6,14 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Notification from '../components/ui/Notification';
 import { debugToken } from '../utils/jwtHelper';
+import { mapValidationErrors } from '../utils/errorUtils';
 import './LoginPage.css';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [notification, setNotification] = useState(null); 
+    const [errors, setErrors] = useState({});
+    const [notification, setNotification] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -67,8 +69,24 @@ const LoginPage = () => {
 
         } catch (err) {
             console.error(err);
-            if (err.response && err.response.status === 401) {
-                showNotification('Credenciales incorrectas. Verifique su email y contraseña.', 'error');
+
+            if (err.response) {
+                const { status, data } = err.response;
+
+                // Error 400: Errores de validación de formato (FluentValidation)
+                if (status === 400 && data?.errors) {
+                    const mappedErrors = mapValidationErrors(data.errors);
+                    setErrors(mappedErrors);
+                    showNotification('Por favor, revise los campos marcados con error.', 'error');
+                }
+                // Error 401: Credenciales inválidas
+                else if (status === 401) {
+                    showNotification('Credenciales incorrectas. Verifique su email y contraseña.', 'error');
+                }
+                // Otros errores del servidor
+                else {
+                    showNotification(data?.message || 'Error del servidor. Intente más tarde.', 'error');
+                }
             } else {
                 showNotification('Error de conexión con el servidor. Intente más tarde.', 'error');
             }
@@ -92,25 +110,35 @@ const LoginPage = () => {
                     <p className="login-subtitle">Sistema de Gestión de Guardia</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="login-form">
+                <form onSubmit={handleSubmit} className="login-form" noValidate>
                     <Input
                         label="Email"
                         type="email"
+                        name="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                            setEmail(e.target.value);
+                            if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+                        }}
                         placeholder="usuario@hospital.com"
                         required
                         disabled={loading}
+                        error={errors.email}
                     />
 
                     <Input
-                        label={"Contraseña"}
+                        label="Contraseña"
                         type="password"
+                        name="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                            if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
+                        }}
                         placeholder="••••••••"
                         required
                         disabled={loading}
+                        error={errors.password}
                     />
 
                     <div className="login-actions">

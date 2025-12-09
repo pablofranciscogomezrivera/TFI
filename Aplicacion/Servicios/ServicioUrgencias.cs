@@ -23,7 +23,9 @@ public class ServicioUrgencias : IServicioUrgencias
 
     public List<Ingreso> ObtenerIngresosPendientes()
     {
-        return _repositorioUrgencias.ObtenerIngresosPendientes();
+        var lista = _repositorioUrgencias.ObtenerIngresosPendientes();
+        lista.Sort();
+        return lista;
     }
 
     public List<Ingreso> ObtenerTodosLosIngresos()
@@ -39,6 +41,7 @@ public class ServicioUrgencias : IServicioUrgencias
         }
 
         var listaEspera = _repositorioUrgencias.ObtenerIngresosPendientes();
+        listaEspera.Sort();
 
         if (listaEspera.Count == 0)
         {

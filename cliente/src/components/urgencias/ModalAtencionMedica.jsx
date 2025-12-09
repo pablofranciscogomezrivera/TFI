@@ -20,25 +20,37 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
 
-        if (!informeMedico.trim() || informeMedico.trim().length < 10) {
-            setError('El informe médico debe tener al menos 10 caracteres');
+        if (!informeMedico.trim()) {
+            setError('El informe médico es obligatorio');
             return;
         }
 
         setLoading(true);
+
         try {
             await onSubmit(ingreso.cuilPaciente, informeMedico);
         } catch (err) {
-            if (err.response && err.response.data && err.response.data.errors) {
-                const mappedErrors = mapValidationErrors(err.response.data.errors);
-                if (mappedErrors.informeMedico) {
-                    setError(mappedErrors.informeMedico);
-                } else {
-                    setError('Error de validación en el servidor');
+            if (err.response && err.response.data) {
+                const { errors: backendErrors, message: errorMessage } = err.response.data;
+
+                // Errores de FluentValidation (response.data.errors)
+                if (backendErrors && typeof backendErrors === 'object' && Object.keys(backendErrors).length > 0) {
+                    const mappedErrors = mapValidationErrors(backendErrors);
+                    // Mostrar el error del campo informeMedico o el primero disponible
+                    setError(mappedErrors.informeMedico || Object.values(mappedErrors)[0] || 'Error de validación');
+                }
+                // Errores de dominio (response.data.message)
+                else if (errorMessage) {
+                    setError(errorMessage);
+                }
+                // Otros errores
+                else {
+                    setError('Error al registrar atención');
                 }
             } else {
-                setError(err.message || 'Error al registrar atención');
+                setError('Error de conexión con el servidor');
             }
         } finally {
             setLoading(false);
@@ -136,7 +148,7 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
                         </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="atencion-form">
+                    <form onSubmit={handleSubmit} className="atencion-form" noValidate>
                         <div className="atencion-seccion">
                             <h3 className="seccion-titulo">📝 Informe Médico</h3>
 

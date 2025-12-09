@@ -14,7 +14,6 @@ export const UrgenciasPage = () => {
     const [pacientes, setPacientes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [notification, setNotification] = useState(null);
-    const [error, setError] = useState(null);
 
     // Estados para el flujo de ingreso
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -31,7 +30,6 @@ export const UrgenciasPage = () => {
     const navigate = useNavigate();
 
     const dniEnfermera = localStorage.getItem('profesionalDNI') || '';
-    const matriculaDoctor = localStorage.getItem('matricula') || '';
 
     const showNotification = (message, type = 'info') => {
         setNotification({ message, type });
@@ -40,7 +38,6 @@ export const UrgenciasPage = () => {
     const cargarPacientes = async () => {
         try {
             setLoading(true);
-            setError(null);
 
             const dataPendientes = await urgenciasService.obtenerListaEspera();
             setPacientes(dataPendientes);
@@ -48,7 +45,6 @@ export const UrgenciasPage = () => {
         } catch (err) {
             console.error('Error al cargar pacientes:', err);
             if (err.response?.status === 401) navigate('/login');
-            setError('No se pudo cargar la lista de pacientes');
             showNotification('No se pudo actualizar la lista', 'error');
         } finally {
             setLoading(false);
@@ -62,54 +58,36 @@ export const UrgenciasPage = () => {
     }, []);
 
     const handleRegistrarIngresoCompleto = async (urgenciaData, pacienteNuevoData) => {
-        try {
-            const datosCompletos = {
-                ...urgenciaData,
-                nombrePaciente: pacienteNuevoData?.nombre || null,
-                apellidoPaciente: pacienteNuevoData?.apellido || null,
-                callePaciente: pacienteNuevoData?.calle || null,
-                numeroPaciente: pacienteNuevoData?.numero || null,
-                localidadPaciente: pacienteNuevoData?.localidad || null,
-                emailPaciente: pacienteNuevoData?.email || null,
-                telefonoPaciente: pacienteNuevoData?.telefono || null,
-                obraSocialIdPaciente: pacienteNuevoData?.obraSocialId || null,
-                numeroAfiliadoPaciente: pacienteNuevoData?.numeroAfiliado || null,
-                fechaNacimientoPaciente: pacienteNuevoData?.fechaNacimiento || null
-            };
+        const datosCompletos = {
+            ...urgenciaData,
+            nombrePaciente: pacienteNuevoData?.nombre || null,
+            apellidoPaciente: pacienteNuevoData?.apellido || null,
+            callePaciente: pacienteNuevoData?.calle || null,
+            numeroPaciente: pacienteNuevoData?.numero || null,
+            localidadPaciente: pacienteNuevoData?.localidad || null,
+            emailPaciente: pacienteNuevoData?.email || null,
+            telefonoPaciente: pacienteNuevoData?.telefono || null,
+            obraSocialIdPaciente: pacienteNuevoData?.obraSocialId || null,
+            numeroAfiliadoPaciente: pacienteNuevoData?.numeroAfiliado || null,
+            fechaNacimientoPaciente: pacienteNuevoData?.fechaNacimiento || null
+        };
 
-            console.log('Datos a enviar:', JSON.stringify(datosCompletos, null, 2));
+        console.log('Datos a enviar:', JSON.stringify(datosCompletos, null, 2));
 
-            await urgenciasService.registrarUrgencia(datosCompletos, dniEnfermera);
+        // Dejamos que el error se propague a FormularioIngreso para que 
+        // muestre los errores de validación en cada input correspondiente
+        await urgenciasService.registrarUrgencia(datosCompletos, dniEnfermera);
 
-            const mensaje = pacienteNuevoData
-                ? 'Ingreso registrado exitosamente. Paciente creado automáticamente.'
-                : 'Ingreso registrado exitosamente.';
+        const mensaje = pacienteNuevoData
+            ? 'Ingreso registrado exitosamente. Paciente creado automáticamente.'
+            : 'Ingreso registrado exitosamente.';
 
-            showNotification(mensaje, 'success');
-            await cargarPacientes();
+        showNotification(mensaje, 'success');
+        await cargarPacientes();
 
-            // Volver a la cola
-            setMostrarFormulario(false);
-            setVistaActual('cola');
-
-        } catch (err) {
-            console.error('Error completo:', err);
-            console.error('Response data:', err.response?.data);
-            console.error('Response status:', err.response?.status);
-
-            if (err.response?.data?.errors) {
-                console.error('❌ ERRORES DE VALIDACIÓN:', err.response.data.errors);
-
-                const errores = Object.entries(err.response.data.errors)
-                    .map(([campo, mensajes]) => `${campo}: ${mensajes.join(', ')}`)
-                    .join('\n');
-
-                showNotification(`Errores de validación:\n${errores}`, 'error');
-            } else {
-                const msg = err.response?.data?.message || err.message || 'Error al procesar el ingreso.';
-                showNotification(msg, 'error');
-            }
-        }
+        // Volver a la cola
+        setMostrarFormulario(false);
+        setVistaActual('cola');
     };
 
     const iniciarNuevoIngreso = () => {

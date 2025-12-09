@@ -50,8 +50,7 @@
                 SELECT i.*, p.CUIL, p.Nombre, p.Apellido, p.DNI
                 FROM Ingresos i
                 INNER JOIN Pacientes p ON i.IdPaciente = p.Id
-                WHERE i.Estado = 0 -- 0 = PENDIENTE
-                ORDER BY i.NivelEmergencia ASC, i.FechaIngreso ASC";
+                WHERE i.Estado = 0";
 
             public const string ActualizarIngreso = @"
                 UPDATE Ingresos 

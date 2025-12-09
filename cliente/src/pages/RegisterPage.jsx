@@ -5,7 +5,6 @@ import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Notification from '../components/ui/Notification';
-import { validateCuilFormat } from '../utils/cuilHelper';
 import { mapValidationErrors } from '../utils/errorUtils';
 import './LoginPage.css';
 import './RegisterPage.css';
@@ -36,22 +35,9 @@ const RegisterPage = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        if (name === 'cuil') {
-            // Validar solo formato básico (con o sin guiones)
-            // El backend validará el dígito verificador
-            if (value && !validateCuilFormat(value)) {
-                setErrors(prev => ({
-                    ...prev,
-                    cuil: 'Formato inválido. Debe ser 11 dígitos (ej: 20-12345678-9 o 20123456789)'
-                }));
-            } else {
-                setErrors(prev => ({ ...prev, cuil: '' }));
-            }
-        } else {
-            // Limpiar error del campo al escribir
-            if (errors[name]) {
-                setErrors(prev => ({ ...prev, [name]: '' }));
-            }
+        // Limpiar error del campo al escribir
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
         }
 
         setFormData(prev => ({
@@ -64,35 +50,10 @@ const RegisterPage = () => {
         e.preventDefault();
         setLoading(true);
         setNotification(null);
-
-        // Validación manual de campos requeridos
-        const newErrors = {};
-        if (!formData.email) newErrors.email = 'El email es obligatorio';
-        if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
-        if (!formData.nombre) newErrors.nombre = 'El nombre es obligatorio';
-        if (!formData.apellido) newErrors.apellido = 'El apellido es obligatorio';
-        if (!formData.dni) newErrors.dni = 'El DNI es obligatorio';
-        if (!formData.cuil) newErrors.cuil = 'El CUIL es obligatorio';
-        if (!formData.matricula) newErrors.matricula = 'La matrícula es obligatoria';
-
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            showNotification('Por favor, complete todos los campos obligatorios', 'error');
-            setLoading(false);
-            return;
-        }
-
-        if (!validateCuilFormat(formData.cuil)) {
-            showNotification('CUIL inválido. Por favor, ingrese 11 dígitos válidos', 'error');
-            setErrors(prev => ({
-                ...prev,
-                cuil: 'Formato inválido. Debe ser 11 dígitos (ej: 20-12345678-9 o 20123456789)'
-            }));
-            setLoading(false);
-            return;
-        }
+        setErrors({});
 
         if (formData.password !== formData.confirmPassword) {
+            setErrors({ confirmPassword: 'Las contraseñas no coinciden' });
             showNotification('Las contraseñas no coinciden', 'error');
             setLoading(false);
             return;
@@ -104,7 +65,7 @@ const RegisterPage = () => {
                 password: formData.password,
                 nombre: formData.nombre,
                 apellido: formData.apellido,
-                dni: parseInt(formData.dni),
+                dni: parseInt(formData.dni) || 0,
                 cuil: formData.cuil,
                 matricula: formData.matricula,
                 tipoAutoridad: parseInt(formData.tipoAutoridad),
@@ -121,52 +82,24 @@ const RegisterPage = () => {
             }, 2000);
 
         } catch (err) {
-            console.error('Error completo:', err);
-            console.log('Response data:', err.response?.data);
+            console.error('Error en registro:', err);
 
             if (err.response && err.response.data) {
-                const backendErrors = err.response.data.errors;
-                const errorMsg = err.response.data.message || err.response.data.title || '';
+                const { errors: backendErrors, message: errorMessage } = err.response.data;
 
-                console.log('Backend errors object:', backendErrors);
-                console.log('Backend errors keys:', backendErrors ? Object.keys(backendErrors) : 'N/A');
-
-                // Si hay errores de validación del backend
+                // Errores de validación de FluentValidation (response.data.errors)
                 if (backendErrors && typeof backendErrors === 'object' && Object.keys(backendErrors).length > 0) {
-                    // Mapear errores usando la utilidad
                     const mappedErrors = mapValidationErrors(backendErrors);
-                    console.log('Mapped errors:', mappedErrors);
-
-                    // Buscar cualquier key que CONTENGA "cuil" (case-insensitive) en los errores originales
-                    const cuilKey = Object.keys(backendErrors).find(key =>
-                        key.toLowerCase().includes('cuil')
-                    );
-                    console.log('CUIL key found:', cuilKey);
-
-                    if (cuilKey && !mappedErrors.cuil) {
-                        // Si encontramos una key de CUIL pero no se mapeó correctamente
-                        const cuilError = Array.isArray(backendErrors[cuilKey])
-                            ? backendErrors[cuilKey][0]
-                            : backendErrors[cuilKey];
-                        mappedErrors.cuil = cuilError;
-                        console.log('CUIL error manually assigned:', cuilError);
-                    }
-
-                    console.log('Final errors to set:', mappedErrors);
                     setErrors(mappedErrors);
-
-                    // Mostrar notificación indicando que revise los campos
                     showNotification('Por favor, revise los campos marcados con error.', 'error');
-                } else if (errorMsg.toLowerCase().includes('cuil')) {
-                    // Caso backup: el mensaje principal menciona CUIL
-                    setErrors(prev => ({
-                        ...prev,
-                        cuil: errorMsg
-                    }));
-                    showNotification('Por favor, revise el campo CUIL.', 'error');
-                } else {
-                    // Error genérico del backend
-                    showNotification(errorMsg || 'Error al registrar usuario', 'error');
+                }
+                // Errores de dominio o mensaje general (response.data.message)
+                else if (errorMessage) {
+                    showNotification(errorMessage, 'error');
+                }
+                // Otros errores del backend
+                else {
+                    showNotification(err.response.data.title || 'Error al registrar usuario', 'error');
                 }
             } else {
                 showNotification('Error de conexión con el servidor. Intente más tarde.', 'error');
@@ -252,6 +185,7 @@ const RegisterPage = () => {
                                     placeholder="Repetir contraseña"
                                     required
                                     disabled={loading}
+                                    error={errors.confirmPassword}
                                 />
                             </div>
                         </div>

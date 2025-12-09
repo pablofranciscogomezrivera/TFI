@@ -8,6 +8,8 @@ const fieldMappings = {
     'CUIL': 'cuil',
     'Cuil': 'cuil',
     'cUIL': 'cuil',
+    'CuilPaciente': 'cuilPaciente',
+    'cuilPaciente': 'cuilPaciente',
     // DNI variations  
     'dni': 'dni',
     'DNI': 'dni',
@@ -23,6 +25,27 @@ const fieldMappings = {
     'Apellido': 'apellido',
     'matricula': 'matricula',
     'Matricula': 'matricula',
+    // Urgencias form fields
+    'Informe': 'informe',
+    'informe': 'informe',
+    'Temperatura': 'temperatura',
+    'temperatura': 'temperatura',
+    'NivelEmergencia': 'nivelEmergencia',
+    'nivelEmergencia': 'nivelEmergencia',
+    'FrecuenciaCardiaca': 'frecuenciaCardiaca',
+    'frecuenciaCardiaca': 'frecuenciaCardiaca',
+    'FrecuenciaRespiratoria': 'frecuenciaRespiratoria',
+    'frecuenciaRespiratoria': 'frecuenciaRespiratoria',
+    'FrecuenciaSistolica': 'frecuenciaSistolica',
+    'frecuenciaSistolica': 'frecuenciaSistolica',
+    'FrecuenciaDiastolica': 'frecuenciaDiastolica',
+    'frecuenciaDiastolica': 'frecuenciaDiastolica',
+    // Patient optional fields
+    'NombrePaciente': 'nombre',
+    'ApellidoPaciente': 'apellido',
+    'EmailPaciente': 'email',
+    'TelefonoPaciente': 'telefono',
+    'FechaNacimientoPaciente': 'fechaNacimiento',
 };
 
 /**

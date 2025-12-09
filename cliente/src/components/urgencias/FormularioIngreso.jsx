@@ -89,6 +89,8 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
     const handlePacienteChange = (e) => {
         const { name, value } = e.target;
         setPacienteData(prev => ({ ...prev, [name]: value }));
+        // Limpiar error del campo al escribir
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
     const handleNivelSelect = (nivelId) => {
@@ -127,6 +129,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
     const validateForm = () => {
         const newErrors = {};
+
         if (!formData.cuilPaciente.trim()) newErrors.cuilPaciente = 'El CUIL es obligatorio';
         if (!formData.informe.trim()) newErrors.informe = 'El informe es obligatorio';
         if (!formData.temperatura) newErrors.temperatura = 'La temperatura es obligatoria';
@@ -135,12 +138,6 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         if (!formData.frecuenciaSistolica) newErrors.frecuenciaSistolica = 'La FS es obligatoria';
         if (!formData.frecuenciaDiastolica) newErrors.frecuenciaDiastolica = 'La FD es obligatoria';
         if (formData.nivelEmergencia === null) newErrors.nivelEmergencia = 'Seleccione un nivel';
-
-        if (parseFloat(formData.frecuenciaCardiaca) < 0) newErrors.frecuenciaCardiaca = 'FC no puede ser negativo';
-        if (parseFloat(formData.frecuenciaRespiratoria) < 0) newErrors.frecuenciaRespiratoria = 'FR no puede ser negativo';
-        if (parseFloat(formData.temperatura) < 0) newErrors.temperatura = 'Temperatura no puede ser negativa';
-        if (parseFloat(formData.frecuenciaSistolica) < 0) newErrors.frecuenciaSistolica = 'FS no puede ser negativo';
-        if (parseFloat(formData.frecuenciaDiastolica) < 0) newErrors.frecuenciaDiastolica = 'FD no puede ser negativo';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -223,10 +220,31 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             });
 
         } catch (error) {
-            console.error(error);
-            if (error.response && error.response.data && error.response.data.errors) {
-                const mappedErrors = mapValidationErrors(error.response.data.errors);
-                setErrors(mappedErrors);
+            console.error('Error al registrar urgencia:', error);
+
+            if (error.response && error.response.data) {
+                const { errors: backendErrors, message: errorMessage } = error.response.data;
+
+                // Caso 1: Errores de FluentValidation (response.data.errors)
+                if (backendErrors && typeof backendErrors === 'object' && Object.keys(backendErrors).length > 0) {
+                    const mappedErrors = mapValidationErrors(backendErrors);
+                    setErrors(mappedErrors);
+                }
+                // Caso 2: Errores de dominio/excepciones (response.data.message)
+                // Si no hay errores de validación específicos pero hay un mensaje general,
+                // lo mostramos en el campo 'informe' como error general del formulario
+                else if (errorMessage) {
+                    setErrors(prev => ({
+                        ...prev,
+                        informe: errorMessage
+                    }));
+                }
+            } else {
+                // Error de conexión o sin respuesta del servidor
+                setErrors(prev => ({
+                    ...prev,
+                    informe: 'Error de conexión con el servidor. Intente nuevamente.'
+                }));
             }
         } finally {
             setLoading(false);
@@ -305,10 +323,25 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
                                     <div className="row g-3">
                                         <div className="col-12 col-md-4">
-                                            <Input label="Nombre (Opcional)" name="nombre" value={pacienteData.nombre} onChange={handlePacienteChange} placeholder="Sin Registrar" />
+                                            <Input
+                                                label="Nombre (Opcional)"
+                                                type="nombre"
+                                                name="nombre"
+                                                value={pacienteData.nombre}
+                                                onChange={handlePacienteChange}
+                                                placeholder="Sin Registrar"
+                                                error={errors.nombre}
+                                            />
                                         </div>
                                         <div className="col-12 col-md-4">
-                                            <Input label="Apellido (Opcional)" name="apellido" value={pacienteData.apellido} onChange={handlePacienteChange} placeholder="Sin Registrar" />
+                                            <Input
+                                                label="Apellido (Opcional)"
+                                                name="apellido"
+                                                value={pacienteData.apellido}
+                                                onChange={handlePacienteChange}
+                                                placeholder="Sin Registrar"
+                                                error={errors.apellido}
+                                            />
                                         </div>
                                         <div className="col-12 col-md-4">
                                             <Input
@@ -317,28 +350,67 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                                 type="date"
                                                 value={pacienteData.fechaNacimiento}
                                                 onChange={handlePacienteChange}
+                                                error={errors.fechaNacimiento}
                                             />
                                         </div>
                                     </div>
 
                                     <div className="row g-3">
                                         <div className="col-12 col-md-6">
-                                            <Input label="Email (Opcional)" name="email" type="email" value={pacienteData.email} onChange={handlePacienteChange} placeholder="ejemplo@email.com" />
+                                            <Input
+                                                label="Email (Opcional)"
+                                                name="email"
+                                                type="email"
+                                                value={pacienteData.email}
+                                                onChange={handlePacienteChange}
+                                                placeholder="ejemplo@email.com"
+                                                error={errors.email}
+                                            />
                                         </div>
                                         <div className="col-12 col-md-6">
-                                            <Input label="Teléfono (Opcional)" name="telefono" type="tel" value={pacienteData.telefono} onChange={handlePacienteChange} placeholder="3814567890" />
+                                            <Input
+                                                label="Teléfono (Opcional)"
+                                                name="telefono"
+                                                type="tel"
+                                                value={pacienteData.telefono}
+                                                onChange={handlePacienteChange}
+                                                placeholder="3814567890"
+                                                error={errors.telefono}
+                                            />
                                         </div>
                                     </div>
 
                                     <div className="row g-3">
                                         <div className="col-12 col-md-5">
-                                            <Input label="Calle (Opcional)" name="calle" value={pacienteData.calle} onChange={handlePacienteChange} placeholder="San Martin" />
+                                            <Input
+                                                label="Calle (Opcional)"
+                                                name="calle"
+                                                value={pacienteData.calle}
+                                                onChange={handlePacienteChange}
+                                                placeholder="San Martin"
+                                                error={errors.calle}
+                                            />
                                         </div>
                                         <div className="col-12 col-md-3">
-                                            <Input label="Número (Opcional)" name="numero" type="number" value={pacienteData.numero} onChange={handlePacienteChange} placeholder="999" />
+                                            <Input
+                                                label="Número (Opcional)"
+                                                name="numero"
+                                                type="number"
+                                                value={pacienteData.numero}
+                                                onChange={handlePacienteChange}
+                                                placeholder="999"
+                                                error={errors.numero}
+                                            />
                                         </div>
                                         <div className="col-12 col-md-4">
-                                            <Input label="Localidad" name="localidad" value={pacienteData.localidad} onChange={handlePacienteChange} placeholder="Tucumán" />
+                                            <Input
+                                                label="Localidad"
+                                                name="localidad"
+                                                value={pacienteData.localidad}
+                                                onChange={handlePacienteChange}
+                                                placeholder="Tucumán"
+                                                error={errors.localidad}
+                                            />
                                         </div>
                                     </div>
 
@@ -368,6 +440,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                                                     onChange={handlePacienteChange}
                                                     placeholder="123456"
                                                     required={!!pacienteData.obraSocialId}
+                                                    error={errors.numeroAfiliado}
                                                 />
                                             </div>
                                         )}
@@ -405,21 +478,62 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                             <p className="form-section-subtitle">Mediciones iniciales del paciente</p>
                             <div className="row g-3">
                                 <div className="col-12 col-md-4">
-                                    <Input label="Temp (°C)" placeholder="36.5" name="temperatura" type="number" step="0.1" value={formData.temperatura} onChange={handleChange} required error={errors.temperatura} />
+                                    <Input
+                                        label="Temp (°C)"
+                                        placeholder="36.5"
+                                        name="temperatura"
+                                        type="number"
+                                        step="0.1"
+                                        value={formData.temperatura}
+                                        onChange={handleChange}
+                                        required
+                                        error={errors.temperatura} />
                                 </div>
                                 <div className="col-12 col-md-4">
-                                    <Input label="FC (lpm)" placeholder="80" name="frecuenciaCardiaca" type="number" value={formData.frecuenciaCardiaca} onChange={handleChange} required error={errors.frecuenciaCardiaca} />
+                                    <Input
+                                        label="FC (lpm)"
+                                        placeholder="80"
+                                        name="frecuenciaCardiaca"
+                                        type="number"
+                                        value={formData.frecuenciaCardiaca}
+                                        onChange={handleChange}
+                                        required
+                                        error={errors.frecuenciaCardiaca} />
                                 </div>
                                 <div className="col-12 col-md-4">
-                                    <Input label="FR (rpm)" placeholder="16" name="frecuenciaRespiratoria" type="number" value={formData.frecuenciaRespiratoria} onChange={handleChange} required error={errors.frecuenciaRespiratoria} />
+                                    <Input
+                                        label="FR (rpm)"
+                                        placeholder="16"
+                                        name="frecuenciaRespiratoria"
+                                        type="number"
+                                        value={formData.frecuenciaRespiratoria}
+                                        onChange={handleChange}
+                                        required
+                                        error={errors.frecuenciaRespiratoria} />
                                 </div>
                             </div>
                             <div className="row g-3">
                                 <div className="col-12 col-md-6">
-                                    <Input label="TA Sistólica" placeholder="120" name="frecuenciaSistolica" type="number" value={formData.frecuenciaSistolica} onChange={handleChange} required error={errors.frecuenciaSistolica} />
+                                    <Input
+                                        label="TA Sistólica"
+                                        placeholder="120"
+                                        name="frecuenciaSistolica"
+                                        type="number"
+                                        value={formData.frecuenciaSistolica}
+                                        onChange={handleChange}
+                                        required
+                                        error={errors.frecuenciaSistolica} />
                                 </div>
                                 <div className="col-12 col-md-6">
-                                    <Input label="TA Diastólica" placeholder="80" name="frecuenciaDiastolica" type="number" value={formData.frecuenciaDiastolica} onChange={handleChange} required error={errors.frecuenciaDiastolica} />
+                                    <Input
+                                        label="TA Diastólica"
+                                        placeholder="80"
+                                        name="frecuenciaDiastolica"
+                                        type="number"
+                                        value={formData.frecuenciaDiastolica}
+                                        onChange={handleChange}
+                                        required
+                                        error={errors.frecuenciaDiastolica} />
                                 </div>
                             </div>
                         </div>

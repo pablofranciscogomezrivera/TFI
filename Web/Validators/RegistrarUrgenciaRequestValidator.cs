@@ -32,7 +32,7 @@ public class RegistrarUrgenciaRequestValidator : AbstractValidator<RegistrarUrge
 
         RuleFor(x => x.FrecuenciaCardiaca)
             .InclusiveBetween(20, 250)
-            .WithMessage("La frecuencia cardíaca debe estar entre 20 y 250 ppm");
+            .WithMessage("La frecuencia cardíaca debe estar entre 20 y 250 lpm");
 
         RuleFor(x => x.FrecuenciaRespiratoria)
             .InclusiveBetween(5, 60)
