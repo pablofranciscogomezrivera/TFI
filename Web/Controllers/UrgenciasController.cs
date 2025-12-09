@@ -104,6 +104,14 @@ public class UrgenciasController : ControllerBase
                 StatusCode = 400
             });
         }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponse
+            {
+                Message = ex.Message,
+                StatusCode = 400
+            });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error inesperado al registrar urgencia: {Message}", ex.Message);
@@ -231,7 +239,7 @@ public class UrgenciasController : ControllerBase
 
             var doctor = new Doctor
             {
-                Nombre = "Doctor", 
+                Nombre = "Doctor",
                 Apellido = "Sistema",
                 Matricula = matriculaDoctor
             };

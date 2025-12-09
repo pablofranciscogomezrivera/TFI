@@ -243,6 +243,7 @@ export const UrgenciasPage = () => {
                                 setVistaActual('cola');
                             }}
                             matriculaEnfermera={dniEnfermera}
+                            showNotification={showNotification}
                         />
                     </div>
                 )}

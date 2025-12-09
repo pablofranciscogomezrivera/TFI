@@ -103,6 +103,13 @@ public class ServicioUrgencias : IServicioUrgencias
             throw new ArgumentException("El informe es un dato mandatorio");
         }
 
+        var ingresoEnCola = _repositorioUrgencias.BuscarIngresoPorCuilYEstado(CUILPaciente, EstadoIngreso.PENDIENTE);
+
+        if (ingresoEnCola != null)
+        {
+            throw new InvalidOperationException($"El paciente con CUIL {CUILPaciente} ya se encuentra en la lista de espera y no puede ser ingresado nuevamente hasta que sea atendido o cancelado.");
+        }
+
         var paciente = _repositorioPacientes.BuscarPacientePorCuil(CUILPaciente);
 
         if (paciente is null)

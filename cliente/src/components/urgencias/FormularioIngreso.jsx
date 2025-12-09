@@ -11,8 +11,7 @@ import React from 'react';
 
 const NIVELES_EMERGENCIA = Object.values(NivelesEmergencia);
 
-export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => {
-
+export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera, showNotification }) => {
     const [formData, setFormData] = useState({
         cuilPaciente: '',
         informe: '',
@@ -220,31 +219,27 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
             });
 
         } catch (error) {
-            console.error('Error al registrar urgencia:', error);
+            console.error("Error en ingreso:", error);
 
             if (error.response && error.response.data) {
-                const { errors: backendErrors, message: errorMessage } = error.response.data;
-
-                // Caso 1: Errores de FluentValidation (response.data.errors)
-                if (backendErrors && typeof backendErrors === 'object' && Object.keys(backendErrors).length > 0) {
-                    const mappedErrors = mapValidationErrors(backendErrors);
-                    setErrors(mappedErrors);
+                // Caso 1: Errores de validación de campos (400 Bad Request con "errors")
+                if (error.response.data.errors) {
+                    const serverErrors = mapValidationErrors(error.response.data.errors);
+                    setErrors(serverErrors);
+                    // Opcional: Avisar que hay errores en el formulario
+                    if (showNotification) showNotification('Por favor corrija los errores en el formulario', 'error');
                 }
-                // Caso 2: Errores de dominio/excepciones (response.data.message)
-                // Si no hay errores de validación específicos pero hay un mensaje general,
-                // lo mostramos en el campo 'informe' como error general del formulario
-                else if (errorMessage) {
-                    setErrors(prev => ({
-                        ...prev,
-                        informe: errorMessage
-                    }));
+                // Caso 2: Errores de Negocio / Conflictos (409 Conflict o 400 con "message")
+                // Ej: "El paciente ya está en la cola"
+                else if (error.response.data.message) {
+                    if (showNotification) {
+                        showNotification(error.response.data.message, 'error');
+                    } else {
+                        setErrors({ informe: error.response.data.message });
+                    }
                 }
             } else {
-                // Error de conexión o sin respuesta del servidor
-                setErrors(prev => ({
-                    ...prev,
-                    informe: 'Error de conexión con el servidor. Intente nuevamente.'
-                }));
+                if (showNotification) showNotification('Error de conexión con el servidor', 'error');
             }
         } finally {
             setLoading(false);
