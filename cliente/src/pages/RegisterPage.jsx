@@ -121,41 +121,53 @@ const RegisterPage = () => {
             }, 2000);
 
         } catch (err) {
-            console.error(err);
-            if (err.response && err.response.data) {
-                let handled = false;
+            console.error('Error completo:', err);
+            console.log('Response data:', err.response?.data);
 
-                // 1. Intentar mapear errores con la utilidad (estándar .NET errors: { Key: [msgs] })
-                if (err.response.data.errors) {
-                    const mappedErrors = mapValidationErrors(err.response.data.errors);
+            if (err.response && err.response.data) {
+                const backendErrors = err.response.data.errors;
+                const errorMsg = err.response.data.message || err.response.data.title || '';
+
+                console.log('Backend errors object:', backendErrors);
+                console.log('Backend errors keys:', backendErrors ? Object.keys(backendErrors) : 'N/A');
+
+                // Si hay errores de validación del backend
+                if (backendErrors && typeof backendErrors === 'object' && Object.keys(backendErrors).length > 0) {
+                    // Mapear errores usando la utilidad
+                    const mappedErrors = mapValidationErrors(backendErrors);
+                    console.log('Mapped errors:', mappedErrors);
+
+                    // Buscar cualquier key que CONTENGA "cuil" (case-insensitive) en los errores originales
+                    const cuilKey = Object.keys(backendErrors).find(key =>
+                        key.toLowerCase().includes('cuil')
+                    );
+                    console.log('CUIL key found:', cuilKey);
+
+                    if (cuilKey && !mappedErrors.cuil) {
+                        // Si encontramos una key de CUIL pero no se mapeó correctamente
+                        const cuilError = Array.isArray(backendErrors[cuilKey])
+                            ? backendErrors[cuilKey][0]
+                            : backendErrors[cuilKey];
+                        mappedErrors.cuil = cuilError;
+                        console.log('CUIL error manually assigned:', cuilError);
+                    }
+
+                    console.log('Final errors to set:', mappedErrors);
                     setErrors(mappedErrors);
 
-                    // Si hay error de CUIL en el mapa, marcamos como manejado para no mostrar notificación genérica
-                    if (mappedErrors.cuil) {
-                        handled = true;
-                    }
-                }
-
-                // 2. Revisar si el mensaje principal es de CUIL (caso borde o backup)
-                const errorMsg = err.response.data.message || '';
-                if (errorMsg.toLowerCase().includes('cuil') || errorMsg.includes('CUIL')) {
+                    // Mostrar notificación indicando que revise los campos
+                    showNotification('Por favor, revise los campos marcados con error.', 'error');
+                } else if (errorMsg.toLowerCase().includes('cuil')) {
+                    // Caso backup: el mensaje principal menciona CUIL
                     setErrors(prev => ({
                         ...prev,
-                        cuil: errorMsg // Asignamos el mensaje del backend al campo
+                        cuil: errorMsg
                     }));
-                    handled = true;
+                    showNotification('Por favor, revise el campo CUIL.', 'error');
+                } else {
+                    // Error genérico del backend
+                    showNotification(errorMsg || 'Error al registrar usuario', 'error');
                 }
-
-                // 3. Si no fue un error específico de CUIL (o campos validados), mostrar notificación general
-                if (!handled) {
-                    if (err.response.data.errors) {
-                        showNotification('Por favor, corrija los errores en el formulario.', 'error');
-                    } else {
-                        // Error genérico del backend (ej: 400 Bad Request con mensaje string)
-                        showNotification(errorMsg || 'Error al registrar usuario', 'error');
-                    }
-                }
-
             } else {
                 showNotification('Error de conexión con el servidor. Intente más tarde.', 'error');
             }
