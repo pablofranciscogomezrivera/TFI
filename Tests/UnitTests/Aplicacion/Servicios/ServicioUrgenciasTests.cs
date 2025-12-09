@@ -12,6 +12,7 @@ public class ServicioUrgenciasTests
 {
     private readonly IRepositorioPacientes _repositorioPacientes;
     private readonly IRepositorioUrgencias _repositorioUrgencias;
+    private readonly IRepositorioObraSocial _repositorioObraSocial;
     private readonly ServicioUrgencias _servicioUrgencias;
     private readonly Enfermera _enfermera;
 
@@ -20,7 +21,9 @@ public class ServicioUrgenciasTests
         // Arrange - Mocks con NSubstitute
         _repositorioPacientes = Substitute.For<IRepositorioPacientes>();
         _repositorioUrgencias = Substitute.For<IRepositorioUrgencias>();
-        _servicioUrgencias = new ServicioUrgencias(_repositorioPacientes, _repositorioUrgencias);
+        _repositorioObraSocial = Substitute.For<IRepositorioObraSocial>();
+        _servicioUrgencias = 
+            new ServicioUrgencias(_repositorioPacientes, _repositorioUrgencias, _repositorioObraSocial);
 
         _enfermera = new Enfermera
         {
