@@ -5,6 +5,7 @@ import { TextArea } from '../ui/Input';
 import Badge from '../ui/Badge';
 import { getNivelEmergenciaInfo } from '../../constants/enums';
 import { formatCuil } from '../../utils/cuilHelper';
+import { mapValidationErrors } from '../../utils/errorUtils';
 import './ModalAtencionMedica.css';
 import React from 'react';
 
@@ -29,7 +30,16 @@ export const ModalAtencionMedica = ({ ingreso, onSubmit, onClose }) => {
         try {
             await onSubmit(ingreso.cuilPaciente, informeMedico);
         } catch (err) {
-            setError(err.message || 'Error al registrar atención');
+            if (err.response && err.response.data && err.response.data.errors) {
+                const mappedErrors = mapValidationErrors(err.response.data.errors);
+                if (mappedErrors.informeMedico) {
+                    setError(mappedErrors.informeMedico);
+                } else {
+                    setError('Error de validación en el servidor');
+                }
+            } else {
+                setError(err.message || 'Error al registrar atención');
+            }
         } finally {
             setLoading(false);
         }

@@ -5,6 +5,7 @@ import Input, { TextArea } from '../ui/Input';
 import { NivelesEmergencia } from '../../constants/enums';
 import pacientesService from '../../services/pacientesService';
 import obrasSocialesService from '../../services/obrasSocialesService';
+import { mapValidationErrors } from '../../utils/errorUtils';
 import './FormularioIngreso.css';
 import React from 'react';
 
@@ -129,17 +130,17 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
         if (!formData.cuilPaciente.trim()) newErrors.cuilPaciente = 'El CUIL es obligatorio';
         if (!formData.informe.trim()) newErrors.informe = 'El informe es obligatorio';
         if (!formData.temperatura) newErrors.temperatura = 'La temperatura es obligatoria';
-        if (!formData.frecuenciaCardiaca) newErrors.frecuenciaCardiaca = 'Obligatorio';
-        if (!formData.frecuenciaRespiratoria) newErrors.frecuenciaRespiratoria = 'Obligatorio';
-        if (!formData.frecuenciaSistolica) newErrors.frecuenciaSistolica = 'Obligatorio';
-        if (!formData.frecuenciaDiastolica) newErrors.frecuenciaDiastolica = 'Obligatorio';
+        if (!formData.frecuenciaCardiaca) newErrors.frecuenciaCardiaca = 'La FC es obligatoria';
+        if (!formData.frecuenciaRespiratoria) newErrors.frecuenciaRespiratoria = 'La FR es obligatoria';
+        if (!formData.frecuenciaSistolica) newErrors.frecuenciaSistolica = 'La FS es obligatoria';
+        if (!formData.frecuenciaDiastolica) newErrors.frecuenciaDiastolica = 'La FD es obligatoria';
         if (formData.nivelEmergencia === null) newErrors.nivelEmergencia = 'Seleccione un nivel';
 
-        if (parseFloat(formData.frecuenciaCardiaca) < 0) newErrors.frecuenciaCardiaca = 'No negativo';
-        if (parseFloat(formData.frecuenciaRespiratoria) < 0) newErrors.frecuenciaRespiratoria = 'No negativo';
-        if (parseFloat(formData.temperatura) < 0) newErrors.temperatura = 'No negativo';
-        if (parseFloat(formData.frecuenciaSistolica) < 0) newErrors.frecuenciaSistolica = 'No negativo';
-        if (parseFloat(formData.frecuenciaDiastolica) < 0) newErrors.frecuenciaDiastolica = 'No negativo';
+        if (parseFloat(formData.frecuenciaCardiaca) < 0) newErrors.frecuenciaCardiaca = 'FC no puede ser negativo';
+        if (parseFloat(formData.frecuenciaRespiratoria) < 0) newErrors.frecuenciaRespiratoria = 'FR no puede ser negativo';
+        if (parseFloat(formData.temperatura) < 0) newErrors.temperatura = 'Temperatura no puede ser negativa';
+        if (parseFloat(formData.frecuenciaSistolica) < 0) newErrors.frecuenciaSistolica = 'FS no puede ser negativo';
+        if (parseFloat(formData.frecuenciaDiastolica) < 0) newErrors.frecuenciaDiastolica = 'FD no puede ser negativo';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -223,6 +224,10 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
 
         } catch (error) {
             console.error(error);
+            if (error.response && error.response.data && error.response.data.errors) {
+                const mappedErrors = mapValidationErrors(error.response.data.errors);
+                setErrors(mappedErrors);
+            }
         } finally {
             setLoading(false);
         }
@@ -240,7 +245,7 @@ export const FormularioIngreso = ({ onSubmit, onClose, matriculaEnfermera }) => 
                         <button className="btn-close" onClick={onClose}>&times;</button>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="formulario-form">
+                    <form onSubmit={handleSubmit} className="formulario-form" noValidate>
 
 
                         <div className="form-section">

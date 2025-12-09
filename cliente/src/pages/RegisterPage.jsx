@@ -6,6 +6,7 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Notification from '../components/ui/Notification';
 import { validateCuilFormat } from '../utils/cuilHelper';
+import { mapValidationErrors } from '../utils/errorUtils';
 import './LoginPage.css';
 import './RegisterPage.css';
 
@@ -24,7 +25,7 @@ const RegisterPage = () => {
         telefono: ''
     });
     const [notification, setNotification] = useState(null);
-    const [cuilError, setCuilError] = useState('');
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -39,9 +40,17 @@ const RegisterPage = () => {
             // Validar solo formato básico (con o sin guiones)
             // El backend validará el dígito verificador
             if (value && !validateCuilFormat(value)) {
-                setCuilError('Formato inválido. Debe ser 11 dígitos (ej: 20-12345678-9 o 20123456789)');
+                setErrors(prev => ({
+                    ...prev,
+                    cuil: 'Formato inválido. Debe ser 11 dígitos (ej: 20-12345678-9 o 20123456789)'
+                }));
             } else {
-                setCuilError('');
+                setErrors(prev => ({ ...prev, cuil: '' }));
+            }
+        } else {
+            // Limpiar error del campo al escribir
+            if (errors[name]) {
+                setErrors(prev => ({ ...prev, [name]: '' }));
             }
         }
 
@@ -56,9 +65,29 @@ const RegisterPage = () => {
         setLoading(true);
         setNotification(null);
 
+        // Validación manual de campos requeridos
+        const newErrors = {};
+        if (!formData.email) newErrors.email = 'El email es obligatorio';
+        if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
+        if (!formData.nombre) newErrors.nombre = 'El nombre es obligatorio';
+        if (!formData.apellido) newErrors.apellido = 'El apellido es obligatorio';
+        if (!formData.dni) newErrors.dni = 'El DNI es obligatorio';
+        if (!formData.cuil) newErrors.cuil = 'El CUIL es obligatorio';
+        if (!formData.matricula) newErrors.matricula = 'La matrícula es obligatoria';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            showNotification('Por favor, complete todos los campos obligatorios', 'error');
+            setLoading(false);
+            return;
+        }
+
         if (!validateCuilFormat(formData.cuil)) {
             showNotification('CUIL inválido. Por favor, ingrese 11 dígitos válidos', 'error');
-            setCuilError('Formato inválido. Debe ser 11 dígitos (ej: 20-12345678-9 o 20123456789)');
+            setErrors(prev => ({
+                ...prev,
+                cuil: 'Formato inválido. Debe ser 11 dígitos (ej: 20-12345678-9 o 20123456789)'
+            }));
             setLoading(false);
             return;
         }
@@ -94,15 +123,39 @@ const RegisterPage = () => {
         } catch (err) {
             console.error(err);
             if (err.response && err.response.data) {
-                const errorMsg = err.response.data.message || 'Error al registrar usuario';
+                let handled = false;
 
-                // Detectar específicamente error de CUIL inválido
-                if (errorMsg.toLowerCase().includes('cuil')) {
-                    showNotification('CUIL inválido. Por favor, reingrese un CUIL válido.', 'error');
-                    setCuilError('CUIL inválido según validación del sistema');
-                } else {
-                    showNotification(errorMsg, 'error');
+                // 1. Intentar mapear errores con la utilidad (estándar .NET errors: { Key: [msgs] })
+                if (err.response.data.errors) {
+                    const mappedErrors = mapValidationErrors(err.response.data.errors);
+                    setErrors(mappedErrors);
+
+                    // Si hay error de CUIL en el mapa, marcamos como manejado para no mostrar notificación genérica
+                    if (mappedErrors.cuil) {
+                        handled = true;
+                    }
                 }
+
+                // 2. Revisar si el mensaje principal es de CUIL (caso borde o backup)
+                const errorMsg = err.response.data.message || '';
+                if (errorMsg.toLowerCase().includes('cuil') || errorMsg.includes('CUIL')) {
+                    setErrors(prev => ({
+                        ...prev,
+                        cuil: errorMsg // Asignamos el mensaje del backend al campo
+                    }));
+                    handled = true;
+                }
+
+                // 3. Si no fue un error específico de CUIL (o campos validados), mostrar notificación general
+                if (!handled) {
+                    if (err.response.data.errors) {
+                        showNotification('Por favor, corrija los errores en el formulario.', 'error');
+                    } else {
+                        // Error genérico del backend (ej: 400 Bad Request con mensaje string)
+                        showNotification(errorMsg || 'Error al registrar usuario', 'error');
+                    }
+                }
+
             } else {
                 showNotification('Error de conexión con el servidor. Intente más tarde.', 'error');
             }
@@ -126,7 +179,7 @@ const RegisterPage = () => {
                     <p className="login-subtitle">Complete el formulario para crear su cuenta</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="register-form">
+                <form onSubmit={handleSubmit} className="register-form" noValidate>
                     <div className="form-section">
                         <h3 className="section-title">Tipo de Empleado</h3>
                         <div className="row g-3">
@@ -159,6 +212,7 @@ const RegisterPage = () => {
                                     placeholder="usuario@hospital.com"
                                     required
                                     disabled={loading}
+                                    error={errors.email}
                                 />
                             </div>
                         </div>
@@ -173,6 +227,7 @@ const RegisterPage = () => {
                                     placeholder="Mínimo 8 caracteres"
                                     required
                                     disabled={loading}
+                                    error={errors.password}
                                 />
                             </div>
                             <div className="col-12 col-md-6">
@@ -203,6 +258,7 @@ const RegisterPage = () => {
                                     placeholder="Juan"
                                     required
                                     disabled={loading}
+                                    error={errors.nombre}
                                 />
                             </div>
                             <div className="col-12 col-md-6">
@@ -215,6 +271,7 @@ const RegisterPage = () => {
                                     placeholder="Pérez"
                                     required
                                     disabled={loading}
+                                    error={errors.apellido}
                                 />
                             </div>
                         </div>
@@ -229,6 +286,7 @@ const RegisterPage = () => {
                                     placeholder="12345678"
                                     required
                                     disabled={loading}
+                                    error={errors.dni}
                                 />
                             </div>
                             <div className="col-12 col-md-6">
@@ -241,13 +299,8 @@ const RegisterPage = () => {
                                     placeholder="20-12345678-9"
                                     required
                                     disabled={loading}
-                                    error={cuilError}
+                                    error={errors.cuil}
                                 />
-                                {cuilError && (
-                                    <div className="field-error">
-                                        ⚠️ {cuilError}
-                                    </div>
-                                )}
                             </div>
                         </div>
                         <div className="row g-3">
@@ -261,6 +314,7 @@ const RegisterPage = () => {
                                     placeholder="MED-12345 o ENF-67890"
                                     required
                                     disabled={loading}
+                                    error={errors.matricula}
                                 />
                             </div>
                         </div>
@@ -277,6 +331,7 @@ const RegisterPage = () => {
                                     value={formData.fechaNacimiento}
                                     onChange={handleChange}
                                     disabled={loading}
+                                    error={errors.fechaNacimiento}
                                 />
                             </div>
                             <div className="col-12 col-md-6">
@@ -288,6 +343,7 @@ const RegisterPage = () => {
                                     onChange={handleChange}
                                     placeholder="3814567890"
                                     disabled={loading}
+                                    error={errors.telefono}
                                 />
                             </div>
                         </div>
@@ -302,7 +358,7 @@ const RegisterPage = () => {
                         >
                             Cancelar
                         </Button>
-                        <Button type="submit" disabled={loading || !!cuilError}>
+                        <Button type="submit" disabled={loading}>
                             {loading ? 'Registrando...' : 'Registrar Usuario'}
                         </Button>
                     </div>

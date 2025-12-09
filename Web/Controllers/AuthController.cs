@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Text;
 using API.DTOs.Auth;
 using API.DTOs.Common;
-using API.DTOs.Auth;
 namespace API.Controllers;
 
 [ApiController]

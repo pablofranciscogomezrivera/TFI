@@ -135,8 +135,8 @@ export const UrgenciasPage = () => {
     };
 
 
-    const handleCerrarModalAtencion = async () => {
-        if (ingresoSeleccionado && ingresoSeleccionado.cuilPaciente) {
+    const handleCerrarModalAtencion = async (shouldCancel = true) => {
+        if (shouldCancel && ingresoSeleccionado && ingresoSeleccionado.cuilPaciente) {
             try {
                 await urgenciasService.cancelarAtencion(ingresoSeleccionado.cuilPaciente);
                 showNotification('Atención cancelada. El paciente ha vuelto a la lista de espera.', 'info');
@@ -157,8 +157,8 @@ export const UrgenciasPage = () => {
 
             showNotification('Atención registrada exitosamente. Paciente dado de alta.', 'success');
 
-            // Cerrar modal y recargar datos
-            handleCerrarModalAtencion();
+            // Cerrar modal sin cancelar (shouldCancel = false) y recargar datos
+            await handleCerrarModalAtencion(false);
             await cargarPacientes();
         } catch (err) {
             const msg = err.response?.data?.message || 'Error al registrar la atención';
