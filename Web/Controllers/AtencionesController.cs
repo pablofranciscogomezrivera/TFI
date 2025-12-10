@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using API.DTOs.Atenciones;
 using API.DTOs.Common;
 using API.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers;
 
+[Authorize(Roles = "Medico")]
 [ApiController]
 [Route("api/[controller]")]
 public class AtencionesController : ControllerBase
@@ -37,7 +39,7 @@ public class AtencionesController : ControllerBase
     {
         try
         {
-            
+
             var matriculaDoctor = User.GetMatricula();
 
             _logger.LogInformation("Registrando atención - Matrícula Doctor (desde JWT): {Matricula}", matriculaDoctor);
