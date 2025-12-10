@@ -11,12 +11,6 @@ public class RegistrarAtencionRequestValidator : AbstractValidator<RegistrarAten
 {
     public RegistrarAtencionRequestValidator()
     {
-        RuleFor(x => x.CuilPaciente)
-            .NotEmpty()
-            .WithMessage("El CUIL del paciente es requerido")
-            .Must(ValidadorCUIL.EsValido)
-            .WithMessage("El CUIL no tiene un formato válido");
-
         RuleFor(x => x.InformeMedico)
             .NotEmpty()
             .WithMessage("El informe médico es requerido")
