@@ -46,7 +46,7 @@ public class RepositorioUrgenciasBDD : IRepositorioUrgencias
 
     public Ingreso? BuscarIngresoPorCuilYEstado(string cuil, EstadoIngreso estado)
     {
-        throw new NotImplementedException();
+        return _ingresos.FirstOrDefault(i => i.Paciente.CUIL == cuil && i.Estado == estado);
     }
 
     public List<Ingreso> ObtenerTodosLosIngresos()

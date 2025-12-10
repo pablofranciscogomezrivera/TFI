@@ -24,7 +24,10 @@ public class RepositorioPacientesBDD : IRepositorioPacientes
 
     public void GuardarPaciente(Paciente paciente)
     {
-        return;
+        if (!_pacientes.Any(p => p.CUIL == paciente.CUIL))
+        {
+            _pacientes.Add(paciente);
+        }
     }
 
     public List<Paciente> ObtenerTodos()
