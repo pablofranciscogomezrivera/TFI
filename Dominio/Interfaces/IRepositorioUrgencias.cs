@@ -15,6 +15,8 @@ public interface IRepositorioUrgencias
     void ActualizarIngreso(Ingreso ingreso);
 
     Ingreso? BuscarIngresoPorCuilYEstado(string cuil, EstadoIngreso estado);
+    Ingreso? ObtenerSiguienteIngresoPendiente();
+    bool IntentarAsignarMedico(Ingreso ingreso, Doctor doctor);
     List<Ingreso> ObtenerTodosLosIngresos();
 
 }

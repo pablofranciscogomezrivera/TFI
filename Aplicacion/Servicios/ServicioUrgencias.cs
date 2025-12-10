@@ -3,7 +3,7 @@ using Dominio.Entidades;
 using Dominio.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq; 
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,21 +44,32 @@ public class ServicioUrgencias : IServicioUrgencias
             throw new ArgumentNullException(nameof(doctor), "El doctor es requerido");
         }
 
-        var listaEspera = _repositorioUrgencias.ObtenerIngresosPendientes();
-        listaEspera.Sort();
+        const int MaxRetries = 3;
+        int retry = 0;
 
-        if (listaEspera.Count == 0)
+        while (retry < MaxRetries)
         {
-            throw new InvalidOperationException("No hay pacientes en la lista de espera");
+            var candidato = _repositorioUrgencias.ObtenerSiguienteIngresoPendiente();
+
+            if (candidato == null)
+            {
+                throw new InvalidOperationException("No hay pacientes en la lista de espera");
+            }
+
+            if (_repositorioUrgencias.IntentarAsignarMedico(candidato, doctor))
+            {
+                candidato.Estado = EstadoIngreso.EN_PROCESO;
+                candidato.Atencion = new Atencion
+                {
+                    Doctor = doctor
+                };
+                return candidato;
+            }
+
+            retry++;
         }
 
-        var ingreso = listaEspera[0];
-
-        ingreso.Estado = EstadoIngreso.EN_PROCESO;
-
-        _repositorioUrgencias.ActualizarIngreso(ingreso);
-
-        return ingreso;
+        throw new Exception("El sistema está ocupado. Por favor, intente reclamar nuevamente.");
     }
 
     public void CancelarAtencion(string cuilPaciente)

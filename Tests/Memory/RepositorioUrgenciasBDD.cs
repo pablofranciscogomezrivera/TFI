@@ -53,4 +53,31 @@ public class RepositorioUrgenciasBDD : IRepositorioUrgencias
     {
         throw new NotImplementedException();
     }
+
+    public Ingreso? ObtenerSiguienteIngresoPendiente()
+    {
+        return _ingresos
+            .Where(i => i.Estado == EstadoIngreso.PENDIENTE)
+            .OrderBy(i => i)
+            .FirstOrDefault();
+    }
+
+    public bool IntentarAsignarMedico(Ingreso ingreso, Doctor doctor)
+    {
+        var candidato = _ingresos.FirstOrDefault(i =>
+            i.Paciente.CUIL == ingreso.Paciente.CUIL &&
+            i.FechaIngreso == ingreso.FechaIngreso);
+
+        if (candidato != null && candidato.Estado == EstadoIngreso.PENDIENTE)
+        {
+            candidato.Estado = EstadoIngreso.EN_PROCESO;
+            if (candidato.Atencion == null)
+            {
+                candidato.Atencion = new Atencion();
+            }
+            candidato.Atencion.Doctor = doctor;
+            return true;
+        }
+        return false;
+    }
 }

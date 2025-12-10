@@ -55,7 +55,7 @@ namespace Infraestructura.Repositorios
             using (var conexion = new SqlConnection(_connectionString))
             {
                 conexion.Open();
-                
+
                 // Ordenamos por Nivel (0 es Crítico) y luego por Fecha (FIFO)
                 var query = SqlQueries.Urgencias.ObtenerIngresosPendientes;
 
@@ -71,6 +71,48 @@ namespace Infraestructura.Repositorios
                 }
             }
             return ingresos;
+        }
+
+        public Ingreso? ObtenerSiguienteIngresoPendiente()
+        {
+            using (var conexion = new SqlConnection(_connectionString))
+            {
+                conexion.Open();
+
+                var query = SqlQueries.Urgencias.ObtenerSiguienteIngresoPendiente;
+
+                using (var cmd = new SqlCommand(query, conexion))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return MapearIngreso(reader);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public bool IntentarAsignarMedico(Ingreso ingreso, Doctor doctor)
+        {
+            using (var conexion = new SqlConnection(_connectionString))
+            {
+                conexion.Open();
+
+                var query = SqlQueries.Urgencias.IntentarAsignarMedico;
+
+                using (var cmd = new SqlCommand(query, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@Cuil", ingreso.Paciente.CUIL);
+                    cmd.Parameters.Add("@FechaIngreso", SqlDbType.DateTime2).Value = ingreso.FechaIngreso;
+                    cmd.Parameters.AddWithValue("@MatriculaDoctor", doctor.Matricula);
+
+                    int filasAfectadas = cmd.ExecuteNonQuery();
+                    return filasAfectadas > 0;
+                }
+            }
         }
 
         public void ActualizarIngreso(Ingreso ingreso)
@@ -136,7 +178,7 @@ namespace Infraestructura.Repositorios
             {
                 conexion.Open();
 
-                
+
                 var query = SqlQueries.Urgencias.BuscarIngresoPorCuilYEstado;
 
                 using (var cmd = new SqlCommand(query, conexion))
@@ -153,7 +195,7 @@ namespace Infraestructura.Repositorios
                     }
                 }
             }
-            return null; 
+            return null;
         }
 
         public List<Ingreso> ObtenerTodosLosIngresos()
@@ -224,11 +266,11 @@ namespace Infraestructura.Repositorios
                 Convert.ToDouble(reader["TensionDiastolica"])
             );
 
-            
+
             ingreso.FechaIngreso = Convert.ToDateTime(reader["FechaIngreso"]);
             ingreso.Estado = (EstadoIngreso)Convert.ToInt32(reader["Estado"]);
 
-            
+
             try
             {
                 // Intentar acceder a las columnas de atención médica

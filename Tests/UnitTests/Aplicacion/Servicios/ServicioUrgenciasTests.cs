@@ -22,7 +22,7 @@ public class ServicioUrgenciasTests
         _repositorioPacientes = Substitute.For<IRepositorioPacientes>();
         _repositorioUrgencias = Substitute.For<IRepositorioUrgencias>();
         _repositorioObraSocial = Substitute.For<IRepositorioObraSocial>();
-        _servicioUrgencias = 
+        _servicioUrgencias =
             new ServicioUrgencias(_repositorioPacientes, _repositorioUrgencias, _repositorioObraSocial);
 
         _enfermera = new Enfermera
@@ -139,27 +139,14 @@ public class ServicioUrgenciasTests
     #region ReclamarPaciente Tests
 
     [Fact]
-    public void ReclamarPaciente_ConPacienteEnCola_CambiaEstadoAEnProceso()
+    public void ReclamarPaciente_CuandoAsignacionEsExitosaAlPrimerIntento_RetornaIngreso()
     {
         // Arrange
-        var doctor = new Doctor { Nombre = "Dr. Juan", Apellido = "Pérez", Matricula = "MP001" };
-        var paciente = new Paciente
-        {
-            CUIL = "20-30123456-3",
-            DNI = 30123456,
-            Nombre = "Juan",
-            Apellido = "Pérez",
-            FechaNacimiento = new DateTime(1990, 1, 1),
-            Domicilio = new Domicilio { Calle = "Calle", Numero = 123, Localidad = "Tucumán" }
-        };
+        var doctor = new Doctor { Nombre = "Dr", Apellido = "Pérez", Matricula = "MP001" };
+        var candidato = new Ingreso(new Paciente { CUIL = "20-12345678-9" }, _enfermera, "Inf", NivelEmergencia.URGENCIA, 37, 80, 20, 120, 80);
 
-        var ingresoPendiente = new Ingreso(
-            paciente, _enfermera, "Dolor de cabeza", NivelEmergencia.URGENCIA,
-            37.0, 80, 18, 120, 80
-        );
-
-        _repositorioUrgencias.ObtenerIngresosPendientes()
-            .Returns(new List<Ingreso> { ingresoPendiente });
+        _repositorioUrgencias.ObtenerSiguienteIngresoPendiente().Returns(candidato);
+        _repositorioUrgencias.IntentarAsignarMedico(candidato, doctor).Returns(true);
 
         // Act
         var resultado = _servicioUrgencias.ReclamarPaciente(doctor);
@@ -167,19 +154,58 @@ public class ServicioUrgenciasTests
         // Assert
         resultado.Should().NotBeNull();
         resultado.Estado.Should().Be(EstadoIngreso.EN_PROCESO);
-        _repositorioUrgencias.Received(1).ObtenerIngresosPendientes();
-        _repositorioUrgencias.Received(1).ActualizarIngreso(Arg.Is<Ingreso>(i =>
-            i.Estado == EstadoIngreso.EN_PROCESO
-        ));
+        resultado.Atencion.Doctor.Should().Be(doctor);
+        _repositorioUrgencias.Received(1).ObtenerSiguienteIngresoPendiente();
+        _repositorioUrgencias.Received(1).IntentarAsignarMedico(candidato, doctor);
+    }
+
+    [Fact]
+    public void ReclamarPaciente_CuandoPrimerIntentoFalla_ReintentaYRetornaSegundo()
+    {
+        // Arrange
+        var doctor = new Doctor { Matricula = "MP001" };
+        var candidato1 = new Ingreso(new Paciente { CUIL = "111" }, _enfermera, "Inf1", NivelEmergencia.URGENCIA, 37, 80, 20, 120, 80);
+        var candidato2 = new Ingreso(new Paciente { CUIL = "222" }, _enfermera, "Inf2", NivelEmergencia.URGENCIA, 37, 80, 20, 120, 80);
+
+        _repositorioUrgencias.ObtenerSiguienteIngresoPendiente().Returns(candidato1, candidato2);
+        _repositorioUrgencias.IntentarAsignarMedico(candidato1, doctor).Returns(false); // Falló concurrencia
+        _repositorioUrgencias.IntentarAsignarMedico(candidato2, doctor).Returns(true);  // Éxito segunda vez
+
+        // Act
+        var resultado = _servicioUrgencias.ReclamarPaciente(doctor);
+
+        // Assert
+        resultado.Should().BeSameAs(candidato2);
+        _repositorioUrgencias.Received(2).ObtenerSiguienteIngresoPendiente();
+    }
+
+    [Fact]
+    public void ReclamarPaciente_CuandoTodosLosIntentosFallan_LanzaExcepcion()
+    {
+        // Arrange
+        var doctor = new Doctor { Matricula = "MP001" };
+        var candidato = new Ingreso(new Paciente { CUIL = "111" }, _enfermera, "Inf", NivelEmergencia.URGENCIA, 37, 80, 20, 120, 80);
+
+        _repositorioUrgencias.ObtenerSiguienteIngresoPendiente().Returns(candidato);
+        _repositorioUrgencias.IntentarAsignarMedico(Arg.Any<Ingreso>(), doctor).Returns(false);
+
+        // Act
+        Action act = () => _servicioUrgencias.ReclamarPaciente(doctor);
+
+        // Assert
+        act.Should().Throw<Exception>()
+            .WithMessage("*intente reclamar nuevamente*");
+
+        // 3 Intentos (MaxRetries)
+        _repositorioUrgencias.Received(3).ObtenerSiguienteIngresoPendiente();
     }
 
     [Fact]
     public void ReclamarPaciente_SinPacientesEnCola_LanzaExcepcion()
     {
         // Arrange
-        var doctor = new Doctor { Nombre = "Dr. Juan", Apellido = "Pérez", Matricula = "MP001" };
-        _repositorioUrgencias.ObtenerIngresosPendientes()
-            .Returns(new List<Ingreso>());
+        var doctor = new Doctor { Matricula = "MP001" };
+        _repositorioUrgencias.ObtenerSiguienteIngresoPendiente().Returns((Ingreso?)null);
 
         // Act
         Action act = () => _servicioUrgencias.ReclamarPaciente(doctor);
@@ -187,7 +213,6 @@ public class ServicioUrgenciasTests
         // Assert
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("No hay pacientes en la lista de espera");
-        _repositorioUrgencias.DidNotReceive().ActualizarIngreso(Arg.Any<Ingreso>());
     }
 
     [Fact]

@@ -72,6 +72,22 @@
                 INNER JOIN Pacientes p ON i.IdPaciente = p.Id
                 ORDER BY i.NivelEmergencia ASC, i.FechaIngreso ASC";
 
+            public const string ObtenerSiguienteIngresoPendiente = @"
+                SELECT TOP 1 i.*, p.CUIL, p.Nombre, p.Apellido, p.DNI
+                FROM Ingresos i
+                INNER JOIN Pacientes p ON i.IdPaciente = p.Id
+                WHERE i.Estado = 0 -- PENDIENTE
+                ORDER BY i.NivelEmergencia ASC, i.FechaIngreso ASC";
+
+            public const string IntentarAsignarMedico = @"
+                UPDATE Ingresos
+                SET Estado = 1, -- EN_PROCESO
+                    MatriculaDoctor = @MatriculaDoctor,
+                    InformeMedico = ''
+                WHERE IdPaciente = (SELECT Id FROM Pacientes WHERE CUIL = @Cuil)
+                  AND FechaIngreso = @FechaIngreso
+                  AND Estado = 0 -- Asegura que siga pendiente";
+
             public const string ObtenerIdPacientePorCuil =
                 "SELECT Id FROM Pacientes WHERE CUIL = @Cuil";
         }
