@@ -8,6 +8,7 @@ using FluentAssertions;
 using Reqnroll;
 using Tests.Memory;
 using NSubstitute;
+using Dominio.Enums;
 
 namespace Tests.StepDefinitions
 {

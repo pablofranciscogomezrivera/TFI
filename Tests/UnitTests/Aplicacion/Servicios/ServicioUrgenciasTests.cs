@@ -2,6 +2,7 @@
 using Aplicacion.DTOs;
 using Aplicacion.Servicios;
 using Dominio.Entidades;
+using Dominio.Enums;
 using Dominio.Interfaces;
 using FluentAssertions;
 using NSubstitute;

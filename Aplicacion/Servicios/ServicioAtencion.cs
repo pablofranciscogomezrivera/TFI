@@ -1,5 +1,6 @@
 ﻿using Aplicacion.Intefaces;
 using Dominio.Entidades;
+using Dominio.Enums;
 using Dominio.Interfaces;
 using System;
 using System.Collections.Generic;

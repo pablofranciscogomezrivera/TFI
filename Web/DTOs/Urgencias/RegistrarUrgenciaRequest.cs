@@ -1,4 +1,5 @@
 ﻿using Dominio.Entidades;
+using Dominio.Enums;
 
 namespace API.DTOs.Urgencias;
 

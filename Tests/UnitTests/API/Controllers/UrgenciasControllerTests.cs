@@ -11,6 +11,7 @@ using NSubstitute;
 using System.Security.Claims;
 using Xunit;
 using AutoMapper;
+using Dominio.Enums;
 
 namespace Tests.UnitTests.Web.Controllers;
 

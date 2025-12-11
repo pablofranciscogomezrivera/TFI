@@ -1,5 +1,6 @@
 ﻿using Dominio.Entidades;
 using Dominio.Entidades.ValueObject;
+using Dominio.Enums;
 using Dominio.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;

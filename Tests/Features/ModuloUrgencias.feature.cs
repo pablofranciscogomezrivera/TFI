@@ -26,8 +26,8 @@ namespace Tests.Features
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Modulo de Urgencias", ("  Esta feature esta relacionada al registro de ingresos de pacientes en la sala d" +
-                "e urgencias,\r\n  respetando su nivel de prioridad y el horario de llegada."), global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Modulo de Urgencias", "  Esta feature esta relacionada al registro de ingresos de pacientes en la sala d" +
+                "e urgencias,\r\n  respetando su nivel de prioridad y el horario de llegada.", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
@@ -136,17 +136,17 @@ namespace Tests.Features
             await this.TestTearDownAsync();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName=("Ingreso de un paciente de bajo nivel de emergencia y luego otro de alto nivel de " +
-            "emergencia"))]
+        [Xunit.SkippableFactAttribute(DisplayName="Ingreso de un paciente de bajo nivel de emergencia y luego otro de alto nivel de " +
+            "emergencia")]
         [Xunit.TraitAttribute("FeatureTitle", "Modulo de Urgencias")]
-        [Xunit.TraitAttribute("Description", ("Ingreso de un paciente de bajo nivel de emergencia y luego otro de alto nivel de " +
-            "emergencia"))]
+        [Xunit.TraitAttribute("Description", "Ingreso de un paciente de bajo nivel de emergencia y luego otro de alto nivel de " +
+            "emergencia")]
         public async System.Threading.Tasks.Task IngresoDeUnPacienteDeBajoNivelDeEmergenciaYLuegoOtroDeAltoNivelDeEmergencia()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo(("Ingreso de un paciente de bajo nivel de emergencia y luego otro de alto nivel de " +
-                    "emergencia"), null, tagsOfScenario, argumentsOfScenario, featureTags);
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Ingreso de un paciente de bajo nivel de emergencia y luego otro de alto nivel de " +
+                    "emergencia", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -417,8 +417,8 @@ await this.FeatureBackgroundAsync();
   await testRunner.WhenAsync("Ingresan a urgencias los siguientes pacientes:", ((string)(null)), table11, "When ");
 #line hidden
 #line 59
-  await testRunner.ThenAsync(("el sistema muestra el siguiente error: \"La frecuencia cardiaca no puede ser negat" +
-                        "iva\""), ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+  await testRunner.ThenAsync("el sistema muestra el siguiente error: \"La frecuencia cardiaca no puede ser negat" +
+                        "iva\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

@@ -1,8 +1,9 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using API.DTOs.Urgencias;
 using API.Validators;
 using Xunit;
 using Dominio.Entidades;
+using Dominio.Enums;
 
 namespace Tests.UnitTests.Web.Validators;
 

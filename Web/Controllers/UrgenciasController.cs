@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using API.DTOs.Common;
 using API.DTOs.Urgencias;
 using AutoMapper;
+using Dominio.Enums;
 
 namespace API.Controllers;
 

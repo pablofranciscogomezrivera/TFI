@@ -1,4 +1,5 @@
-using Dominio.Entidades;
+﻿using Dominio.Entidades;
+using Dominio.Enums;
 
 namespace Aplicacion.DTOs;
 

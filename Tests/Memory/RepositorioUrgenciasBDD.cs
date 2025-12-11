@@ -1,4 +1,5 @@
 ﻿using Dominio.Entidades;
+using Dominio.Enums;
 using Dominio.Interfaces;
 
 namespace Tests.Memory;

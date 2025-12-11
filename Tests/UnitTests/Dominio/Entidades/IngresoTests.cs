@@ -1,4 +1,5 @@
 ﻿using Dominio.Entidades;
+using Dominio.Enums;
 using FluentAssertions;
 using Xunit;
 
