@@ -1,4 +1,5 @@
 ﻿using Aplicacion;
+using Aplicacion.Interfaces;
 using Aplicacion.Servicios;
 using Dominio.Entidades;
 using Dominio.Enums;
@@ -13,13 +14,22 @@ public class ServicioAutenticacionTests
 {
     private readonly IRepositorioUsuario _repositorioUsuario;
     private readonly IRepositorioPersonal _repositorioPersonal;
+    private readonly IPasswordHasher _passwordHasher;
     private readonly ServicioAutenticacion _servicioAutenticacion;
 
     public ServicioAutenticacionTests()
     {
         _repositorioUsuario = Substitute.For<IRepositorioUsuario>();
         _repositorioPersonal = Substitute.For<IRepositorioPersonal>();
-        _servicioAutenticacion = new ServicioAutenticacion(_repositorioUsuario, _repositorioPersonal);
+        _passwordHasher = Substitute.For<IPasswordHasher>();
+
+        // Configure password hasher mock to use BCrypt for realistic testing
+        _passwordHasher.Hash(Arg.Any<string>())
+            .Returns(callInfo => BCrypt.Net.BCrypt.HashPassword(callInfo.Arg<string>()));
+        _passwordHasher.Verify(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(callInfo => BCrypt.Net.BCrypt.Verify(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1)));
+
+        _servicioAutenticacion = new ServicioAutenticacion(_repositorioUsuario, _repositorioPersonal, _passwordHasher);
     }
 
     #region Tests de Registro
@@ -35,7 +45,8 @@ public class ServicioAutenticacionTests
         _repositorioUsuario.ExisteUsuarioConEmail(email).Returns(false);
 
         _repositorioUsuario.GuardarUsuario(Arg.Any<Usuario>())
-            .Returns(callInfo => {
+            .Returns(callInfo =>
+            {
                 var u = callInfo.Arg<Usuario>();
                 u.Id = 1;
                 return u;
@@ -72,7 +83,8 @@ public class ServicioAutenticacionTests
 
         Usuario usuarioGuardado = null;
         _repositorioUsuario.GuardarUsuario(Arg.Do<Usuario>(x => usuarioGuardado = x))
-            .Returns(callInfo => {
+            .Returns(callInfo =>
+            {
                 var u = callInfo.Arg<Usuario>();
                 u.Id = 1;
                 return u;
@@ -109,7 +121,8 @@ public class ServicioAutenticacionTests
         _repositorioUsuario.ExisteUsuarioConEmail(email).Returns(false);
 
         _repositorioUsuario.GuardarUsuario(Arg.Any<Usuario>())
-            .Returns(callInfo => {
+            .Returns(callInfo =>
+            {
                 var u = callInfo.Arg<Usuario>();
                 u.Id = 2;
                 return u;

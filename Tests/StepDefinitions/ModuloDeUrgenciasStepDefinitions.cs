@@ -1,4 +1,5 @@
 ﻿using Aplicacion;
+using Aplicacion.DTOs;
 using Aplicacion.Intefaces;
 using Aplicacion.Servicios;
 using Dominio.Entidades;
@@ -99,7 +100,18 @@ namespace Tests.StepDefinitions
                     var sistolica = double.Parse(tension[0]);
                     var diastolica = double.Parse(tension[1]);
 
-                    _servicioUrgencias.RegistrarUrgencia(cuil, _enfermera, informe, temperatura, nivelEmergencia, frecuenciaCardiaca, frecuenciaRespiratoria, sistolica, diastolica);
+                    var dto = new NuevaUrgenciaDto
+                    {
+                        CuilPaciente = cuil,
+                        Informe = informe,
+                        Temperatura = temperatura,
+                        NivelEmergencia = nivelEmergencia,
+                        FrecuenciaCardiaca = frecuenciaCardiaca,
+                        FrecuenciaRespiratoria = frecuenciaRespiratoria,
+                        FrecuenciaSistolica = sistolica,
+                        FrecuenciaDiastolica = diastolica
+                    };
+                    _servicioUrgencias.RegistrarUrgencia(dto, _enfermera);
                 }
                 catch (Exception e)
                 {

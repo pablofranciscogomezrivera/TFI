@@ -17,10 +17,7 @@ public class ObrasSocialesController : ControllerBase
         _logger = logger;
     }
 
-    /// <summary>
-    /// Obtiene todas las obras sociales disponibles
-    /// </summary>
-    /// <returns>Lista de obras sociales</returns>
+
     [HttpGet]
     [ProducesResponseType(typeof(List<Dominio.Entidades.ObraSocial>), 200)]
     [ProducesResponseType(typeof(ErrorResponse), 500)]

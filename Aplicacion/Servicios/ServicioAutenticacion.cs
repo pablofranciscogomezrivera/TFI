@@ -1,4 +1,5 @@
 ﻿using Aplicacion.Intefaces;
+using Aplicacion.Interfaces;
 using Dominio.Entidades;
 using Dominio.Enums;
 using Dominio.Interfaces;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BCrypt.Net;
 
 namespace Aplicacion;
 
@@ -16,11 +16,16 @@ public class ServicioAutenticacion : IServicioAutenticacion
 {
     private readonly IRepositorioUsuario _repositorioUsuario;
     private readonly IRepositorioPersonal _repositorioPersonal;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public ServicioAutenticacion(IRepositorioUsuario repositorioUsuario, IRepositorioPersonal repositorioPersonal)
+    public ServicioAutenticacion(
+        IRepositorioUsuario repositorioUsuario,
+        IRepositorioPersonal repositorioPersonal,
+        IPasswordHasher passwordHasher)
     {
         _repositorioUsuario = repositorioUsuario;
         _repositorioPersonal = repositorioPersonal;
+        _passwordHasher = passwordHasher;
     }
 
     public Usuario RegistrarUsuario(string email, string password, TipoAutoridad tipoAutoridad)
@@ -50,7 +55,7 @@ public class ServicioAutenticacion : IServicioAutenticacion
             throw new ArgumentException("Ya existe un usuario registrado con ese email");
         }
 
-        string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+        string passwordHash = _passwordHasher.Hash(password);
 
         var usuario = new Usuario
         {
@@ -129,7 +134,7 @@ public class ServicioAutenticacion : IServicioAutenticacion
             throw new ArgumentException("Ya existe un usuario registrado con ese email");
         }
 
-        string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+        string passwordHash = _passwordHasher.Hash(password);
 
         var usuario = new Usuario
         {
@@ -156,7 +161,7 @@ public class ServicioAutenticacion : IServicioAutenticacion
 
             _repositorioPersonal.GuardarEnfermera(enfermera, usuarioGuardado.Id);
         }
-        else 
+        else
         {
             var doctor = new Doctor
             {
@@ -185,7 +190,7 @@ public class ServicioAutenticacion : IServicioAutenticacion
 
         var usuario = _repositorioUsuario.BuscarPorEmail(email);
 
-        if (usuario == null || !BCrypt.Net.BCrypt.Verify(password, usuario.PasswordHash))
+        if (usuario == null || !_passwordHasher.Verify(password, usuario.PasswordHash))
         {
             throw new ArgumentException("Usuario o contraseña inválidos");
         }

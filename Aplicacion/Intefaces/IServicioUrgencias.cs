@@ -1,33 +1,14 @@
 ﻿using Dominio.Entidades;
+using Aplicacion.DTOs;
 
 namespace Aplicacion.Intefaces;
 
 public interface IServicioUrgencias
 {
-    public void RegistrarUrgencia(
-        string CUILPaciente,
-        Enfermera enfermera,
-        string informe,
-        double temperatura,
-        NivelEmergencia nivelEmergencia,
-        double frecCardiaca,
-        double frecRespiratoria,
-        double frecSistolica,
-        double frecDiastolica,
-        // Parámetros opcionales para crear paciente si no existe
-        string? nombrePaciente = null,
-        string? apellidoPaciente = null,
-        string? callePaciente = null,
-        int? numeroPaciente = null,
-        string? localidadPaciente = null,
-        string? emailPaciente = null,
-        long? telefonoPaciente = null,
-        int? obraSocialIdPaciente = null,
-        string? numeroAfiliadoPaciente = null,
-        DateTime? fechaNacimientoPaciente = null);
+    void RegistrarUrgencia(NuevaUrgenciaDto datos, Enfermera enfermera);
 
-    public List<Ingreso> ObtenerIngresosPendientes();
-    public List<Ingreso> ObtenerTodosLosIngresos();
-    public Ingreso ReclamarPaciente(Doctor doctor);
-    public void CancelarAtencion(string cuilPaciente);
+    List<Ingreso> ObtenerIngresosPendientes();
+    List<Ingreso> ObtenerTodosLosIngresos();
+    Ingreso ReclamarPaciente(Doctor doctor);
+    void CancelarAtencion(string cuilPaciente);
 }

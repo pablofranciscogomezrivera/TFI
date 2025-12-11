@@ -11,6 +11,10 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Aplicacion.Servicios;
 using Infraestructura.Repositorios;
+using API.Middleware;
+using Aplicacion.Interfaces;
+using Infraestructura.Servicios;
+using API.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +44,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
 
-// Configurar FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -51,7 +54,6 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "TFI - API de Urgencias", Version = "v1" });
 });
 
-//Configurar CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -78,6 +80,13 @@ builder.Services.AddScoped<IServicioAtencion, ServicioAtencion>();
 builder.Services.AddScoped<IServicioPersonal, ServicioPersonal>();
 builder.Services.AddScoped<IServicioObraSocial, ServicioObraSocial>();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -94,6 +103,7 @@ else
     app.UseHsts();
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();

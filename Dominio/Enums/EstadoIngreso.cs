@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dominio.Entidades;
+namespace Dominio.Enums;
 
 public enum EstadoIngreso
 {
-    
+
     PENDIENTE,
     EN_PROCESO,
     FINALIZADO

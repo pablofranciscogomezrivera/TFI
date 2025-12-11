@@ -1,4 +1,5 @@
 ﻿using Aplicacion;
+using Aplicacion.DTOs;
 using Aplicacion.Servicios;
 using Dominio.Entidades;
 using Dominio.Interfaces;
@@ -53,10 +54,18 @@ public class ServicioUrgenciasTests
         _repositorioPacientes.BuscarPacientePorCuil(cuil).Returns(pacienteExistente);
 
         // Act
-        _servicioUrgencias.RegistrarUrgencia(
-            cuil, _enfermera, "Dolor de pecho", 38.0, NivelEmergencia.CRITICA,
-            95, 22, 140, 90
-        );
+        var dto = new NuevaUrgenciaDto
+        {
+            CuilPaciente = cuil,
+            Informe = "Dolor de pecho",
+            Temperatura = 38.0,
+            NivelEmergencia = NivelEmergencia.CRITICA,
+            FrecuenciaCardiaca = 95,
+            FrecuenciaRespiratoria = 22,
+            FrecuenciaSistolica = 140,
+            FrecuenciaDiastolica = 90
+        };
+        _servicioUrgencias.RegistrarUrgencia(dto, _enfermera);
 
         // Assert
         _repositorioPacientes.Received(1).BuscarPacientePorCuil(cuil);
@@ -80,10 +89,18 @@ public class ServicioUrgenciasTests
             .Returns(callInfo => callInfo.Arg<Paciente>());
 
         // Act
-        _servicioUrgencias.RegistrarUrgencia(
-            cuil, _enfermera, "Consulta", 36.8, NivelEmergencia.URGENCIA_MENOR,
-            75, 16, 120, 80
-        );
+        var dto = new NuevaUrgenciaDto
+        {
+            CuilPaciente = cuil,
+            Informe = "Consulta",
+            Temperatura = 36.8,
+            NivelEmergencia = NivelEmergencia.URGENCIA_MENOR,
+            FrecuenciaCardiaca = 75,
+            FrecuenciaRespiratoria = 16,
+            FrecuenciaSistolica = 120,
+            FrecuenciaDiastolica = 80
+        };
+        _servicioUrgencias.RegistrarUrgencia(dto, _enfermera);
 
         // Assert
         _repositorioPacientes.Received(1).BuscarPacientePorCuil(cuil);
@@ -106,10 +123,18 @@ public class ServicioUrgenciasTests
         string cuil = "20-30123456-3";
 
         // Act
-        Action act = () => _servicioUrgencias.RegistrarUrgencia(
-            cuil, _enfermera, informeInvalido, 37.0, NivelEmergencia.URGENCIA,
-            80, 18, 120, 80
-        );
+        var dto = new NuevaUrgenciaDto
+        {
+            CuilPaciente = cuil,
+            Informe = informeInvalido,
+            Temperatura = 37.0,
+            NivelEmergencia = NivelEmergencia.URGENCIA,
+            FrecuenciaCardiaca = 80,
+            FrecuenciaRespiratoria = 18,
+            FrecuenciaSistolica = 120,
+            FrecuenciaDiastolica = 80
+        };
+        Action act = () => _servicioUrgencias.RegistrarUrgencia(dto, _enfermera);
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -123,11 +148,18 @@ public class ServicioUrgenciasTests
         string cuil = "20-30123456-3";
 
         // Act
-        Action act = () => _servicioUrgencias.RegistrarUrgencia(
-            cuil, _enfermera, "Informe", 37.0, NivelEmergencia.URGENCIA,
-            -10, // Frecuencia cardíaca negativa
-            18, 120, 80
-        );
+        var dto = new NuevaUrgenciaDto
+        {
+            CuilPaciente = cuil,
+            Informe = "Informe",
+            Temperatura = 37.0,
+            NivelEmergencia = NivelEmergencia.URGENCIA,
+            FrecuenciaCardiaca = -10, // Frecuencia cardíaca negativa
+            FrecuenciaRespiratoria = 18,
+            FrecuenciaSistolica = 120,
+            FrecuenciaDiastolica = 80
+        };
+        Action act = () => _servicioUrgencias.RegistrarUrgencia(dto, _enfermera);
 
         // Assert
         act.Should().Throw<ArgumentException>()

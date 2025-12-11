@@ -1,6 +1,7 @@
 ﻿using API.Controllers;
 using API.DTOs.Urgencias;
 using Aplicacion.Intefaces;
+using Aplicacion.DTOs;
 using Dominio.Entidades;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Security.Claims;
 using Xunit;
+using AutoMapper;
 
 namespace Tests.UnitTests.Web.Controllers;
 
@@ -17,12 +19,14 @@ public class UrgenciasControllerTests
     private readonly IServicioUrgencias _servicioUrgencias;
     private readonly UrgenciasController _controller;
     private readonly ILogger<UrgenciasController> _logger;
+    private readonly IMapper _mapper;
 
     public UrgenciasControllerTests()
     {
         _servicioUrgencias = Substitute.For<IServicioUrgencias>();
         _logger = Substitute.For<ILogger<UrgenciasController>>();
-        _controller = new UrgenciasController(_servicioUrgencias, _logger);
+        _mapper = Substitute.For<IMapper>();
+        _controller = new UrgenciasController(_servicioUrgencias, _logger, _mapper);
 
         var claims = new List<Claim>
         {
@@ -55,6 +59,13 @@ public class UrgenciasControllerTests
         };
         _servicioUrgencias.ObtenerIngresosPendientes().Returns(ingresos);
 
+        // Configure mapper to return response
+        var expectedResponse = new List<IngresoResponse>
+        {
+            new IngresoResponse { CuilPaciente = "20-30123456-3" }
+        };
+        _mapper.Map<List<IngresoResponse>>(Arg.Any<List<Ingreso>>()).Returns(expectedResponse);
+
         // Act
         var resultado = _controller.ObtenerListaEspera();
 
@@ -80,27 +91,36 @@ public class UrgenciasControllerTests
             FrecuenciaDiastolica = 80
         };
 
+        // Configure mapper to return a DTO
+        var expectedDto = new NuevaUrgenciaDto
+        {
+            CuilPaciente = request.CuilPaciente,
+            Informe = request.Informe,
+            Temperatura = request.Temperatura,
+            NivelEmergencia = request.NivelEmergencia,
+            FrecuenciaCardiaca = request.FrecuenciaCardiaca,
+            FrecuenciaRespiratoria = request.FrecuenciaRespiratoria,
+            FrecuenciaSistolica = request.FrecuenciaSistolica,
+            FrecuenciaDiastolica = request.FrecuenciaDiastolica
+        };
+        _mapper.Map<NuevaUrgenciaDto>(Arg.Any<RegistrarUrgenciaRequest>()).Returns(expectedDto);
+
         // Act
         var resultado = _controller.RegistrarUrgencia(request);
 
         // Assert
-        resultado.Should().BeOfType<CreatedAtActionResult>(); // O OkObjectResult según tu implementación, CreatedAtAction es lo ideal para POST
+        resultado.Should().BeOfType<CreatedAtActionResult>();
 
         _servicioUrgencias.Received(1).RegistrarUrgencia(
-            "20301234563", // CUIL Normalizado
-            Arg.Any<Enfermera>(),
-            request.Informe,
-            request.Temperatura,
-            Arg.Any<NivelEmergencia>(),
-            request.FrecuenciaCardiaca,
-            request.FrecuenciaRespiratoria,
-            request.FrecuenciaSistolica,
-            request.FrecuenciaDiastolica
+            Arg.Is<NuevaUrgenciaDto>(dto =>
+                dto.CuilPaciente == "20301234563" && // CUIL Normalizado
+                dto.Informe == request.Informe),
+            Arg.Any<Enfermera>()
         );
     }
 
     [Fact]
-    public void RegistrarUrgencia_ConDatosInvalidos_RetornaBadRequest()
+    public void RegistrarUrgencia_ConDatosInvalidos_LanzaExcepcion()
     {
         // Arrange
         var request = new RegistrarUrgenciaRequest
@@ -115,17 +135,17 @@ public class UrgenciasControllerTests
             FrecuenciaDiastolica = 80
         };
 
+        // Configure mapper
+        var expectedDto = new NuevaUrgenciaDto { Informe = "" };
+        _mapper.Map<NuevaUrgenciaDto>(Arg.Any<RegistrarUrgenciaRequest>()).Returns(expectedDto);
+
         _servicioUrgencias.When(x => x.RegistrarUrgencia(
-            Arg.Any<string>(), Arg.Any<Enfermera>(), Arg.Any<string>(),
-            Arg.Any<double>(), Arg.Any<NivelEmergencia>(),
-            Arg.Any<double>(), Arg.Any<double>(), Arg.Any<double>(), Arg.Any<double>()
+            Arg.Any<NuevaUrgenciaDto>(), Arg.Any<Enfermera>()
         )).Do(x => throw new ArgumentException("El informe es mandatorio"));
 
-        // Act
-        var resultado = _controller.RegistrarUrgencia(request);
-
-        // Assert
-        resultado.Should().BeOfType<BadRequestObjectResult>();
+        // Act & Assert - Exception propagates to GlobalExceptionHandler
+        Action act = () => _controller.RegistrarUrgencia(request);
+        act.Should().Throw<ArgumentException>().WithMessage("*informe*");
     }
 
     [Fact]
@@ -150,17 +170,15 @@ public class UrgenciasControllerTests
     }
 
     [Fact]
-    public void ReclamarPaciente_SinPacientesEnCola_RetornaBadRequest()
+    public void ReclamarPaciente_SinPacientesEnCola_LanzaExcepcion()
     {
         // Arrange
         _servicioUrgencias.When(x => x.ReclamarPaciente(Arg.Any<Doctor>()))
             .Do(x => throw new InvalidOperationException("No hay pacientes en la lista de espera"));
 
-        // Act
-        var resultado = _controller.ReclamarPaciente();
-
-        // Assert
-        resultado.Should().BeOfType<BadRequestObjectResult>();
+        // Act & Assert - Exception propagates to GlobalExceptionHandler
+        Action act = () => _controller.ReclamarPaciente();
+        act.Should().Throw<InvalidOperationException>().WithMessage("*lista de espera*");
     }
 
     [Fact]
@@ -180,17 +198,15 @@ public class UrgenciasControllerTests
     }
 
     [Fact]
-    public void CancelarAtencion_SinIngresoEnProceso_RetornaBadRequest()
+    public void CancelarAtencion_SinIngresoEnProceso_LanzaExcepcion()
     {
         // Arrange
         string cuil = "20-30123456-3";
         _servicioUrgencias.When(x => x.CancelarAtencion(Arg.Any<string>()))
             .Do(x => throw new InvalidOperationException("No se encontró ingreso"));
 
-        // Act
-        var resultado = _controller.CancelarAtencion(cuil);
-
-        // Assert
-        resultado.Should().BeOfType<BadRequestObjectResult>();
+        // Act & Assert - Exception propagates to GlobalExceptionHandler
+        Action act = () => _controller.CancelarAtencion(cuil);
+        act.Should().Throw<InvalidOperationException>().WithMessage("*ingreso*");
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Aplicacion.Intefaces;
+using Aplicacion.DTOs;
 using Dominio.Entidades;
 using Dominio.Interfaces;
 using System;
@@ -91,73 +92,56 @@ public class ServicioUrgencias : IServicioUrgencias
         _repositorioUrgencias.ActualizarIngreso(ingreso);
     }
 
-    public void RegistrarUrgencia(
-        string CUILPaciente,
-        Enfermera Enfermera,
-        string informe,
-        double Temperatura,
-        NivelEmergencia NivelEmergencia,
-        double FrecCardiaca,
-        double FrecRespiratoria,
-        double FrecSistolica,
-        double FrecDiastolica,
-        string? nombrePaciente = null,
-        string? apellidoPaciente = null,
-        string? callePaciente = null,
-        int? numeroPaciente = null,
-        string? localidadPaciente = null,
-        string? emailPaciente = null,
-        long? telefonoPaciente = null,
-        int? obraSocialIdPaciente = null,
-        string? numeroAfiliadoPaciente = null,
-        DateTime? fechaNacimientoPaciente = null)
+    public void RegistrarUrgencia(NuevaUrgenciaDto datos, Enfermera enfermera)
     {
-        if (string.IsNullOrWhiteSpace(informe))
+        if (string.IsNullOrWhiteSpace(datos.Informe))
         {
             throw new ArgumentException("El informe es un dato mandatorio");
         }
 
-        var ingresoEnCola = _repositorioUrgencias.BuscarIngresoPorCuilYEstado(CUILPaciente, EstadoIngreso.PENDIENTE);
+        var ingresoEnCola = _repositorioUrgencias.BuscarIngresoPorCuilYEstado(datos.CuilPaciente, EstadoIngreso.PENDIENTE);
 
         if (ingresoEnCola != null)
         {
-            throw new InvalidOperationException($"El paciente con CUIL {CUILPaciente} ya se encuentra en la lista de espera y no puede ser ingresado nuevamente hasta que sea atendido o cancelado.");
+            throw new InvalidOperationException($"El paciente con CUIL {datos.CuilPaciente} ya se encuentra en la lista de espera y no puede ser ingresado nuevamente hasta que sea atendido o cancelado.");
         }
 
-        var paciente = _repositorioPacientes.BuscarPacientePorCuil(CUILPaciente);
+        var paciente = _repositorioPacientes.BuscarPacientePorCuil(datos.CuilPaciente);
 
         if (paciente is null)
         {
+            var datosPaciente = datos.DatosPaciente;
+
             var domicilio = new Domicilio
             {
-                Calle = callePaciente ?? "Sin Registrar",
-                Numero = numeroPaciente ?? 999,
-                Localidad = localidadPaciente ?? "San Miguel de Tucumán"
+                Calle = datosPaciente?.Calle ?? "Sin Registrar",
+                Numero = datosPaciente?.Numero ?? 999,
+                Localidad = datosPaciente?.Localidad ?? "San Miguel de Tucumán"
             };
 
             Afiliado? nuevoAfiliado = null;
-            if (obraSocialIdPaciente.HasValue && !string.IsNullOrWhiteSpace(numeroAfiliadoPaciente))
+            if (datosPaciente?.ObraSocialId.HasValue == true && !string.IsNullOrWhiteSpace(datosPaciente.NumeroAfiliado))
             {
-                var obraSocial = _repositorioObraSocial.BuscarObraSocialPorId(obraSocialIdPaciente.Value);
+                var obraSocial = _repositorioObraSocial.BuscarObraSocialPorId(datosPaciente.ObraSocialId.Value);
                 if (obraSocial != null)
                 {
                     nuevoAfiliado = new Afiliado
                     {
                         ObraSocial = obraSocial,
-                        NumeroAfiliado = numeroAfiliadoPaciente
+                        NumeroAfiliado = datosPaciente.NumeroAfiliado
                     };
                 }
             }
 
             paciente = new Paciente
             {
-                CUIL = CUILPaciente,
-                DNI = ExtraerDniDeCuil(CUILPaciente),
-                Nombre = nombrePaciente ?? "Sin Registrar",
-                Apellido = apellidoPaciente ?? "Sin Registrar",
-                FechaNacimiento = fechaNacimientoPaciente ?? new DateTime(1900, 1, 1),
-                Email = emailPaciente ?? "",
-                Telefono = telefonoPaciente ?? 0,
+                CUIL = datos.CuilPaciente,
+                DNI = ExtraerDniDeCuil(datos.CuilPaciente),
+                Nombre = datosPaciente?.Nombre ?? "Sin Registrar",
+                Apellido = datosPaciente?.Apellido ?? "Sin Registrar",
+                FechaNacimiento = datosPaciente?.FechaNacimiento ?? new DateTime(1900, 1, 1),
+                Email = datosPaciente?.Email ?? "",
+                Telefono = datosPaciente?.Telefono ?? 0,
                 Domicilio = domicilio,
                 Afiliado = nuevoAfiliado
             };
@@ -167,14 +151,14 @@ public class ServicioUrgencias : IServicioUrgencias
 
         var ingreso = new Ingreso(
             paciente,
-            Enfermera,
-            informe,
-            NivelEmergencia,
-            Temperatura,
-            FrecCardiaca,
-            FrecRespiratoria,
-            FrecSistolica,
-            FrecDiastolica);
+            enfermera,
+            datos.Informe,
+            datos.NivelEmergencia,
+            datos.Temperatura,
+            datos.FrecuenciaCardiaca,
+            datos.FrecuenciaRespiratoria,
+            datos.FrecuenciaSistolica,
+            datos.FrecuenciaDiastolica);
 
         _repositorioUrgencias.AgregarIngreso(ingreso);
     }

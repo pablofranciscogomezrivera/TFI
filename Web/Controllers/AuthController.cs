@@ -39,50 +39,29 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), 400)]
     public IActionResult Registrar([FromBody] RegistrarUsuarioRequest request)
     {
-        try
-        {
-            var usuario = _servicioAutenticacion.RegistrarUsuarioConEmpleado(
-                request.Email,
-                request.Password,
-                request.TipoAutoridad,
-                request.Nombre,
-                request.Apellido,
-                request.DNI,
-                request.CUIL,
-                request.Matricula,
-                request.FechaNacimiento,
-                request.Telefono
-            );
+        var usuario = _servicioAutenticacion.RegistrarUsuarioConEmpleado(
+            request.Email,
+            request.Password,
+            request.TipoAutoridad,
+            request.Nombre,
+            request.Apellido,
+            request.DNI,
+            request.CUIL,
+            request.Matricula,
+            request.FechaNacimiento,
+            request.Telefono
+        );
 
-            var response = new UsuarioResponse
-            {
-                Id = usuario.Id,
-                Email = usuario.Email,
-                TipoAutoridad = usuario.TipoAutoridad
-            };
-
-            _logger.LogInformation("Usuario y empleado registrados exitosamente: {Email}", usuario.Email);
-
-            return CreatedAtAction(nameof(Registrar), new { id = usuario.Id }, response);
-        }
-        catch (ArgumentException ex)
+        var response = new UsuarioResponse
         {
-            _logger.LogWarning("Error al registrar usuario: {Message}", ex.Message);
-            return BadRequest(new ErrorResponse
-            {
-                Message = ex.Message,
-                StatusCode = 400
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error inesperado al registrar usuario");
-            return StatusCode(500, new ErrorResponse
-            {
-                Message = "Error interno del servidor",
-                StatusCode = 500
-            });
-        }
+            Id = usuario.Id,
+            Email = usuario.Email,
+            TipoAutoridad = usuario.TipoAutoridad
+        };
+
+        _logger.LogInformation("Usuario y empleado registrados exitosamente: {Email}", usuario.Email);
+
+        return CreatedAtAction(nameof(Registrar), new { id = usuario.Id }, response);
     }
 
     /// <summary>
@@ -93,75 +72,57 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        try
+        var usuario = _servicioAutenticacion.IniciarSesion(request.Email, request.Password);
+
+        _logger.LogInformation("Buscando profesional para usuario {UserId}, tipo: {TipoAutoridad}",
+            usuario.Id, usuario.TipoAutoridad);
+
+        var perfilProfesional = _servicioPersonal.ObtenerPerfilEmpleado(usuario.Id, usuario.TipoAutoridad);
+
+        if (perfilProfesional == null)
         {
-            var usuario = _servicioAutenticacion.IniciarSesion(request.Email, request.Password);
-
-            _logger.LogInformation("Buscando profesional para usuario {UserId}, tipo: {TipoAutoridad}",
-                usuario.Id, usuario.TipoAutoridad);
-
-            var perfilProfesional = _servicioPersonal.ObtenerPerfilEmpleado(usuario.Id, usuario.TipoAutoridad);
-
-            if (perfilProfesional == null)
-            {
-                _logger.LogError("No se encontró perfil de empleado para usuario {UserId}. El perfil no fue creado correctamente.", usuario.Id);
-                return BadRequest(new ErrorResponse
-                {
-                    Message = "Error en el perfil de usuario. Contacte al administrador.",
-                    StatusCode = 400
-                });
-            }
-
-            _logger.LogInformation("Perfil profesional encontrado para usuario {UserId}", usuario.Id);
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                new Claim(ClaimTypes.Email, usuario.Email),
-                new Claim(ClaimTypes.Role, usuario.TipoAutoridad.ToString())
-            };
-
-            if (perfilProfesional != null)
-            {
-                var matricula = (perfilProfesional as dynamic).Matricula;
-                claims.Add(new Claim("Matricula", matricula));
-            }
-
-            var token = new JwtSecurityToken(
-                _configuration["Jwt:Issuer"],
-                _configuration["Jwt:Audience"],
-                claims,
-                expires: DateTime.Now.AddHours(4),
-                signingCredentials: credentials);
-
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            _logger.LogInformation("Usuario autenticado: {Email}", usuario.Email);
-
-            return Ok(new
-            {
-                Token = tokenString,
-                Usuario = new
-                {
-                    usuario.Id,
-                    usuario.Email,
-                    usuario.TipoAutoridad
-                },
-                Profesional = perfilProfesional
-            });
+            throw new InvalidOperationException("Error en el perfil de usuario. Contacte al administrador.");
         }
-        catch (ArgumentException ex)
+
+        _logger.LogInformation("Perfil profesional encontrado para usuario {UserId}", usuario.Id);
+
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
         {
-            _logger.LogWarning("Login fallido: {Message}", ex.Message);
-            return Unauthorized(new ErrorResponse { Message = ex.Message, StatusCode = 401 });
-        }
-        catch (Exception ex)
+            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+            new Claim(ClaimTypes.Email, usuario.Email),
+            new Claim(ClaimTypes.Role, usuario.TipoAutoridad.ToString())
+        };
+
+        if (perfilProfesional != null)
         {
-            _logger.LogError(ex, "Error en login");
-            return StatusCode(500, new ErrorResponse { Message = "Error interno del servidor", StatusCode = 500 });
+            var matricula = (perfilProfesional as dynamic).Matricula;
+            claims.Add(new Claim("Matricula", matricula));
         }
+
+        var token = new JwtSecurityToken(
+            _configuration["Jwt:Issuer"],
+            _configuration["Jwt:Audience"],
+            claims,
+            expires: DateTime.Now.AddHours(4),
+            signingCredentials: credentials);
+
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+        _logger.LogInformation("Usuario autenticado: {Email}", usuario.Email);
+
+        return Ok(new
+        {
+            Token = tokenString,
+            Usuario = new
+            {
+                usuario.Id,
+                usuario.Email,
+                usuario.TipoAutoridad
+            },
+            Profesional = perfilProfesional
+        });
     }
 }
