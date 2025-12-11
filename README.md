@@ -44,7 +44,8 @@ El sistema es una solución Full Stack moderna, separada en Backend (API REST) y
 | Base de Datos       | SQL Server                    |
 | Acceso a Datos      | ADO.NET                       |
 | Seguridad           | JWT + BCrypt                  |
-| Documentación API   | Swagger                       |
+| Mapeo de Objetos    | AutoMapper                    |
+| Documentación API   | Swagger / Scalar              |
 | Validación          | FluentValidation              |
 
 ### Frontend
@@ -64,6 +65,7 @@ El sistema es una solución Full Stack moderna, separada en Backend (API REST) y
 |:--------------------|:------------------------------|
 | Pruebas BDD         | Reqnroll (Gherkin)            |
 | Unit Testing        | xUnit                         |
+| Mocking             | NSubstitute                   |
 | Aserciones          | Fluent Assertions             |
 | CI/CD               | GitHub Actions                |
 
@@ -79,17 +81,22 @@ El sistema sigue una **Arquitectura en Capas (Clean Architecture)** para garanti
 TFI/
 ├── Dominio/              # Entidades, Value Objects, Interfaces
 │   ├── Entidades/        # Paciente, Ingreso, Usuario, Atencion
+│   ├── Enums/            # NivelEmergencia, EstadoIngreso
 │   ├── Interfaces/       # IRepositorioPacientes, IRepositorioUrgencias
 │   └── Validadores/      # ValidadorCUIL, ValidadorEmail
 ├── Aplicacion/           # Servicios de aplicación
 │   ├── Servicios/        # ServicioUrgencias, ServicioAtencion, ServicioPacientes
-│   └── Interfaces/       # IServicioUrgencias, IServicioAtencion
+│   ├── Interfaces/       # IServicioUrgencias, IServicioAtencion, IPasswordHasher
+│   └── DTOs/             # NuevaUrgenciaDto, DatosNuevoPacienteDto
 ├── Infraestructura/      # Acceso a datos
-│   └── Repositorios/     # RepositorioPacientesADO, RepositorioUrgenciasADO
+│   ├── Repositorios/     # RepositorioPacientesADO, RepositorioUrgenciasADO
+│   └── Servicios/        # BCryptPasswordHasher
 ├── Web/                  # API REST
 │   ├── Controllers/      # UrgenciasController, PacientesController, AuthController
 │   ├── DTOs/             # Request/Response objects
 │   ├── Validators/       # FluentValidation validators
+│   ├── Mapping/          # MappingProfile (AutoMapper)
+│   ├── Middleware/       # GlobalExceptionHandler
 │   └── Helpers/          # CuilHelper, JWT configuration
 ├── cliente/              # Frontend React
 │   ├── src/
@@ -115,12 +122,16 @@ Contiene las entidades del negocio, objetos de valor y reglas de negocio puras. 
 - `Usuario`: Credenciales y rol (Médico/Enfermera)
 - `Atencion`: Registro médico del diagnóstico y tratamiento
 
+**Enums:**
+- `NivelEmergencia`: CRITICA, EMERGENCIA, URGENCIA, URGENCIA_MENOR, SIN_URGENCIA
+- `EstadoIngreso`: PENDIENTE, EN_PROCESO, FINALIZADO
+
 **Validadores:**
 - `ValidadorCUIL`: Validación completa con dígito verificador
 - `ValidadorEmail`: Validación de formato de email
 
 #### Aplicación
-Orquesta la lógica de negocio y define los casos de uso del sistema.
+Orquesta la lógica de negocio y define los casos de uso del sistema. Utiliza el **Parameter Object Pattern** para métodos con múltiples parámetros.
 
 **Servicios principales:**
 - `ServicioUrgencias`: Gestión de ingresos y cola de prioridad
@@ -128,24 +139,39 @@ Orquesta la lógica de negocio y define los casos de uso del sistema.
 - `ServicioPacientes`: Búsqueda y registro de pacientes
 - `ServicioAutenticacion`: Login y registro de usuarios
 
-#### Infraestructura
-Implementa el acceso a datos utilizando ADO.NET para comunicarse con SQL Server.
+**DTOs de Aplicación:**
+- `NuevaUrgenciaDto`: Agrupa datos de urgencia + datos opcionales del paciente
+- `DatosNuevoPacienteDto`: Datos anidados del paciente (nombre, domicilio, obra social)
 
-**Características:**
+**Interfaces:**
+- `IPasswordHasher`: Abstracción para operaciones de hashing (implementado por BCryptPasswordHasher)
+
+#### Infraestructura
+Implementa el acceso a datos y servicios externos.
+
+**Repositorios (ADO.NET):**
 - Queries parametrizadas para prevenir SQL Injection
 - Transacciones para operaciones complejas
 - Connection pooling optimizado
 - Manejo robusto de excepciones
 
+**Servicios:**
+- `BCryptPasswordHasher`: Implementación de IPasswordHasher usando BCrypt
+
 #### Web (API)
 Capa de entrada HTTP que expone los endpoints REST.
 
 **Características:**
-- Autenticación JWT
-- Autorización por roles
-- Validación con FluentValidation
-- Documentación interactiva con Scalar
+- Autenticación JWT con claims personalizados
+- Autorización por roles (Médico/Enfermera)
+- Validación automática con FluentValidation
+- Mapeo automático con AutoMapper (`MappingProfile`)
+- Manejo global de excepciones (`GlobalExceptionHandler`)
+- Documentación interactiva con Swagger/Scalar
 - CORS configurado para desarrollo
+
+**Middleware:**
+- `GlobalExceptionHandler`: Centraliza el manejo de errores y mapea excepciones a códigos HTTP apropiados
 
 #### Cliente (Frontend)
 Aplicación React SPA con diseño responsive.
@@ -157,6 +183,35 @@ Aplicación React SPA con diseño responsive.
 - Validación centralizada (cuilHelper)
 - JWT almacenado en localStorage
 - Notificaciones visuales
+
+---
+
+## Patrones de Diseño Implementados
+
+### Parameter Object Pattern
+Utilizado en `ServicioUrgencias.RegistrarUrgencia()` para agrupar 15+ parámetros en un objeto DTO:
+
+```csharp
+// Antes (Code Smell: Long Parameter List)
+void RegistrarUrgencia(string cuil, Enfermera enfermera, string informe, 
+    double temperatura, NivelEmergencia nivel, double frecCardiaca, 
+    double frecRespiratoria, double sistolica, double diastolica, 
+    string? nombrePaciente, string? apellidoPaciente, ...);
+
+// Después (Parameter Object Pattern)
+void RegistrarUrgencia(NuevaUrgenciaDto datos, Enfermera enfermera);
+```
+
+### Dependency Inversion
+- `IPasswordHasher` (Aplicación) → `BCryptPasswordHasher` (Infraestructura)
+- Interfaces de repositorios en Dominio, implementaciones en Infraestructura
+
+### Exception Handler Pattern
+`GlobalExceptionHandler` centraliza el manejo de excepciones:
+- `ArgumentException` → 400 Bad Request
+- `InvalidOperationException` → 409 Conflict
+- `UnauthorizedAccessException` → 401 Unauthorized
+- Otras → 500 Internal Server Error
 
 ---
 
@@ -191,14 +246,6 @@ cd TFI
 1. Navega a la carpeta del proyecto
 2. Doble click en `TFI.sln`
 3. Se abrirá automáticamente en Visual Studio
-
-#### Opción C: Clonar desde Visual Studio
-
-1. Abre Visual Studio 2022
-2. Click en "Clonar un repositorio"
-3. Ingresa la URL: `https://github.com/tu-usuario/TFI.git`
-4. Selecciona la ubicación local
-5. Visual Studio clonará y abrirá la solución automáticamente
 
 ### 1.2 Configurar Visual Studio
 
@@ -257,202 +304,45 @@ Este script crea:
 
 ### 3. Ejecutar el Backend
 
-#### Opción A: Usando Visual Studio (Recomendado)
+#### Desde Visual Studio (Recomendado)
 
 1. En el **Explorador de soluciones**, click derecho en el proyecto **Web**
-2. Selecciona "Establecer como proyecto de inicio" (aparecerá en negrita)
-3. Presiona `F5` o click en el botón de play verde "Iniciar" en la barra superior
-4. Visual Studio compilará y ejecutará la aplicación
-5. Se abrirá automáticamente el navegador con la documentación de Scalar
-
-**Proyecto de inicio correcto:**
-```
-TFI (Solución)
-├── Dominio
-├── Aplicacion
-├── Infraestructura
-├── Web  ← Este debe estar en negrita (proyecto de inicio)
-├── cliente
-└── Tests
-```
-
-#### Opción B: Desde la Consola del Administrador de Paquetes
-
-1. Herramientas > Administrador de paquetes NuGet > Consola del Administrador de paquetes
-2. Asegúrate de que el proyecto predeterminado sea "Web"
-3. Ejecuta: `dotnet run`
+2. Selecciona "Establecer como proyecto de inicio"
+3. Presiona `F5` o click en el botón de play verde
+4. Se abrirá automáticamente el navegador con la documentación de Scalar
 
 La API estará disponible en:
 - **HTTPS:** `https://localhost:5284`
 - **HTTP:** `http://localhost:5285`
 - **Documentación:** `https://localhost:5284/scalar`
 
-#### Ver Logs en Visual Studio
-
-Los logs aparecen en:
-- **Ventana de salida:** Ver > Salida (Ctrl+Alt+O)
-- Selecciona "Mostrar resultados desde: Depuración" en el desplegable
-
-#### Detener la Aplicación
-
-- Presiona `Shift+F5`
-- O click en el botón rojo "Detener" en la barra superior
-
-#### Crear Usuarios
-
-La base de datos no incluye usuarios por defecto. Debes crear usuarios mediante:
-
-1. **Endpoint de registro:** `POST /api/auth/registrar`
-2. **SQL directo:** Insertando en las tablas `Usuarios` y `Doctores`/`Enfermeros`
-
-**Nota:** Las contraseñas se almacenan hasheadas con BCrypt. Tambien se puede registar usuarios ejecutando el frontend en simultaneo.
-
 ### 4. Ejecutar el Frontend
 
-El frontend es una aplicación React separada que debe ejecutarse en una terminal externa.
-
-#### Opción A: Desde Visual Studio - Terminal del Desarrollador
-
-1. En Visual Studio: Ver > Terminal
-2. Navega a la carpeta cliente:
 ```bash
 cd cliente
-```
-
-3. Instala dependencias (solo la primera vez):
-```bash
-npm install
-```
-
-4. Ejecuta el servidor de desarrollo:
-```bash
-npm run dev
-```
-
-#### Opción B: Desde Símbolo del sistema
-
-1. Abre una nueva ventana de CMD o PowerShell
-2. Navega a la carpeta del proyecto:
-```bash
-cd ruta\al\proyecto\TFI\cliente
-```
-
-3. Ejecuta:
-```bash
 npm install
 npm run dev
 ```
 
-La aplicación estará disponible en:
-- **URL:** `http://localhost:5173`
-
-#### Ejecutar Backend y Frontend Simultáneamente
-
-**Flujo de trabajo recomendado:**
-
-1. **En Visual Studio:** 
-   - Presiona `F5` para iniciar el backend
-   - La API correrá en `https://localhost:5284`
-
-2. **En una terminal separada:**
-   - Ejecuta `npm run dev` en la carpeta `cliente`
-   - El frontend correrá en `http://localhost:5173`
-
-3. **Probar la aplicación:**
-   - Abre el navegador en `http://localhost:5173`
-   - El frontend se comunicará automáticamente con el backend
-
-#### Configuración de API
-
-El frontend está configurado para conectarse a `http://localhost:5285` por defecto. Si tu API usa otro puerto, modifica `cliente/src/services/api.js`:
-
-```javascript
-const api = axios.create({
-    baseURL: 'http://localhost:TU_PUERTO'
-});
-```
+La aplicación estará disponible en: `http://localhost:5173`
 
 ---
 
 ## Ejecución de Pruebas
 
-### Pruebas Backend (BDD + Unit Tests)
+### Desde Visual Studio
 
-#### Opción A: Usando el Explorador de Pruebas de Visual Studio
+1. Abre el **Explorador de pruebas:** `Ctrl+E, T`
+2. Click en "Ejecutar todas las pruebas"
 
-1. Abre el **Explorador de pruebas:**
-   - Prueba > Explorador de pruebas
-   - O presiona `Ctrl+E, T`
-
-2. Visual Studio descubrirá automáticamente todas las pruebas
-
-3. Verás la estructura:
-```
-Tests
-├── Features
-│   └── ModuloDeUrgenciasStepDefinitions (BDD Tests)
-└── UnitTests
-    ├── API
-    ├── Aplicacion
-    └── Dominio
-```
-
-4. **Ejecutar pruebas:**
-   - **Ejecutar todas:** Click en el botón "Ejecutar todas las pruebas" (doble play)
-   - **Ejecutar una:** Click derecho en la prueba > Ejecutar
-   - **Debug una prueba:** Click derecho > Depurar
-
-5. **Filtrar pruebas:**
-   - Usa la barra de búsqueda para filtrar por nombre
-   - Click en los íconos de estado (Passed/Failed) para filtrar
-
-#### Opción B: Desde el Editor de Código
-
-Visual Studio muestra indicadores junto a cada método de prueba:
-
-```csharp
-[Fact]                    // ← Verás un ícono verde/rojo aquí
-public void DeberiaValidarCUIL()
-{
-    // Código de la prueba
-}
-```
-
-Click en el ícono para:
-- **Play verde:** Ejecutar la prueba
-- **Bug:** Depurar la prueba
-
-#### Opción C: Desde la Terminal
-
-1. Ver > Terminal
-2. Ejecuta:
+### Desde Terminal
 
 ```bash
 # Todas las pruebas
 dotnet test TFI.sln
 
-# Solo pruebas de un proyecto
-dotnet test Tests/Tests.csproj
-
-# Con verbose para más detalles
-dotnet test TFI.sln --verbosity normal
-```
-
-#### Ver Resultados
-
-Los resultados aparecen en:
-- **Explorador de pruebas:** Vista gráfica con ✓ (passed) y ✗ (failed)
-- **Ventana de salida:** Detalles completos de ejecución
-- **Lista de errores:** Pruebas fallidas con mensajes de error
-
-#### Desde Terminal
-
-```bash
-# Generar reporte de cobertura
-dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-
-# Con reporte HTML
-dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=html
+# Solo pruebas de Urgencias
+dotnet test --filter "FullyQualifiedName~Urgencias"
 ```
 
 ---
@@ -461,10 +351,9 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=html
 
 ### Módulo de Autenticación
 
-**Características:**
 - Login con JWT para roles Médico y Enfermera
 - Registro de nuevos usuarios con validación
-- Contraseñas hasheadas con BCrypt
+- Contraseñas hasheadas con BCrypt (via `IPasswordHasher`)
 - Tokens con expiración configurable
 - Claims personalizados (matrícula, rol)
 
@@ -474,12 +363,10 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=html
 
 ### Módulo de Pacientes
 
-**Características:**
 - Búsqueda de pacientes por CUIL
 - Registro de pacientes nuevos
 - Validación de CUIL con dígito verificador
 - Asociación con obras sociales
-- Historial de ingresos
 
 **Endpoints:**
 - `GET /api/pacientes/{cuil}` - Buscar paciente
@@ -488,45 +375,29 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=html
 
 ### Módulo de Urgencias (Enfermería)
 
-**Características:**
 - Formulario de triage responsive
-- Registro de signos vitales:
-  - Temperatura (°C)
-  - Frecuencia Cardíaca (lpm)
-  - Frecuencia Respiratoria (rpm)
-  - Tensión Arterial (Sistólica/Diastólica)
-- Clasificación de emergencia:
-  - Crítica (Rojo) - Atención inmediata
-  - Emergencia (Naranja) - Máx. 15 min
-  - Urgencia (Amarillo) - Máx. 30 min
-  - Menor (Verde) - Máx. 120 min
-  - Sin Urgencia (Azul) - Máx. 240 min
+- Registro de signos vitales (Temperatura, FC, FR, TA)
+- Clasificación de emergencia con colores
 - Cola de prioridad automática
 - Verificación automática de pacientes existentes
 
 **Endpoints:**
 - `POST /api/urgencias` - Registrar nuevo ingreso
-- `GET /api/urgencias/pendientes` - Obtener cola de espera
+- `GET /api/urgencias/lista-espera` - Obtener cola de espera
 
 ### Módulo de Atención (Médicos)
 
-**Características:**
 - Dashboard en tiempo real
-- Estadísticas de pacientes por nivel
 - Acción "Llamar Siguiente Paciente"
-- Modal con resumen del ingreso:
-  - Datos del paciente
-  - Signos vitales
-  - Informe de enfermería
+- Modal con resumen del ingreso
 - Registro de diagnóstico médico
 - Finalización y alta del paciente
 - Cancelación de atención (devuelve a cola)
 
 **Endpoints:**
-- `GET /api/urgencias/pendientes` - Ver cola de espera
-- `POST /api/urgencias/{cuil}/reclamar` - Reclamar paciente
+- `POST /api/urgencias/reclamar` - Reclamar paciente
 - `POST /api/atenciones` - Registrar atención
-- `POST /api/urgencias/{cuil}/cancelar-atencion` - Cancelar atención
+- `POST /api/urgencias/cancelar/{cuil}` - Cancelar atención
 
 ---
 
@@ -534,53 +405,23 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=html
 
 El proyecto incluye integración continua automática.
 
-### Workflows Configurados
-
 **Backend Tests:** `.github/workflows/backend-tests.yml`
 - Se ejecuta en cada push y pull request
 - Ejecuta todas las pruebas (BDD + Unit)
 - Verifica compilación exitosa
-- Genera reporte de cobertura
+
+---
 
 ## Estructura de Base de Datos
 
 ### Tablas Principales
 
-**Pacientes**
-- CUIL (PK)
-- Nombre, Apellido
-- Fecha de Nacimiento
-- Dirección (Calle, Número, Localidad)
-- Email, Teléfono
-- Obra Social ID, Número de Afiliado
+**Pacientes:** CUIL (PK), Nombre, Apellido, FechaNacimiento, Dirección, Email, Teléfono, ObraSocialId
 
-**Usuarios**
-- Email (PK)
-- Password Hash
-- Nombre, Apellido, DNI, CUIL
-- Matrícula
-- Tipo Autoridad (0 = Médico, 1 = Enfermera)
-- Fecha de Nacimiento, Teléfono
+**Usuarios:** Email (PK), PasswordHash, Nombre, Apellido, Matrícula, TipoAutoridad (0=Médico, 1=Enfermera)
 
-**Ingresos**
-- ID (PK)
-- CUIL Paciente (FK)
-- DNI Enfermera (FK)
-- Fecha Ingreso
-- Nivel Emergencia
-- Estado (Pendiente, En Proceso, Atendido)
-- Signos Vitales (Temp, FC, FR, TA)
-- Informe Enfermera
+**Ingresos:** ID (PK), CUILPaciente (FK), DNIEnfermera (FK), FechaIngreso, NivelEmergencia, Estado, SignosVitales, InformeEnfermera
 
-**Atenciones**
-- ID (PK)
-- Ingreso ID (FK)
-- CUIL Paciente (FK)
-- Matrícula Médico (FK)
-- Fecha Atención
-- Informe Médico
+**Atenciones:** ID (PK), IngresoId (FK), CUILPaciente (FK), MatrículaMédico (FK), FechaAtención, InformeMédico
 
-**Obras Sociales**
-- ID (PK)
-- Nombre
-- Descripción
+**ObrasSociales:** ID (PK), Nombre, Descripción
